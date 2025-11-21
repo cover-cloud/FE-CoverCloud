@@ -3,7 +3,6 @@ import React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { useModalStore } from "../app/store/useModalStore";
-import { Stack } from "@mui/material";
 import { Pagination } from "@mui/material";
 import Grid from "@mui/material/Grid";
 
@@ -11,7 +10,7 @@ import Grid from "@mui/material/Grid";
 import Login from "../components/auth/Login";
 import Modal from "../components/modal/Modal";
 import PostCard from "../components/PostCard";
-
+import Box from "@mui/material/Box";
 import { dummyPosts } from "../data/postData";
 
 export default function Home() {
@@ -33,29 +32,33 @@ export default function Home() {
     router.push(`/?page=${value}`, { scroll: false });
   };
 
+  React.useEffect(() => {
+    const currentPage = Number(searchParams.get("page") || 1);
+    setPage(currentPage);
+  }, [searchParams]);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans ">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32  sm:items-start">
-        {/* 페이지네이션 */}
-        <Stack spacing={2} alignItems="center">
-          <Grid container spacing={2}>
-            {dummyPosts.map((post, idx) => (
-              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={idx}>
-                <PostCard {...post} />
-              </Grid>
-            ))}
+    <Box>
+      <Grid container spacing={2}>
+        {dummyPosts.map((post, idx) => (
+          <Grid size={{ xs: 12, sm: 6, md: 4 }} key={idx}>
+            <PostCard {...post} />
           </Grid>
-          <Pagination
-            count={10}
-            page={page}
-            onChange={handleChange}
-            color="primary"
-          />
-        </Stack>
-        <Modal isOpen={isLoginModalOpen} onClose={modalCloseHandler}>
-          <Login />
-        </Modal>
-      </main>
-    </div>
+        ))}
+      </Grid>
+
+      <Box className="mt-8 flex justify-center">
+        <Pagination
+          count={10}
+          page={page}
+          onChange={handleChange}
+          color="primary"
+        />
+      </Box>
+
+      <Modal isOpen={isLoginModalOpen} onClose={modalCloseHandler}>
+        <Login />
+      </Modal>
+    </Box>
   );
 }

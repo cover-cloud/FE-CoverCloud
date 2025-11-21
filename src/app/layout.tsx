@@ -4,8 +4,9 @@ import "./globals.css";
 import Modal from "../components/modal/Modal";
 import Login from "../components/auth/Login";
 import Header from "../components/Header";
-import QueryProvider from "./providers/QueryProvider";
-import MuiProvider from "./providers/MuiProvider";
+import QueryProvider from "./lib/providers/QueryProvider";
+import MuiProvider from "./lib/providers/MuiProvider";
+import Box from "@mui/material/Box";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,7 +39,11 @@ export default function RootLayout({
         <QueryProvider>
           <MuiProvider>
             <Header />
-            {children}
+            <Box className="bg-zinc-50 font-sans min-h-screen">
+              <main className="max-w-3xl mx-auto py-16 sm:px-6">
+                {children}
+              </main>
+            </Box>
           </MuiProvider>
         </QueryProvider>
       </body>

@@ -1,5 +1,6 @@
 export const dummyPosts = [
   {
+    id: 1,
     imageSrc: "https://via.placeholder.com/150",
     title: "Post Title 1",
     likes: 10,
@@ -8,6 +9,7 @@ export const dummyPosts = [
     genres: "K-pop",
   },
   {
+    id: 2,
     imageSrc: "https://via.placeholder.com/150",
     title: "Post Title 2",
     likes: 5,
@@ -16,6 +18,7 @@ export const dummyPosts = [
     genres: "K-pop",
   },
   {
+    id: 3,
     imageSrc: "https://via.placeholder.com/150",
     title: "Post Title 3",
     likes: 20,
@@ -24,6 +27,7 @@ export const dummyPosts = [
     genres: "Hip-hop",
   },
   {
+    id: 4,
     imageSrc: "https://via.placeholder.com/150",
     title: "Post Title 4",
     likes: 8,
@@ -32,6 +36,7 @@ export const dummyPosts = [
     genres: "J-pop",
   },
   {
+    id: 5,
     imageSrc: "https://via.placeholder.com/150",
     title: "Post Title 5",
     likes: 12,
@@ -40,6 +45,7 @@ export const dummyPosts = [
     genres: "K-pop",
   },
   {
+    id: 6,
     imageSrc: "https://via.placeholder.com/150",
     title: "Post Title 6",
     likes: 7,
@@ -48,6 +54,7 @@ export const dummyPosts = [
     genres: "Pop",
   },
   {
+    id: 7,
     imageSrc: "https://via.placeholder.com/150",
     title: "Post Title 7",
     likes: 15,

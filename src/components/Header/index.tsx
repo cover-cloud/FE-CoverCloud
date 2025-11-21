@@ -2,7 +2,7 @@
 
 import React from "react";
 import Box from "@mui/material/Box";
-import Input from "@mui/material/Input";
+import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import SearchIcon from "@mui/icons-material/Search";
 import { useModalStore } from "../../app/store/useModalStore";
@@ -24,7 +24,7 @@ const Header = () => {
       <Box className="flex items-center justify-between w-[80%] mx-auto h-[97px]">
         <Box>logo</Box>
         <Box>
-          <Input
+          <TextField
             placeholder="Search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}

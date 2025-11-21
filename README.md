@@ -25,3 +25,7 @@ useAuthStore.jsx 파일 생성
 - basic 포스트카드
 - basic 로그인
 - basic 헤더
+
+스포티파이 연동
+
+- Spotify 검색 API 연동
