@@ -14,4 +14,14 @@ QueryProvider.jsx 파일 생성
 
 zustand 적용  
 useAuthStore.jsx 파일 생성
+
 # FE-CoverCloud
+
+# 2025.11.21
+
+- basic 메인페이지
+- basic 모달
+- basic 페이지네이션
+- basic 포스트카드
+- basic 로그인
+- basic 헤더

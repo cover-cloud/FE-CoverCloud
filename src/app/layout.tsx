@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Modal from "../components/modal/Modal";
+import Login from "../components/auth/Login";
+import Header from "../components/Header";
+import QueryProvider from "./providers/QueryProvider";
+import MuiProvider from "./providers/MuiProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,10 +29,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <QueryProvider>
+          <MuiProvider>
+            <Header />
+            {children}
+          </MuiProvider>
+        </QueryProvider>
       </body>
     </html>
   );
