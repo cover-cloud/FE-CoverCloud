@@ -4,7 +4,12 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
   images: {
-    domains: ["via.placeholder.com", "picsum.photos", "source.unsplash.com"], // 허용할 외부 도메인
+    domains: [
+      "via.placeholder.com",
+      "picsum.photos",
+      "source.unsplash.com",
+      "i.scdn.co",
+    ], // 허용할 외부 도메인
   },
 };
 

@@ -9,7 +9,8 @@ const spotifyApi = new SpotifyWebApi({
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const q = searchParams.get("q");
-
+  const offset = parseInt(searchParams.get("offset") || "0");
+  const limit = parseInt(searchParams.get("limit") || "5");
   if (!q) {
     return NextResponse.json({ error: "Missing query param" }, { status: 400 });
   }
@@ -17,8 +18,13 @@ export async function GET(req: Request) {
   try {
     const tokenData = await spotifyApi.clientCredentialsGrant();
     spotifyApi.setAccessToken(tokenData.body["access_token"]);
+    const options = {
+      limit,
+      offset,
+      locale: "ko_KR",
+    };
+    const data = await spotifyApi.search(q, ["track", "artist"], options);
 
-    const data = await spotifyApi.searchTracks(q, { limit: 5 });
     return NextResponse.json(data.body, { status: 200 });
   } catch (err) {
     return NextResponse.json(

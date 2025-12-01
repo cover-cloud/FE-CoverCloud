@@ -35,7 +35,7 @@ const PostCard: React.FC<PostCardProps> = ({
   const imgSrc = imageSrc && imageSrc.trim() !== "" ? imageSrc : DEFAULT_IMAGE;
 
   return (
-    <Link href={`/post/${id}`}>
+    <Link href={`/post/${id}/view`}>
       <Box className="flex flex-col gap-2 w-full">
         <Box className="relative w-full h-40">
           {loading && (

@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Modal from "../components/modal/Modal";
-import Login from "../components/auth/Login";
 import Header from "../components/Header";
 import QueryProvider from "./lib/providers/QueryProvider";
 import MuiProvider from "./lib/providers/MuiProvider";

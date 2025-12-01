@@ -6,6 +6,7 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import SearchIcon from "@mui/icons-material/Search";
 import { useModalStore } from "../../app/store/useModalStore";
+import Link from "next/link";
 
 const Header = () => {
   const openLoginModal = useModalStore((state) => state.openLoginModal);
@@ -22,7 +23,9 @@ const Header = () => {
   return (
     <header>
       <Box className="flex items-center justify-between w-[80%] mx-auto h-[97px]">
-        <Box>logo</Box>
+        <Link href="/">
+          <Box>logo</Box>
+        </Link>
         <Box>
           <TextField
             placeholder="Search"
@@ -33,6 +36,9 @@ const Header = () => {
             <SearchIcon />
           </Button>
         </Box>
+        <Link href="/post/create">
+          <Button variant="outlined">생성</Button>
+        </Link>
         <Box>
           <Button variant="contained" onClick={handleLogin}>
             login

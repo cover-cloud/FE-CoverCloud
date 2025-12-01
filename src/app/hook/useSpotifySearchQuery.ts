@@ -1,15 +1,47 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { SongData } from "../post/components/ItemEditor/type";
 
-export const useSpotifySearchQuery = (query: string, enabled: boolean) => {
-  return useQuery({
-    queryKey: ["spotify-search", query],
-    queryFn: async () => {
-      const res = await fetch(`/api/spotify?q=${encodeURIComponent(query)}`);
-      if (!res.ok) throw new Error("Spotify 검색 실패");
-      return res.json();
+interface SpotifyResponse {
+  tracks: {
+    items: any[];
+  };
+}
+
+export const useSpotifySearchQuery = (searchQuery: string) => {
+  return useInfiniteQuery({
+    queryKey: ["spotify-infinite", searchQuery],
+    queryFn: async ({ pageParam = 0 }) => {
+      const response = await fetch(
+        `/api/spotify?q=${encodeURIComponent(
+          searchQuery
+        )}&offset=${pageParam}&limit=5`
+      );
+
+      if (!response.ok) throw new Error("검색 실패");
+
+      const data: SpotifyResponse = await response.json();
+      const tracks = data.tracks?.items || [];
+
+      const songs: SongData[] = tracks.map((track: any, index: number) => ({
+        key: `${track.id}-${pageParam}-${index}`,
+        songName: track.name,
+        artist: track.artists[0]?.name || "Unknown Artist",
+        albumImage:
+          track.album?.images[2]?.url || track.album?.images[0]?.url || "",
+      }));
+
+      return {
+        songs,
+        nextOffset: pageParam + 5,
+        hasMore: tracks.length === 5,
+      };
     },
-    enabled, // 버튼 눌렀을 때만 실행
+    getNextPageParam: (lastPage) => {
+      return lastPage.hasMore ? lastPage.nextOffset : undefined;
+    },
+    enabled: !!searchQuery.trim(),
+    initialPageParam: 0,
   });
 };

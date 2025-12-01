@@ -7,11 +7,11 @@ import { Pagination } from "@mui/material";
 import Grid from "@mui/material/Grid";
 
 // 컴포넌트
-import Login from "../components/auth/Login";
-import Modal from "../components/modal/Modal";
+
 import PostCard from "../components/PostCard";
 import Box from "@mui/material/Box";
 import { dummyPosts } from "../data/postData";
+import ClientModalRender from "../components/modal/ClientModalRender";
 
 export default function Home() {
   const router = useRouter();
@@ -55,10 +55,7 @@ export default function Home() {
           color="primary"
         />
       </Box>
-
-      <Modal isOpen={isLoginModalOpen} onClose={modalCloseHandler}>
-        <Login />
-      </Modal>
+      <ClientModalRender />
     </Box>
   );
 }
