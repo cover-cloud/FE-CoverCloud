@@ -1,7 +1,10 @@
+"use client";
+
 import React from "react";
 import { Box } from "@mui/material";
 import { getYoutubeVideoId } from "@/app/utils/youtube";
-import ArtistProfile from "@/app/post/components/ArtistProfile";
+import ArtistInfo from "./components/ArtistInfo";
+import CommentSection from "./components/CommentSection";
 
 const PostViewPage = () => {
   const youtubeVideoId = getYoutubeVideoId(
@@ -10,7 +13,15 @@ const PostViewPage = () => {
 
   const genres = "장르";
   const tag = ["태그1", "태그2", "태그3"];
+  const [isMobile, setIsMobile] = React.useState(false);
 
+  React.useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
   return (
     <div>
       <Box className="mt-3">
@@ -49,11 +60,13 @@ const PostViewPage = () => {
             ))}
           </Box>
         </Box>
-        <ArtistProfile
+        <ArtistInfo
           coverArtist="아티스트"
           songName="노래제목"
           albumImage=""
+          isMobile={isMobile}
         />
+        <CommentSection />
       </Box>
     </div>
   );

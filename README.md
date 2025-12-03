@@ -42,3 +42,8 @@ useAuthStore.jsx 파일 생성
 - 아티스트정보 컴포넌트 생성
 - 무한스크롤 구현 (reactQuery의 infiniteQuery 사용) - 클릭시 정보 저장
 - edit, create, view 페이지 구분
+
+# 2025.12.03
+
+-댓글 대댓글 레이아웃 및 스타일링  
+-댓글 컴포넌트 추가 -리액트 아이콘 추가.

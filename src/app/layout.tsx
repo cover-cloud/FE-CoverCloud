@@ -5,6 +5,7 @@ import Header from "../components/Header";
 import QueryProvider from "./lib/providers/QueryProvider";
 import MuiProvider from "./lib/providers/MuiProvider";
 import Box from "@mui/material/Box";
+import ClientModalRender from "../components/modal/ClientModalRender";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,6 +41,7 @@ export default function RootLayout({
             <Box className="bg-zinc-50 font-sans min-h-screen">
               <main className="max-w-3xl mx-auto py-16 sm:px-6">
                 {children}
+                <ClientModalRender />
               </main>
             </Box>
           </MuiProvider>

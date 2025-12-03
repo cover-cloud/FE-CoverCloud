@@ -3,3 +3,6 @@ export type ArtistProfileProps = {
   songName: string;
   albumImage: string;
 };
+export type ArtistProfileMobileProps = ArtistProfileProps & {
+  isMobile: boolean;
+};
