@@ -1,15 +1,18 @@
 import React from "react";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import Image from "next/image";
 import Skeleton from "@mui/material/Skeleton";
 import { CommentData } from "../CommentSection/type";
 import { FaRegComment, FaRegHeart } from "react-icons/fa";
+import CommentInput from "../CommentInput";
 
 interface CommentItemProps extends CommentData {
   depth?: number; // 뎁스 정보 추가
+  onReplySubmit?: (data: string, id: string) => void;
 }
 
 const CommentItem = ({
+  id,
   userAvatarImageUrl,
   userName,
   comment,
@@ -18,6 +21,7 @@ const CommentItem = ({
   updatedAt,
   replies,
   depth = 0,
+  onReplySubmit,
 }: CommentItemProps) => {
   const [isImageLoading, setIsImageLoading] = React.useState(true);
   const [showReplies, setShowReplies] = React.useState(false); // 대댓글 토글 상태
@@ -63,7 +67,7 @@ const CommentItem = ({
                 <Box fontWeight="bold">{userName}</Box>
                 <Box>{createdAt}</Box>
               </Box>
-              <Box>{comment}</Box>
+              <Typography sx={{ whiteSpace: "pre-line" }}>{comment}</Typography>
             </Box>
 
             <Box className="flex gap-2 mt-1">
@@ -71,7 +75,7 @@ const CommentItem = ({
                 <FaRegHeart /> {likes}
               </Box>
 
-              {depth < 1 && replies.length > 0 && (
+              {depth < 1 && (
                 <Box
                   className="flex items-center gap-1 cursor-pointer"
                   onClick={handleToggleReplies} // 클릭 시 토글
@@ -84,13 +88,20 @@ const CommentItem = ({
         </Box>
 
         {/* 대댓글 */}
-        {showReplies && replies.length > 0 && (
-          <Box className="mt-2">
-            {replies.map((reply) => (
-              <CommentItem key={reply.id} {...reply} depth={depth + 1} />
-            ))}
+        {showReplies && (
+          <Box className="mt-2 w-full">
+            <CommentInput
+              onSubmit={(data) => onReplySubmit?.(data, id)}
+              depth={depth + 1}
+            />
           </Box>
         )}
+        {replies.length > 0 &&
+          replies.map((reply) => (
+            <Box key={reply.id}>
+              <CommentItem key={reply.id} {...reply} depth={depth + 1} />
+            </Box>
+          ))}
       </Box>
     </Box>
   );

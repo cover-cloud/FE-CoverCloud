@@ -7,73 +7,113 @@ import "./PostCard.module.css";
 import Box from "@mui/material/Box";
 import router from "next/router";
 import Link from "next/link";
-
-interface PostCardProps {
-  imageSrc?: string;
-  title?: string;
-  likes?: number;
-  date?: string;
-  genres?: string;
-  tag?: string[];
-  id?: number;
-}
+import { FaRegHeart } from "react-icons/fa";
+import { contentData } from "../../app/main/type";
+import { getYoutubeVideoId } from "../../app/utils/youtube";
+import { useTheme } from "@mui/material/styles";
 
 const DEFAULT_IMAGE = "https://via.placeholder.com/150";
 
-const PostCard: React.FC<PostCardProps> = ({
-  imageSrc = DEFAULT_IMAGE,
-  title,
-  likes,
-  date,
-  tag,
-  genres,
-  id,
+const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
+  coverArtist,
+  coverGenre,
+  coverId,
+  coverTitle,
+  createdAt,
+  likeCount,
+  link,
+  musicId,
+  tags,
+  userId,
+  viewCount,
+  isViewer,
 }) => {
-  const [loading, setLoading] = useState(true);
+  const videoId = getYoutubeVideoId(link);
+  const imgSrc = videoId
+    ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+    : DEFAULT_IMAGE;
 
-  // 빈 문자열 체크 추가
-  const imgSrc = imageSrc && imageSrc.trim() !== "" ? imageSrc : DEFAULT_IMAGE;
+  const theme = useTheme();
+  const [loading, setLoading] = useState(true);
+  const [imageSrc, setImageSrc] = useState(imgSrc);
 
   return (
-    <Link href={`/post/${id}/view`}>
-      <Box className="flex flex-col gap-2 w-full">
-        <Box className="relative w-full h-40">
+    <Link href={`/post/${coverId}/view`}>
+      <Box
+        className={` ${isViewer ? "flex" : "flex-col"}`}
+        sx={{
+          padding: "12px 8px 14px 8px",
+          borderRadius: "12px",
+          "&:hover": {
+            backgroundColor: theme.palette.gray.tertiary,
+          },
+        }}
+      >
+        <Box
+          className={`relative flex-shrink-0 ${
+            isViewer ? "w-[148px] h-[107px]" : "w-full h-40"
+          }`}
+        >
           {loading && (
             <Skeleton
               variant="rectangular"
               width="100%"
               height="100%"
               animation="wave"
+              style={{ position: "absolute", inset: 0 }}
             />
           )}
+
           <Image
-            src={imgSrc}
-            alt={title || "Post Image"}
+            src={imageSrc}
+            alt={coverTitle || "Post Image"}
             fill
-            className={`object-cover ${loading ? "hidden" : ""}`}
+            className="object-cover"
             onLoadingComplete={() => setLoading(false)}
+            onError={() => {
+              setImageSrc(DEFAULT_IMAGE);
+              setLoading(false);
+            }}
           />
         </Box>
-        <Box className="flex justify-between items-center">
-          {title && <h3 className="text-sm font-medium">{title}</h3>}
-          {likes !== undefined && (
-            <p className="text-xs text-gray-500">👍 {likes}</p>
-          )}
-          {/* {date && <p className="text-xs text-gray-400">{date}</p>} */}
-        </Box>
-        <Box className="flex gap-2 items-center overflow-hidden min-w-0">
-          <Box className="flex-shrink-0">{genres}</Box>
 
-          <Box className="w-[1px] h-4 bg-black flex-shrink-0" />
-
-          {/* 태그 묶음 */}
-          <Box className="overflow-hidden text-ellipsis whitespace-nowrap min-w-0 flex-1">
-            {tag?.map((t) => (
-              <span key={t} className="text-xs text-black mr-2 underline">
-                #{t}
-              </span>
-            ))}
+        <Box className="flex flex-col flex-1 min-w-0">
+          <Box className="flex justify-between items-center">
+            {coverTitle && (
+              <h3 className="text-sm font-medium">{coverTitle}</h3>
+            )}
+            {!isViewer && (
+              <Box className="flex items-center gap-1">
+                <FaRegHeart /> {likeCount}
+              </Box>
+            )}
           </Box>
+
+          <Box className="flex gap-2 items-center overflow-hidden min-w-0">
+            <Box className="flex-shrink-0">{coverGenre}</Box>
+
+            <Box className="w-[1px] h-4 bg-black flex-shrink-0" />
+
+            {/* 태그 묶음 */}
+            <Box
+              className={`overflow-hidden text-ellipsis whitespace-nowrap min-w-0 flex-1`}
+              sx={{
+                color: theme.palette.genre.primary,
+              }}
+            >
+              {tags?.map((t) => (
+                <span key={t} className="text-xs  mr-2">
+                  #{t}
+                </span>
+              ))}
+            </Box>
+          </Box>
+          {isViewer && (
+            <Box className="flex items-center gap-1">
+              <FaRegHeart />
+              {likeCount}
+            </Box>
+          )}
         </Box>
       </Box>
     </Link>

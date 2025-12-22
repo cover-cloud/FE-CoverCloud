@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
       "picsum.photos",
       "source.unsplash.com",
       "i.scdn.co",
+      "img.youtube.com",
     ], // 허용할 외부 도메인
   },
 };

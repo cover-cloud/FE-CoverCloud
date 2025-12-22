@@ -39,7 +39,7 @@ export default function RootLayout({
           <MuiProvider>
             <Header />
             <Box className="bg-zinc-50 font-sans min-h-screen">
-              <main className="max-w-3xl mx-auto py-16 sm:px-6">
+              <main className="max-w-7xl mx-auto py-16 sm:px-6">
                 {children}
                 <ClientModalRender />
               </main>

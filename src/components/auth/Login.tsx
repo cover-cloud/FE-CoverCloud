@@ -4,20 +4,12 @@ import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 
 const Login = () => {
-  const kakao: any = (window as any).Kakao;
-  React.useEffect(() => {
-    if (kakao && !kakao.isInitialized()) {
-      kakao.init(process.env.NEXT_PUBLIC_KAKAO_JS_KEY!);
-    }
-  }, []);
   const handleLogin = () => {
-    kakao.Auth.login({
-      scope: "profile_nickname,account_email",
-      success: (authObj: any) => console.log(authObj.access_token),
-      fail: (err: any) => console.error(err),
-    });
+    const kakaoLogin = () => {
+      window.location.href = "http://localhost:8080/oauth2/authorization/kakao";
+    };
+    kakaoLogin();
   };
-  console.log("Kakao Key:", process.env.NEXT_PUBLIC_KAKAO_JS_KEY);
   return (
     <div>
       <h1 className="text-2xl font-bold text-center color-black">로그인</h1>

@@ -7,8 +7,10 @@ import Button from "@mui/material/Button";
 import SearchIcon from "@mui/icons-material/Search";
 import { useModalStore } from "../../app/store/useModalStore";
 import Link from "next/link";
+import { useTheme } from "@mui/material/styles";
 
 const Header = () => {
+  const theme = useTheme();
   const openLoginModal = useModalStore((state) => state.openLoginModal);
   const [searchQuery, setSearchQuery] = React.useState("");
 
@@ -24,7 +26,7 @@ const Header = () => {
     <header>
       <Box className="flex items-center justify-between w-[80%] mx-auto h-[97px]">
         <Link href="/">
-          <Box>logo</Box>
+          <Box>CoverCloud</Box>
         </Link>
         <Box>
           <TextField
@@ -37,7 +39,21 @@ const Header = () => {
           </Button>
         </Box>
         <Link href="/post/create">
-          <Button variant="outlined">생성</Button>
+          <Button
+            variant="outlined"
+            sx={{
+              backgroundColor: theme.palette.orange.primary,
+              color: theme.palette.common.white,
+              border: "none",
+              borderRadius: "20px",
+              "&:hover": {
+                backgroundColor: theme.palette.orange.secondary,
+                color: theme.palette.common.black,
+              },
+            }}
+          >
+            곡 추천하기
+          </Button>
         </Link>
         <Box>
           <Button variant="contained" onClick={handleLogin}>

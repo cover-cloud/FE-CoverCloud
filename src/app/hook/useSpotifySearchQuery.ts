@@ -16,7 +16,7 @@ export const useSpotifySearchQuery = (searchQuery: string) => {
       const response = await fetch(
         `/api/spotify?q=${encodeURIComponent(
           searchQuery
-        )}&offset=${pageParam}&limit=5`
+        )}&offset=${pageParam}&limit=10`
       );
 
       if (!response.ok) throw new Error("검색 실패");

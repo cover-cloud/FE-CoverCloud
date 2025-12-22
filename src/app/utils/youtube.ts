@@ -12,3 +12,12 @@ export const getYoutubeVideoId = (url: string): string | null => {
   }
   return null;
 };
+// export const extractYoutubeVideoId = (url: string): string | null => {
+//   if (!url) return null;
+
+//   const match = url.match(
+//     /(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([^?&/]+)/
+//   );
+
+//   return match ? match[1] : null;
+// };

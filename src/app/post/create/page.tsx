@@ -1,4 +1,3 @@
-import React from "react";
 import ItemEditor from "@/app/post/components/ItemEditor";
 
 const page = () => {

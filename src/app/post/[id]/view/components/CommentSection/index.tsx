@@ -2,9 +2,9 @@
 import React from "react";
 import { CommentData } from "./type";
 import { sampleComment, sampleCommentCount } from "./type";
-import { Box, Typography, TextField, Button } from "@mui/material";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { Box, Typography } from "@mui/material";
 import CommentItem from "../CommentItem";
+import CommentInput from "../CommentInput";
 interface CommentFormInput {
   comment: string;
 }
@@ -14,22 +14,53 @@ const CommentSection = () => {
   const [totalCommentCount, setTotalCommentCount] =
     React.useState(sampleCommentCount);
 
-  const { register, handleSubmit, reset, watch } = useForm<CommentFormInput>({
-    defaultValues: { comment: "" },
-  });
-
-  // 대댓글 입력 상태를 댓글 id별로 관리
-  const [replyInputs, setReplyInputs] = React.useState<{
-    [key: string]: string;
-  }>({});
+  const conmmentSubmitHandler = (data: string) => {
+    setCommentsData((prev) => [
+      ...prev,
+      {
+        id: Date.now().toString(),
+        userId: "user_123",
+        createdAt: new Date().toISOString(),
+        updatedAt: "",
+        userAvatarImageUrl: "",
+        userName: "John Doe",
+        comment: data,
+        likes: 0,
+        replies: [],
+      },
+    ]);
+  };
 
   React.useEffect(() => {
     setCommentsData(sampleComment);
   }, []);
 
-  const onSubmit: SubmitHandler<CommentFormInput> = (data) => {
-    console.log("작성된 댓글:", data.comment);
-    reset();
+  const replySubmitHandler = (data: string, parentId: string) => {
+    console.log(data, "epdlxj");
+    setCommentsData((prev) =>
+      prev.map((comment) => {
+        if (comment.id === parentId) {
+          return {
+            ...comment,
+            replies: [
+              ...comment.replies,
+              {
+                id: Date.now().toString(),
+                userId: "user_123",
+                createdAt: new Date().toISOString(),
+                updatedAt: "",
+                userAvatarImageUrl: "",
+                userName: "John Doe",
+                comment: data,
+                likes: 0,
+                replies: [],
+              },
+            ],
+          };
+        }
+        return comment;
+      })
+    );
   };
 
   return (
@@ -39,28 +70,14 @@ const CommentSection = () => {
       <Typography variant="h5" mb={2}>
         댓글 작성
       </Typography>
-      <Box component="form" onSubmit={handleSubmit(onSubmit)} mb={2}>
-        <TextField
-          {...register("comment", { required: true })}
-          label="댓글을 입력하세요"
-          fullWidth
-          multiline
-          minRows={2}
-          maxRows={4}
-        />
-        <Button type="submit" variant="contained" sx={{ mt: 1 }}>
-          작성
-        </Button>
-      </Box>
-      <Box>
-        <Typography variant="body2" color="textSecondary">
-          실시간 입력 값: {watch("comment")}
-        </Typography>
-      </Box>
-
+      <CommentInput onSubmit={conmmentSubmitHandler} />
       <Box className="mt-2">
         {commentsData.map((comment) => (
-          <CommentItem key={comment.id} {...comment} />
+          <CommentItem
+            key={comment.id}
+            {...comment}
+            onReplySubmit={(data) => replySubmitHandler(data, comment.id)}
+          />
         ))}
       </Box>
     </section>

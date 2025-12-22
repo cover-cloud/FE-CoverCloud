@@ -9,11 +9,12 @@ const ArtistProfile = ({
   songName,
   albumImage,
 }: ArtistProfileProps) => {
-  const [isImageLoading, setIsImageLoading] = React.useState(true);
+  const [isImageLoading, setIsImageLoading] = React.useState(false);
+  console.log(albumImage);
   return (
     <Box className="flex gap-2">
       <Box className="relative w-12 h-12 flex-shrink-0">
-        {isImageLoading || albumImage ? (
+        {isImageLoading || !albumImage ? (
           <Skeleton
             variant="rectangular"
             width="100%"
@@ -28,7 +29,7 @@ const ArtistProfile = ({
             sizes="(max-width: 768px) 48px, 52px"
             style={{ objectFit: "cover", borderRadius: 4 }}
             onLoad={() => setIsImageLoading(false)}
-            onError={() => setIsImageLoading(false)}
+            onError={() => setIsImageLoading(true)}
           />
         )}
       </Box>
