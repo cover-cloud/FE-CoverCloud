@@ -10,6 +10,7 @@ declare module "@mui/material/styles" {
       primary: string;
       secondary: string;
       tertiary: string;
+      fourth: string;
     };
     white: {
       primary: string;
@@ -24,6 +25,9 @@ declare module "@mui/material/styles" {
     danger: {
       primary: string;
     };
+    purple: {
+      primary: string;
+    };
   }
 
   interface PaletteOptions {
@@ -35,6 +39,7 @@ declare module "@mui/material/styles" {
       primary: string;
       secondary: string;
       tertiary: string;
+      fourth: string;
     };
     white?: {
       primary: string;
@@ -47,6 +52,9 @@ declare module "@mui/material/styles" {
       secondary: string;
     };
     danger?: {
+      primary: string;
+    };
+    purple?: {
       primary: string;
     };
   }

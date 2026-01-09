@@ -2,20 +2,38 @@ import React from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import Image from "next/image";
 import Skeleton from "@mui/material/Skeleton";
-import { IoIosSend } from "react-icons/io";
+import theme from "@/app/lib/theme";
+import { useCreateComment } from "@/app/api/cover/comment";
+import { useAuthStore } from "@/app/store/useAuthStore";
 
 interface CommentInputProps {
   onSubmit: (data: string) => void;
   depth?: number;
+  id: string;
+  parentId?: string;
 }
 
-const CommentInput = ({ onSubmit, depth = 0 }: CommentInputProps) => {
+const CommentInput = ({
+  onSubmit,
+  depth = 0,
+  id,
+  parentId,
+}: CommentInputProps) => {
   const [comment, setComment] = React.useState("");
-
+  const accessToken = useAuthStore((state) => state.accessToken);
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     if (!comment.trim()) return;
-    console.log(comment);
     e.preventDefault();
+    if (depth > 0) {
+      useCreateComment({
+        comment,
+        coverId: id,
+        parentCommentId: parentId,
+        accessToken,
+      });
+    } else {
+      useCreateComment({ comment, coverId: id, accessToken });
+    }
     onSubmit(comment);
     setComment("");
   };
@@ -62,11 +80,22 @@ const CommentInput = ({ onSubmit, depth = 0 }: CommentInputProps) => {
         />
         <Button
           type="submit"
-          variant="contained"
-          sx={{ mt: 1 }}
+          sx={{
+            mt: 1,
+            backgroundColor: theme.palette.common.black,
+            color: "white",
+            borderRadius: "20px",
+            "&:disabled": {
+              backgroundColor: theme.palette.gray.primary,
+              color: "white",
+            },
+            "&:hover": {
+              backgroundColor: theme.palette.gray.fourth,
+            },
+          }}
           disabled={!comment.trim()}
         >
-          <IoIosSend />
+          <Box className="S3">작성</Box>
         </Button>
       </Box>
     </Box>

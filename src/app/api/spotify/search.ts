@@ -1,9 +1,8 @@
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-const search = async (keyword: string) => {
-  const accessToken = localStorage.getItem("accessToken");
+const search = async (keyword: string, accessToken: string) => {
   const searchResult = await axios.post(
-    `http://localhost:8080/api/music/spotify/search`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/music/spotify/search`,
     { keyword },
     {
       headers: {
@@ -14,10 +13,10 @@ const search = async (keyword: string) => {
   return searchResult.data;
 };
 
-export const useSearchQuery = (keyword: string) => {
+export const useSearchQuery = (keyword: string, accessToken: string) => {
   return useQuery({
     queryKey: ["spotify", keyword],
-    queryFn: () => search(keyword),
+    queryFn: () => search(keyword, accessToken),
     enabled: !!keyword,
   });
 };

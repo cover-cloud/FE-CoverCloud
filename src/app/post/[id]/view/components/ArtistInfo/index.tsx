@@ -5,8 +5,8 @@ import { ArtistProfileMobileProps } from "../../../../components/ArtistProfile/t
 
 const ArtistInfo = ({
   coverArtist = "아티스트",
-  songName = "노래제목",
-  albumImage = "",
+  songTitle = "노래제목",
+  coverUrl = "",
   isMobile = false,
 }: ArtistProfileMobileProps) => {
   const [isArtistInfoOpen, setIsArtistInfoOpen] = React.useState(false);
@@ -14,7 +14,7 @@ const ArtistInfo = ({
     setIsArtistInfoOpen((prev) => !prev);
   };
   return (
-    <section>
+    <section style={{ marginBottom: "20px" }}>
       {isMobile ? (
         <Box>
           <Box className="mt-3" onClick={openArtistInfoHandler}>
@@ -33,16 +33,16 @@ const ArtistInfo = ({
           >
             <ArtistProfile
               coverArtist={coverArtist}
-              songName={songName}
-              albumImage={albumImage}
+              songTitle={songTitle}
+              coverUrl={coverUrl}
             />
           </Box>
         </Box>
       ) : (
         <ArtistProfile
           coverArtist={coverArtist}
-          songName={songName}
-          albumImage={albumImage}
+          songTitle={songTitle}
+          coverUrl={coverUrl}
         />
       )}
     </section>

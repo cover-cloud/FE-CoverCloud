@@ -14,12 +14,13 @@ import theme from "@/app/lib/theme";
 import VideoInputField from "../../[id]/edit/components/VideoInputField";
 import SearchSong from "../../[id]/edit/components/SearchSong";
 import ErrorMessageComponent from "../ErrorMessageComponent";
+import { useAuthStore } from "@/app/store/useAuthStore";
 
 const fields: FormField[] = [
   { key: "title", label: "제목", placeholder: "게시글의 제목을 입력해주세요." },
   { key: "link", label: "링크", placeholder: "링크" },
   {
-    key: "songName",
+    key: "songTitle",
     label: "노래 검색",
     placeholder: "노래 검색",
     hasButton: true,
@@ -38,41 +39,52 @@ const genres = [
 const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
   const params = useParams();
   const router = useRouter();
-  const { control, handleSubmit, watch, setValue } = useForm<FormSchema>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      link: "",
-      songName: "",
-      songNameManual: { songName: "", artist: "" },
-      coverArtist: "",
-      genre: "",
-      title: "",
-      tag: "",
-    },
-  });
+  const songSearchWrapperRef = React.useRef<HTMLDivElement | null>(null);
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const { control, handleSubmit, watch, setValue, formState } =
+    useForm<FormSchema>({
+      resolver: zodResolver(formSchema),
+      defaultValues: {
+        link: "",
+        songTitle: "",
+        selectedSongData: {
+          artist: "",
+          songTitle: "",
+          key: "",
+          coverUrl: "",
+        },
+        coverArtist: "",
+        genre: "",
+        title: "",
+        tag: "",
+      },
+    });
 
   const [isManualInput, setIsManualInput] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
   const [tagError, setTagError] = useState<string>("");
 
   const [isSongSearchFocus, setIsSongSearchFocus] = useState(false);
-  const [selectedSongData, setSelectedSongData] = useState<SongData | null>(
-    null
-  );
-  const [songNameManualError, setSongNameManualError] =
-    useState<boolean>(false);
-  const [songNameError, setSongNameError] = useState<boolean>(false);
+  // const [selectedSongData, setSelectedSongData] = useState<SongData | null>(
+  //   null
+  // );
+
   const link = watch("link");
-  const songName = watch("songName");
+  const songTitle = watch("songTitle");
   const tagInput = watch("tag");
+  const selectedSongData = watch("selectedSongData");
 
   const youtubeVideoId = getYoutubeVideoId(link);
 
   const toggleInputMode = () => {
     setIsManualInput((prev) => !prev);
-    setSelectedSongData(null);
-    setValue("songName", "");
-    setValue("songNameManual", { songName: "", artist: "" });
+    setValue("selectedSongData", {
+      artist: "",
+      songTitle: "",
+      key: "",
+      coverUrl: "",
+    });
+    setValue("songTitle", "");
   };
 
   // 태그 추가
@@ -110,24 +122,19 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
     //   setTagError("태그를 최소 1개 이상 추가해주세요");
     //   return;
     // }
-    console.log("tlfgod");
-    const songNameError = songNameErrorHandler(formData);
-    if (!songNameError) return;
 
     if (mode === "create") {
       const postData: PostData = {
         videoUrl: formData.link,
-        originalTitle:
-          selectedSongData?.songName || formData.songNameManual.songName,
-        originalArtist:
-          selectedSongData?.artist || formData.songNameManual.artist,
+        originalTitle: formData.selectedSongData.songTitle,
+        originalArtist: formData.selectedSongData?.artist,
         coverArtist: formData.coverArtist,
         title: formData.title,
         genre: formData.genre,
         tags: tags,
       };
       try {
-        const createResult = await createPost(postData);
+        const createResult = await createPost(postData, accessToken);
 
         if (createResult.success) {
           router.push("/main");
@@ -142,40 +149,43 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
     setTagError("");
     router.push("/main");
   };
-  const songNameErrorHandler = (formData: FormSchema) => {
-    if (isManualInput && formData.songNameManual.artist.trim() === "") {
-      setSongNameManualError(true);
-      return false;
-    } else if (!isManualInput && formData.songName.trim() === "") {
-      setSongNameError(true);
-      return false;
-    }
-    return true;
-  };
-  const selectSongHandler = (songData: SongData | null) => {
-    setSelectedSongData(songData);
+
+  const selectSongHandler = (
+    songData: SongData & { title: string; spotifyTrackId: string }
+  ) => {
+    setValue("selectedSongData", {
+      key: songData?.spotifyTrackId,
+      artist: songData?.artist,
+      songTitle: songData?.title,
+      coverUrl: songData?.coverUrl,
+    });
     setIsSongSearchFocus(false);
-    setValue("songName", "");
+    setValue("songTitle", "");
   };
 
-  const songNameFocusHandler = (key: string) => {
-    if (key === "songName") {
+  const songTitleFocusHandler = (key: string) => {
+    if (key === "songTitle") {
       setIsSongSearchFocus(true);
     }
   };
 
-  const songNameBlurHandler = (key: string) => {
-    if (key === "songName") {
+  const songTitleBlurHandler = (key: string) => {
+    if (key === "songTitle") {
       setIsSongSearchFocus(false);
     }
   };
-  const songNameManualChangeHandler = (songName: string, artist: string) => {
-    setValue("songNameManual", { songName, artist });
+  const songTitleManualChangeHandler = (songTitle: string, artist: string) => {
+    setValue("selectedSongData", {
+      key: "",
+      artist: artist,
+      songTitle: songTitle,
+      coverUrl: "",
+    });
   };
   const onClickOutside = () => {
-    setIsManualInput(false);
     setIsSongSearchFocus(false);
   };
+
   return (
     <Box
       component="form"
@@ -191,20 +201,17 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
             <Box className="mb-4 relative">
               {/* 레이블과 에러 */}
               <Box className="flex items-center justify-between mb-1">
-                <Box className="flex items-center gap-3">
-                  <Box fontSize={20}>{field.label}</Box>
+                {fieldState.error && (
+                  <ErrorMessageComponent>입력필수</ErrorMessageComponent>
+                )}
 
-                  {(field.key === "songName" && songNameError) ||
-                    (field.key === "songNameManual" && songNameManualError) ||
-                    (fieldState.error && (
-                      <ErrorMessageComponent>
-                        {/* {fieldState.error
-                      ? fieldState.error.message || "입력필수"
-                      : ""} */}
-                        입력필수
-                      </ErrorMessageComponent>
-                    ))}
-                </Box>
+                {/* 노래 검색 전용 에러 */}
+                {field.key === "songTitle" &&
+                  formState.isSubmitted &&
+                  (!selectedSongData.artist || !selectedSongData.songTitle) && (
+                    <ErrorMessageComponent>입력필수</ErrorMessageComponent>
+                  )}
+
                 {field.key === "tag" && (
                   <Button
                     type="button"
@@ -215,9 +222,56 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
                   </Button>
                 )}
               </Box>
+              {field.key === "songTitle" ? (
+                <Box
+                  ref={songSearchWrapperRef}
+                  onFocusCapture={() => {
+                    setIsSongSearchFocus(true);
+                  }}
+                  onBlurCapture={(e) => {
+                    if (
+                      songSearchWrapperRef.current &&
+                      !songSearchWrapperRef.current.contains(
+                        e.relatedTarget as Node
+                      )
+                    ) {
+                      setIsSongSearchFocus(false);
+                    }
+                  }}
+                  className="relative"
+                >
+                  <TextField
+                    placeholder={field.placeholder}
+                    fullWidth
+                    {...controllerField}
+                    slotProps={{
+                      input: {
+                        readOnly: isManualInput,
+                      },
+                    }}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        backgroundColor: theme.palette.gray.secondary,
+                        borderRadius: "15px",
+                        border: "none",
+                      },
+                    }}
+                  />
 
-              {/* 입력 필드 */}
-              {field.key === "genre" ? (
+                  <SearchSong
+                    selectedSongData={selectedSongData}
+                    selectSongHandler={selectSongHandler}
+                    songTitle={songTitle}
+                    isSongSearchFocus={isSongSearchFocus}
+                    toggleInputMode={toggleInputMode}
+                    isManualInput={isManualInput}
+                    songTitleManualChangeHandler={songTitleManualChangeHandler}
+                    onClickOutside={onClickOutside}
+                  />
+                </Box>
+              ) : field.key === "genre" ? (
+                /* 기존 genre 로직 */
+
                 <TextField
                   select
                   fullWidth
@@ -260,7 +314,11 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
                 <TextField
                   placeholder={field.placeholder}
                   fullWidth
-                  disabled={field.key === "songName" && isManualInput}
+                  // slotProps={{
+                  //   input: {
+                  //     readOnly: field.key === "songTitle" && isManualInput,
+                  //   },
+                  // }}
                   sx={{
                     "& .MuiOutlinedInput-root": {
                       backgroundColor: theme.palette.gray.secondary,
@@ -269,7 +327,7 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
                     },
                   }}
                   {...controllerField}
-                  onFocus={() => songNameFocusHandler(field.key)}
+                  onFocus={() => songTitleFocusHandler(field.key)}
                   onKeyDown={(e) =>
                     handleTagKeyDown(field.key, e, controllerField)
                   }
@@ -277,18 +335,18 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
               )}
 
               {/* 노래 검색 컴포넌트 */}
-              {field.key === "songName" && (
+              {/* {field.key === "songTitle" && (
                 <SearchSong
                   selectedSongData={selectedSongData}
                   selectSongHandler={selectSongHandler}
-                  songName={songName}
+                  songTitle={songTitle}
                   isManualInput={isManualInput}
                   isSongSearchFocus={isSongSearchFocus}
                   toggleInputMode={toggleInputMode}
-                  songNameManualChangeHandler={songNameManualChangeHandler}
+                  songTitleManualChangeHandler={songTitleManualChangeHandler}
                   onClickOutside={onClickOutside}
                 />
-              )}
+              )} */}
 
               {/* 태그 렌더링 */}
               {field.key === "tag" && tags.length > 0 && (

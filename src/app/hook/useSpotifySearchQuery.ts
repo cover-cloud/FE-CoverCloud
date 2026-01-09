@@ -26,9 +26,9 @@ export const useSpotifySearchQuery = (searchQuery: string) => {
 
       const songs: SongData[] = tracks.map((track: any, index: number) => ({
         key: `${track.id}-${pageParam}-${index}`,
-        songName: track.name,
+        songTitle: track.name,
         artist: track.artists[0]?.name || "Unknown Artist",
-        albumImage:
+        coverUrl:
           track.album?.images[2]?.url || track.album?.images[0]?.url || "",
       }));
 

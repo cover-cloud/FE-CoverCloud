@@ -1,19 +1,43 @@
 "use client";
-import React from "react";
-import { CommentData } from "./type";
-import { sampleComment, sampleCommentCount } from "./type";
+import React, { useEffect } from "react";
+import { CommentData, CommentListData } from "./type";
+import { sampleCommentCount } from "./type";
 import { Box, Typography } from "@mui/material";
 import CommentItem from "../CommentItem";
 import CommentInput from "../CommentInput";
+import { useCommentListQuery } from "@/app/api/cover/comment";
 interface CommentFormInput {
   comment: string;
 }
 
-const CommentSection = () => {
+const CommentSection = ({ id }: { id: string }) => {
   const [commentsData, setCommentsData] = React.useState<CommentData[]>([]);
   const [totalCommentCount, setTotalCommentCount] =
     React.useState(sampleCommentCount);
 
+  const { data: commentList } = useCommentListQuery(id);
+  console.log(commentList);
+  useEffect(() => {
+    if (!commentList?.data) {
+      setCommentsData([]);
+      return;
+    }
+    const comments = commentList.data.map((comment: CommentListData) => ({
+      id: comment.commentId.toString(),
+      userId: comment.userId.toString(),
+      createdAt: new Date().toISOString(), // 서버에서 없으면 임시
+      updatedAt: "",
+      userAvatarImageUrl: "",
+      userName: "John Doe", // 서버 없으면 임시
+      comment: comment.content,
+      likes: 0,
+      replies: comment.replies ?? [],
+    }));
+    setCommentsData(comments);
+  }, [commentList]);
+  useEffect(() => {
+    console.log(commentsData, "eㅔ이터");
+  }, [commentsData]);
   const conmmentSubmitHandler = (data: string) => {
     setCommentsData((prev) => [
       ...prev,
@@ -30,11 +54,13 @@ const CommentSection = () => {
       },
     ]);
   };
+  const [selectedCommentId, setSelectedCommentId] = React.useState<
+    string | null
+  >(null);
 
-  React.useEffect(() => {
-    setCommentsData(sampleComment);
-  }, []);
-
+  const openCommentInputHandler = (id: string) => {
+    setSelectedCommentId(selectedCommentId === id ? null : id);
+  };
   const replySubmitHandler = (data: string, parentId: string) => {
     console.log(data, "epdlxj");
     setCommentsData((prev) =>
@@ -65,20 +91,22 @@ const CommentSection = () => {
 
   return (
     <section>
-      <Typography variant="h4">댓글 {totalCommentCount}</Typography>
+      <Box className="H2">댓글 {totalCommentCount}</Box>
 
-      <Typography variant="h5" mb={2}>
-        댓글 작성
-      </Typography>
-      <CommentInput onSubmit={conmmentSubmitHandler} />
+      <CommentInput onSubmit={conmmentSubmitHandler} id={id} />
       <Box className="mt-2">
-        {commentsData.map((comment) => (
-          <CommentItem
-            key={comment.id}
-            {...comment}
-            onReplySubmit={(data) => replySubmitHandler(data, comment.id)}
-          />
-        ))}
+        {commentsData.length > 0
+          ? commentsData.map((comment: CommentData) => (
+              <CommentItem
+                key={comment.id}
+                parentId={id}
+                {...comment}
+                onReplySubmit={(data) => replySubmitHandler(data, comment.id)}
+                openCommentInputHandler={openCommentInputHandler}
+                openCmmentInput={selectedCommentId === comment.id}
+              />
+            ))
+          : null}
       </Box>
     </section>
   );

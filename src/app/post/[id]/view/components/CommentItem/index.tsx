@@ -1,14 +1,19 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import Image from "next/image";
 import Skeleton from "@mui/material/Skeleton";
 import { CommentData } from "../CommentSection/type";
-import { FaRegComment, FaRegHeart } from "react-icons/fa";
+import { FaComment, FaHeart, FaRegComment, FaRegHeart } from "react-icons/fa";
+import { FaArrowTurnDown, FaArrowTurnUp } from "react-icons/fa6";
 import CommentInput from "../CommentInput";
+import theme from "@/app/lib/theme";
 
 interface CommentItemProps extends CommentData {
   depth?: number; // 뎁스 정보 추가
   onReplySubmit?: (data: string, id: string) => void;
+  openCmmentInput?: boolean;
+  openCommentInputHandler?: (id: string) => void;
+  parentId?: string;
 }
 
 const CommentItem = ({
@@ -18,24 +23,29 @@ const CommentItem = ({
   comment,
   likes,
   createdAt,
-  updatedAt,
+  parentId,
   replies,
   depth = 0,
   onReplySubmit,
+  openCmmentInput,
+  openCommentInputHandler,
 }: CommentItemProps) => {
   const [isImageLoading, setIsImageLoading] = React.useState(true);
-  const [showReplies, setShowReplies] = React.useState(false); // 대댓글 토글 상태
 
+  const [liked, setLiked] = React.useState(false);
   const size = Math.max(48 - depth * 12, 24);
 
-  const handleToggleReplies = () => {
-    setShowReplies((prev) => !prev);
-  };
-
   return (
-    <Box className={`mb-2`} ml={depth * 4}>
+    <Box className={`mb-2`} ml={depth * 2}>
       <Box className="flex gap-2 items-start flex-col">
         <Box className="flex gap-2">
+          {depth > 0 && (
+            <Box>
+              <Box className="rotate-90 transform mt-3">
+                <FaArrowTurnUp size={16} />
+              </Box>
+            </Box>
+          )}
           <Box
             className="relative flex-shrink-0 rounded-full overflow-hidden"
             width={size}
@@ -71,28 +81,44 @@ const CommentItem = ({
             </Box>
 
             <Box className="flex gap-2 mt-1">
-              <Box className="flex items-center gap-1">
-                <FaRegHeart /> {likes}
-              </Box>
+              <Button
+                className="flex items-center gap-1 cursor-pointer"
+                sx={{
+                  "&:hover": {
+                    backgroundColor: theme.palette.gray.secondary,
+                  },
+                }}
+                onClick={() => setLiked(!liked)}
+              >
+                {liked ? <FaHeart /> : <FaRegHeart />} {likes}
+              </Button>
 
               {depth < 1 && (
-                <Box
+                <Button
                   className="flex items-center gap-1 cursor-pointer"
-                  onClick={handleToggleReplies} // 클릭 시 토글
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: theme.palette.gray.secondary,
+                    },
+                  }}
+                  onClick={() => openCommentInputHandler?.(id)} // 클릭 시 토글
                 >
-                  <FaRegComment /> {replies.length}
-                </Box>
+                  {openCmmentInput ? <FaComment /> : <FaRegComment />}{" "}
+                  {replies.length}
+                </Button>
               )}
             </Box>
           </Box>
         </Box>
 
         {/* 대댓글 */}
-        {showReplies && (
+        {openCmmentInput && (
           <Box className="mt-2 w-full">
             <CommentInput
               onSubmit={(data) => onReplySubmit?.(data, id)}
               depth={depth + 1}
+              id={id}
+              parentId={parentId}
             />
           </Box>
         )}

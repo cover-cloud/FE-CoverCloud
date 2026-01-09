@@ -24,3 +24,60 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.H1 {
+  font-size: 24px;
+  font-weight: 700;
+}
+.H2 {
+  font-size: 20px;
+  font-weight: 400;
+}
+.H3 {
+  font-size: 18px;
+  font-weight: 800;
+}
+.S1 {
+  font-size: 20px;
+  font-weight: 700;
+}
+.S2 {
+  font-size: 20px;
+  font-weight: 600;
+}
+.S3 {
+  font-size: 16px;
+  font-weight: 700;
+}
+.S4 {
+  font-size: 16px;
+  font-weight: 600;
+}
+.B1 {
+  font-size: 20px;
+  font-weight: 400;
+}
+.B2 {
+  font-size: 16px;
+  font-weight: 500;
+}
+.B3 {
+  font-size: 16px;
+  font-weight: 400;
+}
+.C1 {
+  font-size: 14px;
+  font-weight: 500;
+}
+.C2 {
+  font-size: 14px;
+  font-weight: 400;
+}
+.C3 {
+  font-size: 12px;
+  font-weight: 500;
+}
+.C4 {
+  font-size: 12px;
+  font-weight: 700;
+}

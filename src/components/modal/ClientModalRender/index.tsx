@@ -9,7 +9,11 @@ const ClientModalRender = () => {
     closeLoginModal();
   };
   return (
-    <Modal isOpen={isLoginModalOpen} onClose={modalCloseHandler}>
+    <Modal
+      isOpen={isLoginModalOpen}
+      onClose={modalCloseHandler}
+      width={"672px"}
+    >
       <Login />
     </Modal>
   );

@@ -53,6 +53,7 @@ const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
           className={`relative flex-shrink-0 ${
             isViewer ? "w-[148px] h-[107px]" : "w-full h-40"
           }`}
+          sx={{ zIndex: 10 }}
         >
           {loading && (
             <Skeleton
@@ -68,8 +69,10 @@ const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
             src={imageSrc}
             alt={coverTitle || "Post Image"}
             fill
+            sizes={isViewer ? "148px" : "(max-width: 768px) 100vw, 33vw"}
             className="object-cover"
-            onLoadingComplete={() => setLoading(false)}
+            loading="eager"
+            onLoad={() => setLoading(false)}
             onError={() => {
               setImageSrc(DEFAULT_IMAGE);
               setLoading(false);

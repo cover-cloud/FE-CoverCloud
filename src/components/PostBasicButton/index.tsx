@@ -1,33 +1,43 @@
 import theme from "@/app/lib/theme";
-import { Button } from "@mui/material";
+import { Box, Button } from "@mui/material";
 
 const PostBasicButton = ({
   children,
   onClick,
   color,
   backgroundColor,
+  hoverBGColor,
   hoverColor,
+  sxStyle,
+  postRadius = "15px",
+  postClass = "",
 }: {
   children: string;
   onClick: () => void;
   color?: string;
   backgroundColor?: string;
+  hoverBGColor?: string;
   hoverColor?: string;
+  postRadius?: string;
+  sxStyle?: React.CSSProperties;
+  postClass?: string;
 }) => {
   return (
     <Button
       sx={{
         padding: "8px 28px",
-        borderRadius: "15px",
+        borderRadius: postRadius,
         backgroundColor: backgroundColor,
         color: color,
         "&:hover": {
-          backgroundColor: hoverColor,
+          backgroundColor: hoverBGColor,
+          color: hoverColor,
         },
+        ...sxStyle,
       }}
       onClick={onClick}
     >
-      {children}
+      <Box className={postClass}>{children}</Box>
     </Button>
   );
 };

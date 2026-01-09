@@ -11,10 +11,9 @@ export type PostData = {
   tags?: string[];
 };
 
-export const createPost = async (postData: PostData) => {
-  const accessToken = localStorage.getItem("accessToken");
+export const createPost = async (postData: PostData, accessToken: string) => {
   const res = await axios.post(
-    "http://localhost:8080/api/cover/create",
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cover/create`,
     postData,
     {
       headers: {
@@ -25,10 +24,13 @@ export const createPost = async (postData: PostData) => {
   return res.data;
 };
 
-export const updatePost = async (coverId: string, postData: PostData) => {
-  const accessToken = localStorage.getItem("accessToken");
+export const updatePost = async (
+  coverId: string,
+  postData: PostData,
+  accessToken: string
+) => {
   const res = await axios.post(
-    `http://localhost:8080/api/cover/update?coverId=${coverId}`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cover/update?coverId=${coverId}`,
     postData,
     {
       headers: {
@@ -39,10 +41,12 @@ export const updatePost = async (coverId: string, postData: PostData) => {
   return res.data;
 };
 
-export const deletePost = async (coverId: string | string[]) => {
-  const accessToken = localStorage.getItem("accessToken");
+export const deletePost = async (
+  coverId: string | string[],
+  accessToken: string
+) => {
   const res = await axios.post(
-    `http://localhost:8080/api/cover/delete?coverId=${coverId}`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cover/delete?coverId=${coverId}`,
     null,
     {
       headers: {
@@ -51,4 +55,18 @@ export const deletePost = async (coverId: string | string[]) => {
     }
   );
   return res.data;
+};
+
+export const readingPost = async (coverId: string, accessToken: string) => {
+  const res = await axios.get(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cover/list/${coverId}`
+  );
+  return res;
+};
+export const useReadingPost = (coverId: string, accessToken: string) => {
+  return useQuery({
+    queryKey: ["readingPost", coverId],
+    queryFn: () => readingPost(coverId, accessToken),
+    enabled: !!coverId,
+  });
 };

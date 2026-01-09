@@ -15,6 +15,7 @@ const theme = createTheme({
       primary: "#666666",
       secondary: "#DDDDDD",
       tertiary: "#F2F2F2",
+      fourth: "#484848",
     },
 
     common: {
@@ -27,6 +28,9 @@ const theme = createTheme({
     },
     danger: {
       primary: "#FEE9E7",
+    },
+    purple: {
+      primary: "#8385EF",
     },
   },
 });

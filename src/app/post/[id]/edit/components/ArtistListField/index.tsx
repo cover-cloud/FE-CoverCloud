@@ -6,28 +6,31 @@ import { useSpotifySearchQuery } from "@/app/hook/useSpotifySearchQuery";
 import theme from "@/app/lib/theme";
 import PostBasicButton from "@/components/PostBasicButton";
 import { useSearchQuery } from "@/app/api/spotify/search";
+import { useAuthStore } from "@/app/store/useAuthStore";
 
 const ArtistListField = ({
-  searchSongName,
+  searchsongTitle,
   selectedSongData,
   setSelectedSongData,
   isSongSearchFocus,
   isManualInput,
   toggleInputMode,
-  songNameManualChangeHandler,
+  songTitleManualChangeHandler,
 }: {
-  searchSongName: string;
-  selectedSongData: SongData | null;
-  setSelectedSongData: (songData: SongData | null) => void;
+  searchsongTitle: string;
+  selectedSongData: SongData;
+  setSelectedSongData: (
+    songData: SongData & { title: string; spotifyTrackId: string }
+  ) => void;
   isSongSearchFocus: boolean;
   isManualInput: boolean;
   toggleInputMode: () => void;
-  songNameManualChangeHandler: (songName: string, artist: string) => void;
+  songTitleManualChangeHandler: (songTitle: string, artist: string) => void;
 }) => {
   // const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-  //   useSpotifySearchQuery(searchSongName);
-
-  const { data, isLoading } = useSearchQuery(searchSongName);
+  //   useSpotifySearchQuery(searchsongTitle);
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const { data, isLoading } = useSearchQuery(searchsongTitle, accessToken);
   const observer = useRef<IntersectionObserver | null>(null);
 
   // const lastSongRef = (node: HTMLDivElement | null) => {
@@ -44,16 +47,20 @@ const ArtistListField = ({
   // };
 
   // 모든 페이지의 songs를 flat하게 합치기
-  const allSongs = data?.pages.flatMap((page: any) => page.songs) || [];
+  // const allSongs = data?.pages.flatMap((page: any) => page.songs) || [];
 
-  const [songName, setSongName] = React.useState("");
+  const [songTitle, setsongTitle] = React.useState("");
   const [artist, setArtist] = React.useState("");
 
   React.useEffect(() => {
-    songNameManualChangeHandler(songName, artist);
-  }, [songName, artist]);
-
-  // if (!searchSongName.trim()) return null;
+    songTitleManualChangeHandler(songTitle, artist);
+  }, [songTitle, artist]);
+  const toggleInputHandler = () => {
+    setArtist("");
+    setsongTitle("");
+    toggleInputMode();
+  };
+  // if (!searchsongTitle.trim()) return null;
   if (!isSongSearchFocus) return null;
 
   const manualStyle = {
@@ -78,21 +85,21 @@ const ArtistListField = ({
         }}
         className="flex flex-col gap-2 rounded p-2"
       >
-        {!isManualInput || allSongs.length > 0 ? (
-          allSongs.map((song: any, index: any) => {
-            const isLast = index === allSongs.length - 1;
+        {!isManualInput || data?.length > 0 ? (
+          data?.map((song: any, index: any) => {
+            const isLast = index === data?.length - 1;
 
             return (
               <Box
                 // ref={isLast ? lastSongRef : null}
-                key={song.key}
+                key={song.spotifyTrackId}
                 onClick={() => setSelectedSongData(song)}
                 className="cursor-pointer"
               >
                 <ArtistProfile
                   coverArtist={song.artist}
-                  songName={song.songName}
-                  albumImage={song.albumImage}
+                  songTitle={song.title}
+                  coverUrl={song.coverUrl}
                 />
               </Box>
             );
@@ -105,8 +112,8 @@ const ArtistListField = ({
                 placeholder="원곡 제목"
                 variant="outlined"
                 sx={manualStyle}
-                value={songName}
-                onChange={(e) => setSongName(e.target.value)}
+                value={songTitle}
+                onChange={(e) => setsongTitle(e.target.value)}
               />
             </Box>
             <Box className="w-full mb-2">
@@ -130,7 +137,7 @@ const ArtistListField = ({
           </p>
         )} */}
 
-        {allSongs.length === 0 && !isManualInput && (
+        {!isManualInput && (
           <Box
             className="flex items-center justify-center"
             sx={{
@@ -140,7 +147,13 @@ const ArtistListField = ({
             }}
           >
             <Typography>
-              {isLoading ? "검색 중..." : "커버곡의 원곡 정보를 검색해주세요"}
+              {searchsongTitle === ""
+                ? "커버곡의 원곡 정보를 검색해주세요"
+                : isLoading
+                ? "검색 중..."
+                : data?.length === 0
+                ? `"${searchsongTitle}" 의 검색 결과가 없습니다.`
+                : ""}
             </Typography>
           </Box>
         )}
@@ -184,9 +197,9 @@ const ArtistListField = ({
             <PostBasicButton
               backgroundColor={theme.palette.common.black}
               color={theme.palette.common.white}
-              onClick={() => {
-                toggleInputMode();
-              }}
+              hoverBGColor={theme.palette.gray.secondary}
+              hoverColor={theme.palette.common.black}
+              onClick={toggleInputHandler}
             >
               {isManualInput ? "돌아가기" : "직접입력"}
             </PostBasicButton>

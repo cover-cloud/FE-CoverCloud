@@ -6,6 +6,9 @@ import QueryProvider from "./lib/providers/QueryProvider";
 import MuiProvider from "./lib/providers/MuiProvider";
 import Box from "@mui/material/Box";
 import ClientModalRender from "../components/modal/ClientModalRender";
+import Footer from "../components/Footer";
+import AuthInit from "@/components/auth/AuthInit";
+import GlobalSnackbar from "@/components/GlobalSnackbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,15 +39,20 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <QueryProvider>
-          <MuiProvider>
-            <Header />
-            <Box className="bg-zinc-50 font-sans min-h-screen">
-              <main className="max-w-7xl mx-auto py-16 sm:px-6">
-                {children}
-                <ClientModalRender />
-              </main>
-            </Box>
-          </MuiProvider>
+          <AuthInit>
+            <MuiProvider>
+              <Header />
+              <Box className="bg-zinc-50 font-sans min-h-screen">
+                <main className="max-w-7xl mx-auto py-16 sm:px-6">
+                  {children}
+
+                  <ClientModalRender />
+                </main>
+                <Footer />
+              </Box>
+              <GlobalSnackbar />
+            </MuiProvider>
+          </AuthInit>
         </QueryProvider>
       </body>
     </html>

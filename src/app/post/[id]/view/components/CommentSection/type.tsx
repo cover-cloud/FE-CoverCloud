@@ -9,6 +9,14 @@ export type CommentData = {
   likes: number;
   replies: CommentData[];
 };
+export type CommentListData = {
+  commentId: number;
+  content: string;
+  coverId: number;
+  userId: number;
+  parentCommentId: number | null;
+  replies: CommentListData[];
+};
 
 export const sampleComment: CommentData[] = [
   {

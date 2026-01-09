@@ -2,25 +2,24 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/app/store/useAuthStore";
+import axios from "axios";
+import { useSearchParams } from "next/navigation";
+import { useSnackbarStore } from "@/app/store/useSnackbar";
+
 const CallbackPage = () => {
   const router = useRouter();
 
+  const searchParams = useSearchParams();
+  const token = searchParams.get("accessToken");
   React.useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-
-    const accessToken = params.get("accessToken");
-    const refreshToken = params.get("refreshToken");
-
-    if (!accessToken || !refreshToken) {
-      console.error("토큰 없음");
-      return;
-    }
-
-    // ✅ 토큰 저장
-    localStorage.setItem("accessToken", accessToken);
-    localStorage.setItem("refreshToken", refreshToken);
     // localStorage.setItem("isLogin", "true");
-    useAuthStore.setState({ isLogin: true });
+    if (token) {
+      useAuthStore.setState({ isLogin: true });
+      useAuthStore.setState({ accessToken: token });
+      useSnackbarStore.getState().show("로그인되었습니다.", "success");
+    } else {
+      useSnackbarStore.getState().show("로그인에 실패했습니다.", "error");
+    }
     // 필요하면 axios 기본 헤더 설정
     // axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
 
