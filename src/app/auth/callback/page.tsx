@@ -4,7 +4,9 @@ import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { completeLogin } from "@/app/utils/auth.service";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
+
 export const dynamic = "force-dynamic";
+
 export default function CallbackPage() {
   const router = useRouter();
   const params = useSearchParams();

@@ -16,7 +16,7 @@ import { useAuthMeQuery } from "../../app/api/auth/authMe";
 import { useAuthStore } from "../../app/store/useAuthStore";
 import InfoMessage from "@/components/InfoMessage";
 import { Period } from "@/app/api/cover/list";
-
+export const dynamic = "force-dynamic";
 type PopularTab = {
   title: string;
   value: number;

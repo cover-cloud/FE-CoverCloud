@@ -8,7 +8,7 @@ import { contentData } from "@/app/main/type";
 import PostCard from "@/components/PostCard";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useMyCoverListQuery } from "@/app/api/mypage/myCoverList";
-
+export const dynamic = "force-dynamic";
 const ActivityPage = () => {
   const searchParams = useSearchParams();
   const router = useRouter();

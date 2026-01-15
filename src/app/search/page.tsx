@@ -7,7 +7,7 @@ import InfoMessage from "@/components/InfoMessage";
 import { contentData } from "@/app/main/type";
 import { usePopularCoverListQuery } from "@/app/api/cover/list";
 import { useSearchParams } from "next/navigation";
-
+export const dynamic = "force-dynamic";
 const searchPage = () => {
   const searchParams = useSearchParams();
   const query = searchParams.get("q");
