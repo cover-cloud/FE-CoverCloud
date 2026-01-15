@@ -1,3 +1,4 @@
+import { useAuthStore } from "@/app/store/useAuthStore";
 import axios from "axios";
 
 export const logout = async (accessToken: string) => {
@@ -11,5 +12,11 @@ export const logout = async (accessToken: string) => {
       },
     }
   );
+  useAuthStore.setState({
+    accessToken: undefined,
+    userId: undefined,
+    isLogin: false,
+  });
+
   return response;
 };

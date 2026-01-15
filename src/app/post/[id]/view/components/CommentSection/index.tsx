@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect } from "react";
-import { CommentData, CommentListData } from "./type";
-import { sampleCommentCount } from "./type";
+import { CommentListData } from "./type";
 import { Box, Typography } from "@mui/material";
 import CommentItem from "../CommentItem";
 import CommentInput from "../CommentInput";
@@ -10,10 +9,9 @@ interface CommentFormInput {
   comment: string;
 }
 
-const CommentSection = ({ id }: { id: string }) => {
-  const [commentsData, setCommentsData] = React.useState<CommentData[]>([]);
-  const [totalCommentCount, setTotalCommentCount] =
-    React.useState(sampleCommentCount);
+const CommentSection = ({ id }: { id: number }) => {
+  const [commentsData, setCommentsData] = React.useState<CommentListData[]>([]);
+  const [totalCommentCount, setTotalCommentCount] = React.useState(0);
 
   const { data: commentList } = useCommentListQuery(id);
   console.log(commentList);
@@ -23,14 +21,12 @@ const CommentSection = ({ id }: { id: string }) => {
       return;
     }
     const comments = commentList.data.map((comment: CommentListData) => ({
-      id: comment.commentId.toString(),
-      userId: comment.userId.toString(),
+      coverId: comment.coverId,
+      commentId: comment.commentId,
+      userId: comment.userId,
       createdAt: new Date().toISOString(), // 서버에서 없으면 임시
-      updatedAt: "",
-      userAvatarImageUrl: "",
-      userName: "John Doe", // 서버 없으면 임시
-      comment: comment.content,
-      likes: 0,
+      parentCommentId: comment.parentCommentId ?? null,
+      content: comment.content,
       replies: comment.replies ?? [],
     }));
     setCommentsData(comments);
@@ -39,54 +35,48 @@ const CommentSection = ({ id }: { id: string }) => {
     console.log(commentsData, "eㅔ이터");
   }, [commentsData]);
   const conmmentSubmitHandler = (data: string) => {
-    setCommentsData((prev) => [
-      ...prev,
-      {
-        id: Date.now().toString(),
-        userId: "user_123",
-        createdAt: new Date().toISOString(),
-        updatedAt: "",
-        userAvatarImageUrl: "",
-        userName: "John Doe",
-        comment: data,
-        likes: 0,
-        replies: [],
-      },
-    ]);
+    // setCommentsData((prev) => [
+    //   ...prev,
+    //   {
+    //     coverId: prev[prev.length - 1]?.coverId + 1 || 0,
+    //     userId: prev[prev.length - 1]?.userId + 1 || 0,
+    //     commentId: prev.length + 1,
+    //     createdAt: new Date().toISOString(),
+    //     parentCommentId: null,
+    //     content: data,
+    //     replies: [],
+    //   },
+    // ]);
   };
   const [selectedCommentId, setSelectedCommentId] = React.useState<
-    string | null
+    number | null
   >(null);
 
-  const openCommentInputHandler = (id: string) => {
+  const openCommentInputHandler = (id: number) => {
     setSelectedCommentId(selectedCommentId === id ? null : id);
   };
-  const replySubmitHandler = (data: string, parentId: string) => {
-    console.log(data, "epdlxj");
-    setCommentsData((prev) =>
-      prev.map((comment) => {
-        if (comment.id === parentId) {
-          return {
-            ...comment,
-            replies: [
-              ...comment.replies,
-              {
-                id: Date.now().toString(),
-                userId: "user_123",
-                createdAt: new Date().toISOString(),
-                updatedAt: "",
-                userAvatarImageUrl: "",
-                userName: "John Doe",
-                comment: data,
-                likes: 0,
-                replies: [],
-              },
-            ],
-          };
-        }
-        return comment;
-      })
-    );
+  const replySubmitHandler = (data: string, parentId: number) => {
+    // setCommentsData((prev) =>
+    //   prev.map((comment: CommentListData) => {
+    //     if (comment.commentId === parentId) {
+    //       return {
+    //         ...comment,
+    //         replies: [
+    //           ...comment.replies,
+    //           {
+    //             commentId: comment.replies.length + 1,
+    //             content: data,
+    //             coverId: 0,
+    //             userId: 0,
+    //             parentCommentId: null,
+    //             replies: [],
+    //           },
+    //         ],
+    //       };
+    //     }
+    //     return comment;
+    //   })
+    // );
   };
 
   return (
@@ -96,14 +86,15 @@ const CommentSection = ({ id }: { id: string }) => {
       <CommentInput onSubmit={conmmentSubmitHandler} id={id} />
       <Box className="mt-2">
         {commentsData.length > 0
-          ? commentsData.map((comment: CommentData) => (
+          ? commentsData.map((comment: CommentListData) => (
               <CommentItem
-                key={comment.id}
-                parentId={id}
+                key={comment.commentId}
                 {...comment}
-                onReplySubmit={(data) => replySubmitHandler(data, comment.id)}
+                onReplySubmit={(data) =>
+                  replySubmitHandler(data, comment.commentId)
+                }
                 openCommentInputHandler={openCommentInputHandler}
-                openCmmentInput={selectedCommentId === comment.id}
+                openCmmentInput={selectedCommentId === comment.commentId}
               />
             ))
           : null}

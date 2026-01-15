@@ -1,34 +1,92 @@
+"use client";
 import React from "react";
-import { Box, Tabs, Tab } from "@mui/material";
+import { Box, Tabs, Tab, Button } from "@mui/material";
 import { dummyPosts } from "@/data/postData";
 import PostCard from "@/components/PostCard";
+import { Period, usePopularCoverListQuery } from "@/app/api/cover/list";
+import theme from "@/app/lib/theme";
+import { contentData } from "@/app/main/type";
+
+type PopularTab = {
+  title: string;
+  value: number;
+  period: Period;
+};
 const PopularVideos = () => {
-  const [selectedTab, setSelectedTab] = React.useState(0);
-  const tabChangeHandler = (event: React.SyntheticEvent, newValue: number) => {
-    setSelectedTab(newValue);
+  const popularTabs: PopularTab[] = [
+    { title: "전체", value: 0, period: "ALL" },
+    { title: "월간", value: 1, period: "MONTHLY" },
+    { title: "일간", value: 2, period: "DAILY" },
+    { title: "주간", value: 3, period: "WEEKLY" },
+  ];
+  const [selectedTab, setSelectedTab] = React.useState<PopularTab>({
+    title: "전체",
+    value: 0,
+    period: "ALL",
+  });
+
+  const { data, isLoading, error } = usePopularCoverListQuery({
+    page: 0,
+    size: 10,
+    period: selectedTab.period,
+  });
+  React.useEffect(() => {
+    console.log(data, "data");
+  }, []);
+  const popularTabChangeHandler = (
+    event: React.ChangeEvent<unknown>,
+    value: PopularTab
+  ) => {
+    setSelectedTab(value);
   };
-  function a11yProps(index: number) {
+
+  const popularTabSx = (index: number) => {
     return {
-      id: `simple-tab-${index}`,
-      "aria-controls": `simple-tabpanel-${index}`,
+      color:
+        index === selectedTab.value
+          ? theme.palette.common.black
+          : theme.palette.gray.primary,
+      borderRadius: "10px",
+      minWidth: "60px",
+      minHeight: "32px",
+      padding: "0",
+      fontSize: "20px",
+      marginLeft: index === 0 || index === 1 ? "0" : "12px",
+
+      "&:hover": {
+        backgroundColor: theme.palette.gray.secondary,
+      },
     };
-  }
+  };
   return (
     <Box>
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        {/* 해당 탭마다 변경되는 값 체인지시에 벨류값을 넣어서 api 호출하면 될듯 */}
-        <Tabs
-          value={selectedTab}
-          onChange={tabChangeHandler}
-          aria-label="basic tabs example"
-        >
-          <Tab label="최신" {...a11yProps(0)} />
-          <Tab label="일간" {...a11yProps(1)} />
-          <Tab label="주간" {...a11yProps(2)} />
-        </Tabs>
+      <Box role="tablist" className="flex items-center mb-4">
+        {popularTabs.map((tab, index) => (
+          <Box key={index} className="flex items-center">
+            <Button
+              role="tab"
+              aria-selected={selectedTab.period === tab.period}
+              onClick={(e) => popularTabChangeHandler(e, tab)}
+              sx={popularTabSx(index)}
+            >
+              {tab.title}
+            </Button>
+            {index === 0 && (
+              <Box
+                sx={{
+                  width: "1px",
+                  height: "14px",
+                  backgroundColor: theme.palette.common.black,
+                  marginLeft: "12px",
+                  marginRight: "12px",
+                }}
+              />
+            )}
+          </Box>
+        ))}
       </Box>
       <Box>
-        {dummyPosts.map((post, idx) => (
+        {data?.content.map((post: contentData, idx: number) => (
           <PostCard {...post} key={idx} isViewer />
         ))}
       </Box>

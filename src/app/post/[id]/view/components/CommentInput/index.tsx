@@ -1,41 +1,73 @@
+"use client";
 import React from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import Image from "next/image";
 import Skeleton from "@mui/material/Skeleton";
 import theme from "@/app/lib/theme";
-import { useCreateComment } from "@/app/api/cover/comment";
+import { useCreateCommentMutation } from "@/app/api/cover/comment";
 import { useAuthStore } from "@/app/store/useAuthStore";
+import { useSnackbarStore } from "@/app/store/useSnackbar";
 
 interface CommentInputProps {
   onSubmit: (data: string) => void;
   depth?: number;
-  id: string;
-  parentId?: string;
+  id: number;
+  parentId?: number | null;
 }
 
 const CommentInput = ({
   onSubmit,
+
   depth = 0,
   id,
   parentId,
 }: CommentInputProps) => {
   const [comment, setComment] = React.useState("");
   const accessToken = useAuthStore((state) => state.accessToken);
+  const createMutation = useCreateCommentMutation();
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     if (!comment.trim()) return;
     e.preventDefault();
-    if (depth > 0) {
-      useCreateComment({
-        comment,
-        coverId: id,
-        parentCommentId: parentId,
-        accessToken,
-      });
-    } else {
-      useCreateComment({ comment, coverId: id, accessToken });
-    }
     onSubmit(comment);
     setComment("");
+    if (parentId) {
+      createMutation.mutate(
+        {
+          comment,
+          coverId: id,
+          parentCommentId: parentId,
+          accessToken,
+        },
+        {
+          onSuccess: () => {
+            useSnackbarStore
+              .getState()
+              .show("댓글이 등록되었습니다.", "success");
+          },
+          onError: () => {
+            useSnackbarStore
+              .getState()
+              .show("댓글등록에 실패했습니다.", "error");
+          },
+        }
+      );
+    } else {
+      createMutation.mutate(
+        { comment, coverId: id, accessToken },
+        {
+          onSuccess: () => {
+            useSnackbarStore
+              .getState()
+              .show("댓글이 등록되었습니다.", "success");
+          },
+          onError: () => {
+            useSnackbarStore
+              .getState()
+              .show("댓글등록에 실패했습니다.", "error");
+          },
+        }
+      );
+    }
   };
   const [isImageLoading, setIsImageLoading] = React.useState(true);
   const userAvatarImageUrl = "";

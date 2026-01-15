@@ -18,8 +18,18 @@ const searchPage = () => {
   const { data, isLoading, error } = usePopularCoverListQuery({
     page: page - 1,
     size: 18,
-    period: "DAILY,MONTHLY,WEEKLY",
+    // period: "ALL",
   });
+  return (
+    <InfoMessage
+      subMessage={query ? `“${query}”` : ""}
+      message="검색 결과가 없습니다.\n새로운 곡을 추천하시겠어요?"
+      buttonText="곡 추천하기"
+      onClick={() => {
+        // TODO: 곡 추천 페이지로 이동 로그인 상태 확인후
+      }}
+    />
+  );
   return (
     <Box>
       <Box>searchPage</Box>

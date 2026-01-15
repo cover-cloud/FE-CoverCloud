@@ -1,18 +1,26 @@
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 
-const fetchAuthMeWithCookie = async (accessToken: string) => {
-  const res = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/me`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-      withCredentials: true,
+export const fetchAuthMeWithCookie = async (accessToken: string) => {
+  try {
+    const res = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/me`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        withCredentials: true,
+      }
+    );
+    if (res) {
+      return res.data;
+    } else {
+      // 로그아웃 로직
     }
-  );
-
-  return res.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 };
 
 export const useAuthMeQuery = (accessToken: string) => {

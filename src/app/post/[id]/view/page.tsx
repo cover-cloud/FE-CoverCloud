@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useAuthStore } from "@/app/store/useAuthStore";
 import { useRouter } from "next/navigation";
@@ -8,7 +8,8 @@ import { Box, Button } from "@mui/material";
 
 import { getYoutubeVideoId } from "@/app/utils/youtube";
 import { deletePost, useReadingPost } from "@/app/api/cover/post";
-import { fetchLike } from "@/app/api/cover/like";
+import { fetchLike, fetchUnlike } from "@/app/api/cover/like";
+import { useMyCommentList } from "@/app/api/cover/comment";
 
 import { FaPlay } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa";
@@ -23,21 +24,26 @@ import PopularVideos from "./components/PopularVideos";
 import Modal from "@/components/modal/Modal";
 import theme from "@/app/lib/theme";
 import { useFormatCreatedAt } from "@/app/utils/formetCreatedAt";
+import OptionButton from "@/components/OptionButton";
 const PostViewPage = () => {
   const { id } = useParams();
   const router = useRouter();
   const { isLogin } = useAuthStore();
   const accessToken = useAuthStore((state) => state.accessToken);
+  const userId = useAuthStore((state) => state.userId);
+  const { data: myCommentList } = useMyCommentList(accessToken);
+
   const [youtubeVideoId, setYoutubeVideoId] = React.useState<string>("");
   const [coverTitle, setCoverTitle] = React.useState<string>("");
   const [coverArtist, setCoverArtist] = React.useState<string>("");
   const [createAt, setCreateAt] = React.useState<string>("");
   const [coverGenre, setCoverGenre] = React.useState<string>("");
   const [tags, setTags] = React.useState<string[]>([]);
-
+  const [originalArtist, setOriginalArtist] = React.useState<string>("");
+  const [originalTitle, setOriginalTitle] = React.useState<string>("");
+  const [videoOwner, setVideoOwner] = React.useState<number | null>(null);
   //상태
   const [isMobile, setIsMobile] = React.useState(false);
-  const [isOptionOpen, setIsOptionOpen] = React.useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
   const [toggleLikeButton, setToggleLikeButton] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -46,22 +52,28 @@ const PostViewPage = () => {
     accessToken
   );
 
-  const videoId = postData ? getYoutubeVideoId(postData.data.link) : "";
+  const videoId = postData ? getYoutubeVideoId(postData.data.data.link) : "";
   const formetCreatedAt = postData
-    ? useFormatCreatedAt(postData.data.createdAt)
+    ? useFormatCreatedAt(postData.data.data.createdAt)
     : "";
+  useEffect(() => {
+    console.log(myCommentList);
+    // 이게 필요한가?
+  }, [myCommentList]);
   React.useEffect(() => {
     if (!postData) return;
     if (videoId) {
       setYoutubeVideoId(videoId); // 원본url
     }
 
-    setCoverTitle(postData.data.coverTitle);
-    setCoverArtist(postData.data.coverArtist);
-
+    setCoverTitle(postData.data.data.coverTitle);
+    setCoverArtist(postData.data.data.coverArtist);
+    setOriginalTitle(postData.data.data.originalTitle);
+    setOriginalArtist(postData.data.data.originalArtist);
     setCreateAt(formetCreatedAt);
-    setCoverGenre(postData.data.coverGenre);
-    setTags(postData.data.tags);
+    setCoverGenre(postData.data.data.coverGenre);
+    setTags(postData.data.data.tags);
+    setVideoOwner(postData.data.data.userId);
   }, [postData]);
 
   React.useEffect(() => {
@@ -72,7 +84,7 @@ const PostViewPage = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
   if (isPostLoading) return <Box>로딩중..</Box>;
-  console.log(postData, "포스트 데이터");
+
   if (!postData) {
     return <Box>페이지 로드에 실패하였습니다.</Box>;
   }
@@ -80,9 +92,6 @@ const PostViewPage = () => {
     return <div>찾을 수 없는 페이지입니다!</div>;
   }
 
-  const openOptionHandler = () => {
-    setIsOptionOpen(!isOptionOpen);
-  };
   const navigateToEdit = () => {
     router.push(`/post/${id}/edit`);
   };
@@ -92,7 +101,6 @@ const PostViewPage = () => {
         id as string | string[],
         accessToken
       );
-      console.log(deleteResult, "결과");
       if (deleteResult.success) {
         router.push("/");
       } else {
@@ -107,9 +115,17 @@ const PostViewPage = () => {
     // setToggleLikeButton(!toggleLikeButton);
     setIsLoading(true);
     try {
-      const likedResult = await fetchLike(id as string);
-      if (likedResult.success) {
-        setToggleLikeButton(!toggleLikeButton);
+      if (toggleLikeButton) {
+        const likedResult = await fetchUnlike(id as string, accessToken);
+        if (likedResult.success) {
+          setToggleLikeButton(false);
+          console.log("싫어요");
+        }
+      } else {
+        const likedResult = await fetchLike(id as string, accessToken);
+        if (likedResult.success) {
+          setToggleLikeButton(true);
+        }
       }
     } finally {
       setIsLoading(false);
@@ -141,40 +157,18 @@ const PostViewPage = () => {
             <Box className="flex gap-2">
               <FaPlay />
               <Button onClick={likeToggleHandler} disabled={isLoading}>
-                {toggleLikeButton ? <FaRegHeart /> : <FaHeart />}
+                {!toggleLikeButton ? <FaRegHeart /> : <FaHeart />}
               </Button>
-              <Box
-                className="flex items-center justify-center relative"
-                onClick={openOptionHandler}
-              >
-                <HiDotsHorizontal />
-                {isOptionOpen && isLogin && (
-                  <Box className="absolute top-7 right-0 bg-white w-24 border-2 border-gray-200">
-                    <Box
-                      className="hover:bg-gray-100 p-2"
-                      onClick={() => setIsDeleteModalOpen(true)}
-                    >
-                      삭제
-                    </Box>
-                    <Box
-                      className="hover:bg-gray-100 p-2"
-                      onClick={navigateToEdit}
-                    >
-                      수정
-                    </Box>
-                  </Box>
-                )}
-                {isOptionOpen && !isLogin && (
-                  <Box className="absolute top-7 right-0 bg-white w-24 border-2 border-gray-200">
-                    <Box className="hover:bg-gray-100 p-2">신고</Box>
-                  </Box>
-                )}
-              </Box>
+              <OptionButton
+                isLogin={userId === videoOwner}
+                openDeleteModal={() => setIsDeleteModalOpen(true)}
+                navigateToEdit={navigateToEdit}
+              />
             </Box>
           </Box>
 
           <Box className="flex B1 mb-2">
-            <Box>{"비어있음"}</Box>
+            <Box>{coverArtist}</Box>
           </Box>
           <Box className="flex C2 mb-4">
             <Box>{createAt}</Box>
@@ -204,12 +198,12 @@ const PostViewPage = () => {
             </Box>
           </Box>
           <ArtistInfo
-            coverArtist={coverArtist}
-            songTitle="노래제목"
+            coverArtist={originalArtist || ""}
+            songTitle={originalTitle || ""}
             coverUrl=""
             isMobile={isMobile}
           />
-          <CommentSection id={id as string} />
+          <CommentSection id={Number(id)} />
         </Box>
       </Box>
       <Box className="w-[33%]">

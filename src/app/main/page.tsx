@@ -35,7 +35,7 @@ const MainPage = () => {
   const [selectedTab, setSelectedTab] = React.useState<PopularTab>({
     title: "전체",
     value: 0,
-    period: "DAILY,MONTHLY,WEEKLY",
+    period: "ALL",
   });
   const [selectedGenres, setSelectedGenres] = React.useState<Genre[]>([
     { title: "K-POP", value: "K-POP", label: "kpop" },
@@ -45,7 +45,7 @@ const MainPage = () => {
     page: page - 1,
     size: 18,
     period: selectedTab.period,
-    genre: selectedGenres.map((genre) => genre.value).join(","),
+    genre: selectedGenres.map((genre) => genre.value),
   });
   const pageChangeHandler = (
     event: React.ChangeEvent<unknown>,
@@ -79,7 +79,7 @@ const MainPage = () => {
   // 스타일
 
   const popularTabs: PopularTab[] = [
-    { title: "전체", value: 0, period: "DAILY,MONTHLY,WEEKLY" },
+    { title: "전체", value: 0, period: "ALL" },
     { title: "월간", value: 1, period: "MONTHLY" },
     { title: "일간", value: 2, period: "DAILY" },
     { title: "주간", value: 3, period: "WEEKLY" },

@@ -17,11 +17,6 @@ const Login = () => {
         "http://34.47.76.202:8080/oauth2/authorization/naver";
     }
   };
-  const logout = () => {
-    axios.post("http://34.47.76.202:8080/api/auth/logout", {
-      withCredentials: true,
-    });
-  };
 
   return (
     <Box
@@ -103,7 +98,6 @@ const Login = () => {
           <br />
           개인정보처리방침에 동의한 것으로 간주합니다.
         </Box>
-        <Button onClick={logout}>로그아웃</Button>
       </Box>
     </Box>
   );

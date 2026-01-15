@@ -1,14 +1,30 @@
 "use client";
-import React from "react";
-import { Box, Button } from "@mui/material";
+import React, { useEffect } from "react";
+import { Box, Button, Grid, Pagination } from "@mui/material";
 import theme from "@/app/lib/theme";
 import InfoMessage from "@/components/InfoMessage";
+import { useAuthStore } from "@/app/store/useAuthStore";
+import { contentData } from "@/app/main/type";
+import PostCard from "@/components/PostCard";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useMyCoverListQuery } from "@/app/api/mypage/myCoverList";
+
 const ActivityPage = () => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const initialPage = Number(searchParams.get("page") || 1);
+  const [page, setPage] = React.useState(initialPage);
   const activityTabs = ["추천", "좋아요", "댓글"];
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const { data, isLoading } = useMyCoverListQuery(accessToken);
   const [selectedTab, setSelectedTab] = React.useState(0);
-  const activityTabChangeHandler = (e: React.MouseEvent, index: number) => {
+  const activityTabChangeHandler = (_: React.MouseEvent, index: number) => {
     setSelectedTab(index);
   };
+  useEffect(() => {
+    console.log(data, "Epdlxj");
+  }, []);
   const activityTabSx = (index: number) => {
     return {
       color:
@@ -25,7 +41,17 @@ const ActivityPage = () => {
       },
     };
   };
-
+  const pageChangeHandler = (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
+    setPage(value);
+    //현재 페이지 정보 있어야할듯?
+    router.push(`/mypage/activity?page=${value}`, { scroll: false });
+  };
+  if (isLoading) {
+    return <Box>로딩 중...</Box>;
+  }
   return (
     <Box>
       <Box className="H1" sx={{ width: "100%", textAlign: "center" }}>
@@ -43,11 +69,27 @@ const ActivityPage = () => {
             <Box className="B1">{tab}</Box>
           </Button>
         ))}
-        <InfoMessage
-          message="아직 추천한 곡이 없습니다.\n새로운 곡을 추천하시겠어요?"
-          buttonText="게시물 작성하기"
-          onClick={() => {}}
-        />
+        {data?.data.content.length > 0 ? (
+          <React.Fragment>
+            <Grid container spacing={2}>
+              {data?.data.content.map((post: contentData, idx: number) => (
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={idx}>
+                  <PostCard {...post} />
+                </Grid>
+              ))}
+            </Grid>
+            <Box className="mt-8 flex justify-center">
+              {/* 여기 토탈카운트로 조합? 페이지 숫자 만들기 나머지값이 있으면 +1 기본 랭스받아오기 */}
+              <Pagination count={1} page={page} onChange={pageChangeHandler} />
+            </Box>
+          </React.Fragment>
+        ) : (
+          <InfoMessage
+            message="아직 추천한 곡이 없습니다.\n새로운 곡을 추천하시겠어요?"
+            buttonText="게시물 작성하기"
+            onClick={() => {}}
+          />
+        )}
       </Box>
     </Box>
   );

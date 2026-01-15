@@ -10,8 +10,7 @@ export const refreshToken = async () => {
         withCredentials: true,
       }
     );
-    const data = await response.data;
-    return data;
+    return response.data;
   } catch (error) {
     console.error(error);
     throw error;
