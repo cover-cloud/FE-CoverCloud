@@ -10,7 +10,7 @@ export const fetchAuthMeWithCookie = async (accessToken: string) => {
           Authorization: `Bearer ${accessToken}`,
         },
         withCredentials: true,
-      }
+      },
     );
     if (res) {
       return res.data;
@@ -19,7 +19,6 @@ export const fetchAuthMeWithCookie = async (accessToken: string) => {
     }
   } catch (error) {
     console.error(error);
-    throw error;
   }
 };
 
