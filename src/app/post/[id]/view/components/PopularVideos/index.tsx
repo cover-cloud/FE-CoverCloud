@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { Box, Tabs, Tab, Button } from "@mui/material";
-import { dummyPosts } from "@/data/postData";
 import PostCard from "@/components/PostCard";
 import { Period, usePopularCoverListQuery } from "@/app/api/cover/list";
 import theme from "@/app/lib/theme";
