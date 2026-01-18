@@ -25,12 +25,7 @@ const fetchPopularCoverList = async ({
         period: period === "ALL" ? undefined : period,
         genre, // genre 있을 때만 붙음
       },
-    }
-    // {
-    //   headers: {
-    //     Authorization: `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwidXNlcklkIjoyLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzY4Mzk0NzY5LCJleHAiOjE3NjgzOTgzNjl9.ufEW0k1jkk82v8g6oacjwQkYBtWTI4IbyWuXb_J3u2cXgOosJEomWQm3AIdkQmXJUaIIRHDi9czWfJhyh4EvRw`,
-    //   },
-    // }
+    },
   );
 
   return res.data.data;
