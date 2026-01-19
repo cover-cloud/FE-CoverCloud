@@ -3,6 +3,15 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
+  async redirects() {
+    return [
+      {
+        source: "/",
+        destination: "/main",
+        permanent: true, // 301 리다이렉트 (SEO에 유리)
+      },
+    ];
+  },
   images: {
     domains: [
       "via.placeholder.com",
