@@ -11,10 +11,10 @@ const Login = () => {
   const handleLogin = (loginType: "kakao" | "naver") => {
     if (loginType === "kakao") {
       window.location.href =
-        "http://34.47.76.202:8080/oauth2/authorization/kakao";
+        "https://www.covercloud.kr/oauth2/authorization/kakao";
     } else {
       window.location.href =
-        "http://34.47.76.202:8080/oauth2/authorization/naver";
+        "https://www.covercloud.kr/oauth2/authorization/naver";
     }
   };
 

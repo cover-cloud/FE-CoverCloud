@@ -7,23 +7,23 @@ interface FetchPopularCoverParams {
   page: number;
   size?: number;
   period?: Period;
-  genre?: string[]; // 선택
+  genres?: string[]; // 선택
 }
 
 const fetchPopularCoverList = async ({
   page,
   size,
   period,
-  genre,
+  genres,
 }: FetchPopularCoverParams) => {
-  const res = await axios.post(
+  const res = await axios.get(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cover/trending/search`,
     {
       params: {
         page,
         size,
         period: period === "ALL" ? undefined : period,
-        genre, // genre 있을 때만 붙음
+        genres,
       },
     },
   );
@@ -35,16 +35,16 @@ export const usePopularCoverListQuery = ({
   page,
   size,
   period,
-  genre,
+  genres,
 }: FetchPopularCoverParams) => {
   return useQuery({
-    queryKey: ["cover-trending", page, size, period, genre],
+    queryKey: ["cover-trending", page, size, period, genres],
     queryFn: () =>
       fetchPopularCoverList({
         page,
         size,
         period,
-        genre,
+        genres,
       }),
     // staleTime: 1000 * 60,
   });

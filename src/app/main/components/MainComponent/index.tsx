@@ -43,7 +43,7 @@ const MainComponent = () => {
     page: page - 1,
     size: 18,
     period: selectedTab.period,
-    genre: selectedGenres.map((genre) => genre.value),
+    genres: selectedGenres.map((genre) => genre.value),
   });
 
   const pageChangeHandler = (_: any, value: number) => {

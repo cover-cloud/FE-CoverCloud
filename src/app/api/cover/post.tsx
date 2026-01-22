@@ -19,7 +19,7 @@ export const createPost = async (postData: PostData, accessToken: string) => {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
-    }
+    },
   );
   return res.data;
 };
@@ -27,7 +27,7 @@ export const createPost = async (postData: PostData, accessToken: string) => {
 export const updatePost = async (
   coverId: string,
   postData: PostData,
-  accessToken: string
+  accessToken: string,
 ) => {
   const res = await axios.post(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cover/update?coverId=${coverId}`,
@@ -36,14 +36,14 @@ export const updatePost = async (
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
-    }
+    },
   );
   return res.data;
 };
 
 export const deletePost = async (
   coverId: string | string[],
-  accessToken: string
+  accessToken: string,
 ) => {
   const res = await axios.post(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cover/delete?coverId=${coverId}`,
@@ -52,14 +52,14 @@ export const deletePost = async (
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
-    }
+    },
   );
   return res.data;
 };
 
 export const readingPost = async (coverId: string, accessToken: string) => {
   const res = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cover/list/${coverId}`
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cover/list/${coverId}`,
   );
   return res;
 };
