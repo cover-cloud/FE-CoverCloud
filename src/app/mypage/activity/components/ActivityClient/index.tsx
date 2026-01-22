@@ -9,6 +9,7 @@ import { contentData } from "@/app/main/type";
 import PostCard from "@/components/PostCard";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useMyCoverListQuery } from "@/app/api/mypage/myCoverList";
+import Login from "@/components/auth/Login";
 
 export default function ActivityClient() {
   const searchParams = useSearchParams();
@@ -45,14 +46,19 @@ export default function ActivityClient() {
 
   const pageChangeHandler = (
     event: React.ChangeEvent<unknown>,
-    value: number
+    value: number,
   ) => {
     setPage(value);
     router.push(`/mypage/activity?page=${value}`, { scroll: false });
   };
 
   if (isLoading) {
-    return <Box>로딩 중...</Box>;
+    return (
+      <Box>
+        로딩 중...
+        <Login />
+      </Box>
+    );
   }
 
   return (

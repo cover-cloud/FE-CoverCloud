@@ -36,7 +36,7 @@ const MainComponent = () => {
     period: "ALL",
   });
   const [selectedGenres, setSelectedGenres] = useState<Genre[]>([
-    { title: "K-POP", value: "K-POP", label: "kpop" },
+    { title: "K-POP", value: "K_POP", label: "kpop" },
   ]);
 
   const { data } = usePopularCoverListQuery({
@@ -76,8 +76,8 @@ const MainComponent = () => {
   ];
 
   const genreTabs: Genre[] = [
-    { title: "K-POP", value: "K-POP", label: "kpop" },
-    { title: "J-POP", value: "J-POP", label: "jpop" },
+    { title: "K-POP", value: "K_POP", label: "kpop" },
+    { title: "J-POP", value: "J_POP", label: "jpop" },
     { title: "POP", value: "POP", label: "pop" },
   ];
 

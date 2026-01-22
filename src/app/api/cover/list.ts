@@ -9,22 +9,38 @@ interface FetchPopularCoverParams {
   period?: Period;
   genres?: string[]; // 선택
 }
+const GENRE_MAP: Record<string, string> = {
+  K_POP: "K_POP",
+  J_POP: "J_POP",
+  POP: "POP",
+  OTHER: "OTHER",
+};
 
 const fetchPopularCoverList = async ({
   page,
-  size,
+  size = 18,
   period,
   genres,
 }: FetchPopularCoverParams) => {
-  const res = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cover/trending/search`,
+  const body: any = {
+    page,
+    size,
+  };
 
+  if (period && period !== "ALL") {
+    body.period = period;
+  }
+
+  if (genres?.length) {
+    body.genres = genres.map((g) => GENRE_MAP[g]).filter(Boolean);
+  }
+
+  const res = await axios.post(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cover/trending/search`,
+    body,
     {
-      params: {
-        page,
-        size,
-        period: period === "ALL" ? undefined : period,
-        genres,
+      headers: {
+        "Content-Type": "application/json",
       },
     },
   );
