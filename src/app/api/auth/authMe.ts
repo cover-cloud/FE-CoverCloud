@@ -18,7 +18,6 @@ export const fetchAuthMeWithCookie = async (accessToken: string) => {
       // 로그아웃 로직
     }
   } catch (error) {
-    console.error(error);
     return {
       success: false,
       message: "로그인 정보를 확인할 수 없습니다.",
