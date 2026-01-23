@@ -26,9 +26,9 @@ export const fetchAuthMeWithCookie = async (accessToken: string) => {
 };
 
 export const useAuthMeQuery = (accessToken: string) => {
-  const hasToken = !!accessToken || accessToken !== "";
+  const hasToken = !!accessToken;
   return useQuery({
-    queryKey: ["auth-me-cookie"],
+    queryKey: ["auth-me-cookie", accessToken],
     queryFn: () => fetchAuthMeWithCookie(accessToken),
     enabled: hasToken,
     retry: false,
