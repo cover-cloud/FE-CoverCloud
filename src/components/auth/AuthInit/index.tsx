@@ -23,7 +23,7 @@ const AuthInit = ({ children }: { children: React.ReactNode }) => {
     if (pathname.startsWith("/auth/callback")) return;
 
     refreshTokenHandler();
-  }, [pathname]);
+  }, []);
 
   return <>{children}</>;
 };
