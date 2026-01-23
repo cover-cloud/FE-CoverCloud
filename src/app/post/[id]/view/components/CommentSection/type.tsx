@@ -17,4 +17,9 @@ export type CommentListData = {
   userId: number;
   parentCommentId: number | null;
   replies: CommentListData[];
+  likeCount: number;
+  isLiked: boolean;
+  createdAt: string;
+  nickname: string;
+  profileImageUrl: string | null;
 };

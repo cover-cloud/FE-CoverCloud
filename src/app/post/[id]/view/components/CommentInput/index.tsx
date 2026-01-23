@@ -7,6 +7,8 @@ import theme from "@/app/lib/theme";
 import { useCreateCommentMutation } from "@/app/api/cover/comment";
 import { useAuthStore } from "@/app/store/useAuthStore";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
+import { fetchAuthMeWithCookie, useAuthMeQuery } from "@/app/api/auth/authMe";
+import { useModalStore } from "@/app/store/useModalStore";
 
 interface CommentInputProps {
   onSubmit: (data: string) => void;
@@ -17,7 +19,6 @@ interface CommentInputProps {
 
 const CommentInput = ({
   onSubmit,
-
   depth = 0,
   id,
   parentId,
@@ -25,9 +26,19 @@ const CommentInput = ({
   const [comment, setComment] = React.useState("");
   const accessToken = useAuthStore((state) => state.accessToken);
   const createMutation = useCreateCommentMutation();
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    if (!comment.trim()) return;
+
+  const openLoginModal = useModalStore((state) => state.openLoginModal);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!comment.trim()) return;
+    //로그인 상태 확인로직
+    const isMyAccount = await fetchAuthMeWithCookie(accessToken);
+    if (!isMyAccount.success) {
+      openLoginModal();
+      return;
+    }
+
     onSubmit(comment);
     setComment("");
     if (parentId) {
@@ -49,7 +60,7 @@ const CommentInput = ({
               .getState()
               .show("댓글등록에 실패했습니다.", "error");
           },
-        }
+        },
       );
     } else {
       createMutation.mutate(
@@ -65,7 +76,7 @@ const CommentInput = ({
               .getState()
               .show("댓글등록에 실패했습니다.", "error");
           },
-        }
+        },
       );
     }
   };

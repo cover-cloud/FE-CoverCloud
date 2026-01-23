@@ -8,7 +8,7 @@ export const fetchLike = async (coverId: string, accessToken: string) => {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
-    }
+    },
   );
   return res.data;
 };
@@ -21,7 +21,7 @@ export const fetchUnlike = async (coverId: string, accessToken: string) => {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
-    }
+    },
   );
   return res.data;
 };

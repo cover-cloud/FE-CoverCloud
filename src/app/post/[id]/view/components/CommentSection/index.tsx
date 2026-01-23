@@ -9,12 +9,18 @@ interface CommentFormInput {
   comment: string;
 }
 
-const CommentSection = ({ id }: { id: number }) => {
+const CommentSection = ({
+  id,
+  currentUserId,
+}: {
+  id: number;
+  currentUserId: number;
+}) => {
   const [commentsData, setCommentsData] = React.useState<CommentListData[]>([]);
   const [totalCommentCount, setTotalCommentCount] = React.useState(0);
 
   const { data: commentList } = useCommentListQuery(id);
-  console.log(commentList);
+
   useEffect(() => {
     if (!commentList?.data) {
       setCommentsData([]);
@@ -28,6 +34,10 @@ const CommentSection = ({ id }: { id: number }) => {
       parentCommentId: comment.parentCommentId ?? null,
       content: comment.content,
       replies: comment.replies ?? [],
+      likeCount: comment.likeCount,
+      isLiked: comment.isLiked,
+      nickname: comment.nickname,
+      profileImageUrl: comment.profileImageUrl,
     }));
     setCommentsData(comments);
   }, [commentList]);
@@ -90,6 +100,7 @@ const CommentSection = ({ id }: { id: number }) => {
               <CommentItem
                 key={comment.commentId}
                 {...comment}
+                currentUserId={currentUserId}
                 onReplySubmit={(data) =>
                   replySubmitHandler(data, comment.commentId)
                 }

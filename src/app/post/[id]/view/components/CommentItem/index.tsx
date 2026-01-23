@@ -1,5 +1,12 @@
-import React from "react";
-import { Box, Button, FormControl, TextField, Typography } from "@mui/material";
+import React, { useEffect } from "react";
+import {
+  Box,
+  Button,
+  FormControl,
+  Skeleton,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { CommentListData } from "../CommentSection/type";
 import { FaComment, FaHeart, FaRegComment, FaRegHeart } from "react-icons/fa";
 import { FaArrowTurnUp } from "react-icons/fa6";
@@ -7,25 +14,37 @@ import CommentInput from "../CommentInput";
 import theme from "@/app/lib/theme";
 import OptionButton from "@/components/OptionButton";
 import {
+  useCommentLikeMutation,
   useDeleteCommentMutation,
   useUpdateCommentMutation,
 } from "@/app/api/cover/comment";
 import { useAuthStore } from "@/app/store/useAuthStore";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
+import Image from "next/image";
+import { fetchAuthMeWithCookie } from "@/app/api/auth/authMe";
+import { useModalStore } from "@/app/store/useModalStore";
+import { useFormatCreatedAt } from "@/app/utils/formetCreatedAt";
 
 interface CommentItemProps extends CommentListData {
   depth?: number; // 뎁스 정보 추가
   onReplySubmit?: (data: string, id: number) => void;
   openCmmentInput?: boolean;
   openCommentInputHandler?: (id: number) => void;
+  currentUserId: number;
 }
 
 const CommentItem = ({
+  currentUserId,
   commentId,
   coverId,
   userId,
   content,
   parentCommentId,
+  likeCount,
+  isLiked,
+  createdAt,
+  nickname,
+  profileImageUrl,
   replies,
   depth = 0,
   onReplySubmit,
@@ -35,13 +54,33 @@ const CommentItem = ({
   const deleteCommentMutation = useDeleteCommentMutation();
   const updateCommentMutation = useUpdateCommentMutation();
   const accessToken = useAuthStore((state) => state.accessToken);
-  const currentUserId = useAuthStore((state) => state.userId);
+
   const [isImageLoading, setIsImageLoading] = React.useState(true);
   const [isCommentEdit, setIsCommentEdit] = React.useState(false);
   const [editContent, setEditContent] = React.useState(content);
-  const [liked, setLiked] = React.useState(false);
+  const [liked, setLiked] = React.useState(isLiked);
 
   const size = Math.max(48 - depth * 12, 24);
+
+  const openLoginModal = useModalStore((state) => state.openLoginModal);
+  const likeComment = useCommentLikeMutation();
+  const likeCommentHandler = async () => {
+    if (!accessToken) {
+      const isMyAccount = await fetchAuthMeWithCookie(accessToken);
+      if (!isMyAccount.success) {
+        openLoginModal();
+        return;
+      }
+      return;
+    }
+
+    likeComment.mutate({
+      commentId,
+      coverId,
+      accessToken,
+    });
+  };
+
   const deleteCommentHandler = () => {
     deleteCommentMutation.mutate(
       {
@@ -58,7 +97,7 @@ const CommentItem = ({
           // TODO: 댓글 삭제 실패 시 처리
           useSnackbarStore.getState().show("댓글삭제에 실패했습니다.", "error");
         },
-      }
+      },
     );
   };
 
@@ -89,7 +128,7 @@ const CommentItem = ({
           setIsCommentEdit(false);
           useSnackbarStore.getState().show("댓글수정에 실패했습니다.", "error");
         },
-      }
+      },
     );
   };
 
@@ -110,31 +149,30 @@ const CommentItem = ({
               width={size}
               height={size}
             >
-              {/* {isImageLoading || !userAvatarImageUrl ? (
-              <Skeleton
-                variant="circular"
-                width="100%"
-                height="100%"
-                className="absolute inset-0"
-              />
-            ) : (
-              <Image
-                src={userAvatarImageUrl}
-                alt={userName}
-                fill
-                sizes={`${size}px`}
-                style={{ objectFit: "cover", borderRadius: "50%" }}
-                onLoad={() => setIsImageLoading(false)}
-                onError={() => setIsImageLoading(false)}
-              />
-            )} */}
-              이미지 url 필요합니다!
+              {isImageLoading || !profileImageUrl ? (
+                <Skeleton
+                  variant="circular"
+                  width="100%"
+                  height="100%"
+                  className="absolute inset-0"
+                />
+              ) : (
+                <Image
+                  src={profileImageUrl}
+                  alt={nickname}
+                  fill
+                  sizes={`${size}px`}
+                  style={{ objectFit: "cover", borderRadius: "50%" }}
+                  onLoad={() => setIsImageLoading(false)}
+                  onError={() => setIsImageLoading(false)}
+                />
+              )}
             </Box>
             <Box sx={{ width: "100%" }}>
               <Box>
                 <Box className="flex">
-                  <Box fontWeight="bold">{userId}</Box>
-                  <Box>{"필요!"}</Box>
+                  <Box fontWeight="bold">{nickname || "익명"}</Box>
+                  <Box>{useFormatCreatedAt(createdAt)}</Box>
                 </Box>
                 <Box>
                   {isCommentEdit ? (
@@ -174,9 +212,10 @@ const CommentItem = ({
                       backgroundColor: theme.palette.gray.secondary,
                     },
                   }}
-                  onClick={() => setLiked(!liked)}
+                  onClick={() => likeCommentHandler()}
                 >
-                  {liked ? <FaHeart /> : <FaRegHeart />} {"필요!"}
+                  {liked ? <FaHeart /> : <FaRegHeart />}
+                  {likeCount}
                 </Button>
 
                 {depth < 1 && (
@@ -217,7 +256,12 @@ const CommentItem = ({
         {replies.length > 0 &&
           replies.map((reply) => (
             <Box className="w-full" key={reply.commentId}>
-              <CommentItem key={reply.commentId} {...reply} depth={depth + 1} />
+              <CommentItem
+                key={reply.commentId}
+                {...reply}
+                depth={depth + 1}
+                currentUserId={currentUserId}
+              />
             </Box>
           ))}
       </Box>

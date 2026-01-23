@@ -25,13 +25,18 @@ import Modal from "@/components/modal/Modal";
 import theme from "@/app/lib/theme";
 import { useFormatCreatedAt } from "@/app/utils/formetCreatedAt";
 import OptionButton from "@/components/OptionButton";
+import { fetchAuthMeWithCookie, useAuthMeQuery } from "@/app/api/auth/authMe";
+import { useModalStore } from "@/app/store/useModalStore";
 const PostViewPage = () => {
   const { id } = useParams();
   const router = useRouter();
   const { isLogin } = useAuthStore();
   const accessToken = useAuthStore((state) => state.accessToken);
-  const userId = useAuthStore((state) => state.userId);
+
   const { data: myCommentList } = useMyCommentList(accessToken);
+  const userInfo = useAuthMeQuery(accessToken);
+
+  const openLoginModal = useModalStore((state) => state.openLoginModal);
 
   const [youtubeVideoId, setYoutubeVideoId] = React.useState<string>("");
   const [coverTitle, setCoverTitle] = React.useState<string>("");
@@ -49,7 +54,6 @@ const PostViewPage = () => {
   const [isLoading, setIsLoading] = React.useState(false);
   const { data: postData, isLoading: isPostLoading } = useReadingPost(
     id as string,
-    accessToken
   );
 
   const videoId = postData ? getYoutubeVideoId(postData.data.data.link) : "";
@@ -58,8 +62,9 @@ const PostViewPage = () => {
     : "";
   useEffect(() => {
     console.log(myCommentList);
+    console.log(userInfo);
     // 이게 필요한가?
-  }, [myCommentList]);
+  }, [userInfo]);
   React.useEffect(() => {
     if (!postData) return;
     if (videoId) {
@@ -76,13 +81,24 @@ const PostViewPage = () => {
     setVideoOwner(postData.data.data.userId);
   }, [postData]);
 
-  React.useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
 
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    const handleChange = (e: MediaQueryListEvent) => {
+      setIsMobile(e.matches);
+    };
+
+    setIsMobile(mediaQuery.matches);
+    mediaQuery.addEventListener("change", handleChange);
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+    };
   }, []);
+  useEffect(() => {
+    console.log(isMobile);
+  }, [isMobile]);
+
   if (isPostLoading) return <Box>로딩중..</Box>;
 
   if (!postData) {
@@ -92,14 +108,20 @@ const PostViewPage = () => {
     return <div>찾을 수 없는 페이지입니다!</div>;
   }
 
-  const navigateToEdit = () => {
-    router.push(`/post/${id}/edit`);
+  const navigateToEdit = async () => {
+    const isAuthenticated = await fetchAuthMeWithCookie(accessToken);
+    if (!isAuthenticated.success) {
+      openLoginModal();
+      return;
+    } else {
+      router.push(`/post/${id}/edit`);
+    }
   };
   const deletePostHandler = async () => {
     try {
       const deleteResult = await deletePost(
         id as string | string[],
-        accessToken
+        accessToken,
       );
       if (deleteResult.success) {
         router.push("/");
@@ -133,8 +155,8 @@ const PostViewPage = () => {
   };
 
   return (
-    <Box className="flex gap-3">
-      <Box className="w-[66%]">
+    <Box className={isMobile ? "flex flex-col" : "flex gap-3"}>
+      <Box className={isMobile ? "w-full" : "w-[66%]"}>
         <Box className="flex justify-between">
           <Box className="flex items-center justify-center">
             <IoIosArrowBack />
@@ -160,7 +182,7 @@ const PostViewPage = () => {
                 {!toggleLikeButton ? <FaRegHeart /> : <FaHeart />}
               </Button>
               <OptionButton
-                isLogin={userId === videoOwner}
+                isLogin={userInfo.data?.data?.userId === videoOwner}
                 openDeleteModal={() => setIsDeleteModalOpen(true)}
                 navigateToEdit={navigateToEdit}
               />
@@ -203,10 +225,13 @@ const PostViewPage = () => {
             coverUrl=""
             isMobile={isMobile}
           />
-          <CommentSection id={Number(id)} />
+          <CommentSection
+            id={Number(id)}
+            currentUserId={userInfo.data?.data?.userId}
+          />
         </Box>
       </Box>
-      <Box className="w-[33%]">
+      <Box className={isMobile ? "w-full" : "w-[33%]"}>
         <PopularVideos />
       </Box>
       <Modal

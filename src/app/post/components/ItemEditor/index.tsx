@@ -8,7 +8,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { FormSchema, formSchema, FormField, SongData } from "./type";
 import { useState } from "react";
 import { getYoutubeVideoId } from "@/app/utils/youtube";
-import { createPost, updatePost, PostData } from "@/app/api/cover/post";
+import {
+  createPost,
+  updatePost,
+  PostData,
+  useReadingPost,
+} from "@/app/api/cover/post";
 import { useRouter } from "next/navigation";
 import theme from "@/app/lib/theme";
 import VideoInputField from "../../[id]/edit/components/VideoInputField";
@@ -32,8 +37,8 @@ const fields: FormField[] = [
   { key: "tag", label: "태그", placeholder: "태그 입력 후 추가 버튼 클릭" },
 ];
 const genres = [
-  { title: "K-POP", value: "K-POP" },
-  { title: "J-POP", value: "J-POP" },
+  { title: "K-POP", value: "K_POP" },
+  { title: "J-POP", value: "J_POP" },
   { title: "POP", value: "POP" },
 ];
 const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
@@ -41,6 +46,9 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
   const router = useRouter();
   const songSearchWrapperRef = React.useRef<HTMLDivElement | null>(null);
   const accessToken = useAuthStore((state) => state.accessToken);
+  const { data: postData, isLoading: isPostLoading } = useReadingPost(
+    params.id as string,
+  );
   const { control, handleSubmit, watch, setValue, formState } =
     useForm<FormSchema>({
       resolver: zodResolver(formSchema),
@@ -106,7 +114,7 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
   const handleTagKeyDown = (
     key: string,
     e: React.KeyboardEvent,
-    controllerField: any
+    controllerField: any,
   ) => {
     if (key !== "tag") return;
     if (e.key === "Enter") {
@@ -118,13 +126,8 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
   };
 
   const onSubmit = async (formData: FormSchema) => {
-    // if (tags.length === 0) {
-    //   setTagError("태그를 최소 1개 이상 추가해주세요");
-    //   return;
-    // }
-
     if (mode === "create") {
-      const postData: PostData = {
+      const sendData: PostData = {
         videoUrl: formData.link,
         originalTitle: formData.selectedSongData.songTitle,
         originalArtist: formData.selectedSongData?.artist,
@@ -134,7 +137,7 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
         tags: tags,
       };
       try {
-        const createResult = await createPost(postData, accessToken);
+        const createResult = await createPost(sendData, accessToken);
 
         if (createResult.success) {
           router.push("/main");
@@ -143,15 +146,32 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
         console.log(error);
       }
     } else {
-      // updatePost(postData);
+      const sendData: PostData = {
+        videoUrl: formData.link,
+        originalTitle: formData.selectedSongData.songTitle,
+        originalArtist: formData.selectedSongData?.artist,
+        coverArtist: formData.coverArtist,
+        title: formData.title,
+        genre: formData.genre,
+        tags: tags,
+      };
+
+      const updateResult = await updatePost(
+        params.id as string,
+        sendData,
+        accessToken,
+      );
+      if (updateResult.success) {
+        router.push("/main");
+      }
     }
 
     setTagError("");
-    router.push("/main");
+    // router.push("/main");
   };
 
   const selectSongHandler = (
-    songData: SongData & { title: string; spotifyTrackId: string }
+    songData: SongData & { title: string; spotifyTrackId: string },
   ) => {
     setValue("selectedSongData", {
       key: songData?.spotifyTrackId,
@@ -185,6 +205,25 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
   const onClickOutside = () => {
     setIsSongSearchFocus(false);
   };
+
+  React.useEffect(() => {
+    if (mode !== "edit") return;
+
+    if (postData) {
+      setValue("title", postData.data.data.coverTitle);
+      setValue("link", postData.data.data.link);
+      setValue("coverArtist", postData.data.data.coverArtist);
+      setValue("genre", postData.data.data.coverGenre);
+      setValue("selectedSongData", {
+        artist: postData.data.data.originalArtist,
+        songTitle: postData.data.data.originalTitle,
+        key: postData.data.data.spotifyTrackId ?? "",
+        coverUrl: postData.data.data.coverUrl ?? "",
+      });
+
+      setTags(postData.data.data.tags ?? []);
+    }
+  }, [mode, postData]);
 
   return (
     <Box
@@ -232,7 +271,7 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
                     if (
                       songSearchWrapperRef.current &&
                       !songSearchWrapperRef.current.contains(
-                        e.relatedTarget as Node
+                        e.relatedTarget as Node,
                       )
                     ) {
                       setIsSongSearchFocus(false);

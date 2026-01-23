@@ -57,16 +57,16 @@ export const deletePost = async (
   return res.data;
 };
 
-export const readingPost = async (coverId: string, accessToken: string) => {
+export const readingPost = async (coverId: string) => {
   const res = await axios.get(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cover/list/${coverId}`,
   );
   return res;
 };
-export const useReadingPost = (coverId: string, accessToken: string) => {
+export const useReadingPost = (coverId: string) => {
   return useQuery({
     queryKey: ["readingPost", coverId],
-    queryFn: () => readingPost(coverId, accessToken),
+    queryFn: () => readingPost(coverId),
     enabled: !!coverId,
   });
 };
