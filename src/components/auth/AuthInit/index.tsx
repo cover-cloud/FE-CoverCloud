@@ -11,10 +11,10 @@ const AuthInit = ({ children }: { children: React.ReactNode }) => {
   const refreshTokenHandler = async () => {
     const accessToken = await refreshToken();
 
-    if (!accessToken) return;
+    if (!accessToken.success) return;
 
     useAuthStore.setState({
-      accessToken,
+      accessToken: accessToken.data.accessToken,
       isLogin: true,
     });
   };
