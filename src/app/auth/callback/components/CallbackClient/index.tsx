@@ -4,28 +4,35 @@ import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { completeLogin } from "@/app/utils/auth.service";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
+import { refreshToken } from "@/app/api/auth/refresh";
+import { useAuthStore } from "@/app/store/useAuthStore";
 
 export default function CallbackClient() {
   const router = useRouter();
   const params = useSearchParams();
-  const token = params.get("accessToken");
 
   useEffect(() => {
-    if (!token) {
-      useSnackbarStore.getState().show("로그인에 실패했습니다.", "error");
-      return;
-    }
-
-    (async () => {
-      try {
-        await completeLogin(token);
-        useSnackbarStore.getState().show("로그인되었습니다.", "success");
-        router.replace("/main");
-      } catch {
+    const refreshTokenHandler = async () => {
+      const accessToken = await refreshToken();
+      useAuthStore.setState({ accessToken, isLogin: true });
+      if (!accessToken) {
         useSnackbarStore.getState().show("로그인에 실패했습니다.", "error");
+        return;
       }
-    })();
-  }, [token, router]);
+
+      (async () => {
+        try {
+          await completeLogin(accessToken);
+          useSnackbarStore.getState().show("로그인되었습니다.", "success");
+          router.replace("/main");
+        } catch {
+          useSnackbarStore.getState().show("로그인에 실패했습니다.", "error");
+        }
+      })();
+    };
+
+    refreshTokenHandler();
+  }, [router]);
 
   return <div>로그인 중...</div>;
 }
