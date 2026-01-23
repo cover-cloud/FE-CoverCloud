@@ -9,7 +9,6 @@ export const fetchAuthMeWithCookie = async (accessToken: string) => {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-        withCredentials: true,
       },
     );
     if (res) {
