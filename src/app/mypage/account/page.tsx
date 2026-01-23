@@ -83,7 +83,6 @@ const AccountPage = () => {
   const logoutHandler = async () => {
     // TODO: 로그아웃 API 호출
     const result = await logout(accessToken);
-    console.log(result);
     if (result.data.success) {
       useAuthStore.setState({ accessToken: "" });
       useAuthStore.setState({ isLogin: false });

@@ -26,9 +26,7 @@ export default function ActivityClient() {
     setSelectedTab(index);
   };
 
-  useEffect(() => {
-    console.log(data, "내 활동 데이터");
-  }, [data]);
+  useEffect(() => {}, [data]);
 
   const activityTabSx = (index: number) => ({
     color:

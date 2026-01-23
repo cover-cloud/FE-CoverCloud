@@ -60,11 +60,7 @@ const PostViewPage = () => {
   const formetCreatedAt = postData
     ? useFormatCreatedAt(postData.data.data.createdAt)
     : "";
-  useEffect(() => {
-    console.log(myCommentList);
-    console.log(userInfo);
-    // 이게 필요한가?
-  }, [userInfo]);
+
   React.useEffect(() => {
     if (!postData) return;
     if (videoId) {
@@ -95,9 +91,6 @@ const PostViewPage = () => {
       mediaQuery.removeEventListener("change", handleChange);
     };
   }, []);
-  useEffect(() => {
-    console.log(isMobile);
-  }, [isMobile]);
 
   if (isPostLoading) return <Box>로딩중..</Box>;
 
@@ -141,7 +134,6 @@ const PostViewPage = () => {
         const likedResult = await fetchUnlike(id as string, accessToken);
         if (likedResult.success) {
           setToggleLikeButton(false);
-          console.log("싫어요");
         }
       } else {
         const likedResult = await fetchLike(id as string, accessToken);

@@ -10,7 +10,7 @@ const AvatarComponent = ({
   openAccountModalHandler: () => void;
 }) => {
   const accessToken = useAuthStore((state) => state.accessToken);
-  console.log(accessToken);
+
   const { data } = useAuthMeQuery(accessToken);
 
   const profileImage = getProfileImage(data?.data.profileImage || "");

@@ -14,7 +14,6 @@ export default function CallbackClient() {
   useEffect(() => {
     const refreshTokenHandler = async () => {
       const accessToken = await refreshToken();
-      console.log("accessToken", accessToken.data.accessToken);
       useAuthStore.setState({
         accessToken: accessToken.data.accessToken,
         isLogin: true,

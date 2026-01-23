@@ -29,12 +29,10 @@ const PopularVideos = () => {
     size: 10,
     period: selectedTab.period,
   });
-  React.useEffect(() => {
-    console.log(data, "data");
-  }, []);
+
   const popularTabChangeHandler = (
     event: React.ChangeEvent<unknown>,
-    value: PopularTab
+    value: PopularTab,
   ) => {
     setSelectedTab(value);
   };

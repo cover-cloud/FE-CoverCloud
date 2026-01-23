@@ -41,9 +41,7 @@ const CommentSection = ({
     }));
     setCommentsData(comments);
   }, [commentList]);
-  useEffect(() => {
-    console.log(commentsData, "eㅔ이터");
-  }, [commentsData]);
+
   const conmmentSubmitHandler = (data: string) => {
     // setCommentsData((prev) => [
     //   ...prev,
