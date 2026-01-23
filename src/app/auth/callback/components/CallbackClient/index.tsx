@@ -14,19 +14,19 @@ export default function CallbackClient() {
   useEffect(() => {
     const refreshTokenHandler = async () => {
       const accessToken = await refreshToken();
-      console.log("accessToken", accessToken);
+      console.log("accessToken", accessToken.data.accessToken);
       useAuthStore.setState({
-        accessToken: accessToken.accessToken,
+        accessToken: accessToken.data.accessToken,
         isLogin: true,
       });
-      if (!accessToken.accessToken) {
+      if (!accessToken.data.accessToken) {
         useSnackbarStore.getState().show("로그인에 실패했습니다.", "error");
         return;
       }
 
       (async () => {
         try {
-          await completeLogin(accessToken.accessToken);
+          await completeLogin(accessToken.data.accessToken);
           useSnackbarStore.getState().show("로그인되었습니다.", "success");
           router.replace("/main");
         } catch {
