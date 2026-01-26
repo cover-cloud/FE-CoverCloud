@@ -7,7 +7,7 @@ import Modal from "@/components/modal/Modal";
 import { useAuthStore } from "@/app/store/useAuthStore";
 import { useAuthMeQuery } from "@/app/api/auth/authMe";
 import { getProfileImage } from "@/app/utils/profileImage";
-import { useChangeAccount } from "@/app/api/auth/changeAccount";
+import { changeAccount } from "@/app/api/auth/changeAccount";
 import { logout } from "@/app/api/auth/logout";
 import { useRouter } from "next/navigation";
 
@@ -23,6 +23,14 @@ const AccountPage = () => {
   const [isDeleteAccountModalOpen, setIsDeleteAccountModalOpen] =
     React.useState(false);
 
+  const [openImageConfirmModal, setOpenImageConfirmModal] =
+    React.useState(false);
+
+  const [tempAvatar, setTempAvatar] = React.useState<string | null>(null);
+  const [prevAvatar, setPrevAvatar] = React.useState<string>("");
+
+  const [isImageChanging, setIsImageChanging] = React.useState(false);
+
   const [avatar, setAvatar] = React.useState<string>("");
   const [originalNickName, setOriginalNickName] = React.useState<string>("");
   const [newNickName, setNewNickName] = React.useState<string>("");
@@ -31,26 +39,7 @@ const AccountPage = () => {
 
   const accessToken = useAuthStore((state) => state.accessToken);
   const { data } = useAuthMeQuery(accessToken);
-  useEffect(() => {
-    if (!data) return;
-    const avatar = getProfileImage(data?.data.profileImage);
-    setAvatar(avatar);
-    setOriginalNickName(data.data.nickname);
-    setAccessedSNS(data.data.provider);
-  }, [data]);
-  // const { control, handleSubmit } = useForm<AccountFormType>({
-  //   resolver: zodResolver(accountSchema),
-  //   defaultValues: {
-  //     avatar: "",
-  //     nickName: "",
-  //     email: "",
-  //     accessedSNS: "",
-  //   },
-  // });
 
-  // const onSubmit = (data: AccountFormType) => {
-  //   console.log("제출 데이터:", data);
-  // };
   const accountSx = {
     "& .MuiInputBase-input": {
       padding: "12px 20px",
@@ -61,18 +50,36 @@ const AccountPage = () => {
   };
   const hasImage = typeof avatar === "string" && avatar.length > 0;
 
-  const handleRemoveImage = () => {
-    setAvatar("");
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+  const handleRemoveImage = async () => {
+    try {
+      const result = await changeAccount(accessToken, undefined, null);
+
+      if (result.data.success) {
+        setAvatar("");
+        setPrevAvatar("");
+        useSnackbarStore.getState().show("이미지가 삭제되었습니다.", "success");
+      }
+    } catch {
+      useSnackbarStore.getState().show("이미지 삭제 실패", "error");
     }
   };
 
-  const changedNickNameHandler = () => {
-    const result = useChangeAccount(accessToken, avatar, newNickName);
+  const changedNickNameHandler = async () => {
+    try {
+      const result = await changeAccount(accessToken, newNickName, undefined);
 
-    setOpenNickNameModal(false);
+      if (result.data.success) {
+        setOriginalNickName(newNickName);
+        setNewNickName("");
+        setOpenNickNameModal(false);
+
+        useSnackbarStore.getState().show("닉네임이 변경되었습니다.", "success");
+      }
+    } catch {
+      useSnackbarStore.getState().show("닉네임 변경에 실패했습니다.", "error");
+    }
   };
+
   const openDeleteAccountModalHandler = () => {
     setIsDeleteAccountModalOpen(true);
   };
@@ -92,6 +99,44 @@ const AccountPage = () => {
       useSnackbarStore.getState().show("로그아웃에 실패했습니다.", "error");
     }
   };
+  const changedImageHandler = async () => {
+    if (!tempAvatar) return;
+
+    try {
+      setIsImageChanging(true);
+
+      const result = await changeAccount(accessToken, tempAvatar, undefined);
+
+      if (result.data.success) {
+        setAvatar(tempAvatar);
+        setPrevAvatar(tempAvatar);
+        setTempAvatar(null);
+        setOpenImageConfirmModal(false);
+
+        useSnackbarStore
+          .getState()
+          .show("프로필 이미지가 변경되었습니다.", "success");
+      } else {
+        throw new Error("change failed");
+      }
+    } catch (e) {
+      useSnackbarStore
+        .getState()
+        .show("프로필 이미지 변경에 실패했습니다.", "error");
+    } finally {
+      setIsImageChanging(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!data) return;
+    const avatar = getProfileImage(data?.data.profileImage);
+    setAvatar(avatar);
+    setPrevAvatar(avatar);
+    setOriginalNickName(data.data.nickname);
+    setAccessedSNS(data.data.provider);
+  }, [data]);
+
   return (
     <Box className="flex flex-col gap-4" sx={{ width: "70%", mx: "auto" }}>
       <Box sx={{ fontSize: 24, fontWeight: "bold", mb: 4 }}>내 계정 설정</Box>
@@ -145,8 +190,8 @@ const AccountPage = () => {
 
               const reader = new FileReader();
               reader.onload = () => {
-                setAvatar(reader.result as string);
-                // field.onChange(reader.result);
+                setTempAvatar(reader.result as string);
+                setOpenImageConfirmModal(true);
               };
               reader.readAsDataURL(file);
             }}
@@ -427,6 +472,53 @@ const AccountPage = () => {
                 계정 탈퇴하기
               </PostBasicButton>
             </Box>
+          </Box>
+        </Box>
+      </Modal>
+      <Modal
+        isOpen={openImageConfirmModal}
+        onClose={() => {
+          setOpenImageConfirmModal(false);
+          setTempAvatar(null);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+          }
+        }}
+      >
+        <Box className="flex flex-col gap-4 items-center" sx={{ p: 3 }}>
+          <Box className="H1">프로필 이미지 변경</Box>
+
+          <Avatar
+            src={tempAvatar || undefined}
+            sx={{ width: 160, height: 160 }}
+          />
+
+          <Box className="B1 text-center">
+            해당 이미지로 프로필을 변경하시겠습니까?
+          </Box>
+
+          <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+            <Button
+              onClick={changedImageHandler}
+              variant="contained"
+              disabled={isImageChanging}
+            >
+              {isImageChanging ? "변경 중..." : "변경"}
+            </Button>
+
+            <Button
+              onClick={() => {
+                setAvatar(prevAvatar);
+                setTempAvatar(null);
+                setOpenImageConfirmModal(false);
+                if (fileInputRef.current) {
+                  fileInputRef.current.value = "";
+                }
+              }}
+              variant="outlined"
+            >
+              취소
+            </Button>
           </Box>
         </Box>
       </Modal>

@@ -19,25 +19,38 @@ type PopularTab = {
   value: number;
   period: Period;
 };
+const popularTabs: PopularTab[] = [
+  { title: "전체", value: 0, period: "ALL" },
+  { title: "월간", value: 1, period: "MONTHLY" },
+  { title: "일간", value: 2, period: "DAILY" },
+  { title: "주간", value: 3, period: "WEEKLY" },
+];
 
+const genreTabs: Genre[] = [
+  { title: "K-POP", value: "K_POP", label: "kpop" },
+  { title: "J-POP", value: "J_POP", label: "jpop" },
+  { title: "POP", value: "POP", label: "pop" },
+];
 const MainComponent = () => {
   const theme = useTheme();
   const router = useRouter();
   const searchParams = useSearchParams();
-
+  const periodFromUrl = (searchParams.get("period") as Period) || "ALL";
+  const genresFromUrl = searchParams.get("genres")
+    ? searchParams.get("genres")!.split(",")
+    : ["K_POP"];
   const accessToken = useAuthStore((state) => state.accessToken);
 
   // 페이지네이션
   const initialPage = Number(searchParams.get("page") || 1);
   const [page, setPage] = useState(initialPage);
-  const [selectedTab, setSelectedTab] = useState<PopularTab>({
-    title: "전체",
-    value: 0,
-    period: "ALL",
-  });
-  const [selectedGenres, setSelectedGenres] = useState<Genre[]>([
-    { title: "K-POP", value: "K_POP", label: "kpop" },
-  ]);
+  const [selectedTab, setSelectedTab] = useState<PopularTab>(
+    () => popularTabs.find((t) => t.period === periodFromUrl) ?? popularTabs[0],
+  );
+
+  const [selectedGenres, setSelectedGenres] = useState<Genre[]>(() =>
+    genreTabs.filter((g) => genresFromUrl.includes(g.value)),
+  );
 
   const { data } = usePopularCoverListQuery({
     page: page - 1,
@@ -51,35 +64,42 @@ const MainComponent = () => {
     router.push(`/main?page=${value}`, { scroll: false });
   };
 
-  const popularTabChangeHandler = (_: any, value: PopularTab) => {
-    setSelectedTab(value);
+  const popularTabChangeHandler = (tab: PopularTab) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("period", tab.period);
+    params.set("page", "1"); // 탭 바뀌면 페이지 초기화
+
+    router.push(`/main?${params.toString()}`, { scroll: false });
   };
 
   const genreTabChangeHandler = (genre: Genre) => {
-    setSelectedGenres((prev) => {
-      const exists = prev.some((item) => item.value === genre.value);
-      if (exists) return prev.filter((item) => item.value !== genre.value);
-      return [...prev, genre];
-    });
+    const params = new URLSearchParams(searchParams.toString());
+
+    const current = new Set(searchParams.get("genres")?.split(",") ?? []);
+
+    if (current.has(genre.value)) {
+      current.delete(genre.value);
+    } else {
+      current.add(genre.value);
+    }
+
+    params.set("genres", Array.from(current).join(","));
+    params.set("page", "1");
+
+    router.push(`/main?${params.toString()}`, { scroll: false });
   };
-
   useEffect(() => {
-    const currentPage = Number(searchParams.get("page") || 1);
-    setPage(currentPage);
+    setPage(Number(searchParams.get("page") || 1));
+
+    const period = searchParams.get("period") as Period;
+    if (period) {
+      const tab = popularTabs.find((t) => t.period === period);
+      if (tab) setSelectedTab(tab);
+    }
+
+    const genres = searchParams.get("genres")?.split(",") ?? [];
+    setSelectedGenres(genreTabs.filter((g) => genres.includes(g.value)));
   }, [searchParams]);
-
-  const popularTabs: PopularTab[] = [
-    { title: "전체", value: 0, period: "ALL" },
-    { title: "월간", value: 1, period: "MONTHLY" },
-    { title: "일간", value: 2, period: "DAILY" },
-    { title: "주간", value: 3, period: "WEEKLY" },
-  ];
-
-  const genreTabs: Genre[] = [
-    { title: "K-POP", value: "K_POP", label: "kpop" },
-    { title: "J-POP", value: "J_POP", label: "jpop" },
-    { title: "POP", value: "POP", label: "pop" },
-  ];
 
   const popularTabSx = (index: number) => ({
     color:
@@ -126,7 +146,7 @@ const MainComponent = () => {
             <Button
               role="tab"
               aria-selected={selectedTab.period === tab.period}
-              onClick={(e) => popularTabChangeHandler(e, tab)}
+              onClick={(e) => popularTabChangeHandler(tab)}
               sx={popularTabSx(index)}
             >
               {tab.title}

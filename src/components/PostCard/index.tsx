@@ -36,7 +36,10 @@ const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
   const theme = useTheme();
   const [loading, setLoading] = useState(true);
   const [imageSrc, setImageSrc] = useState(imgSrc);
-
+  React.useEffect(() => {
+    setImageSrc(imgSrc);
+    setLoading(true);
+  }, [imgSrc]);
   return (
     <Link href={`/post/${coverId}/view`}>
       <Box
@@ -85,7 +88,7 @@ const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
             {coverTitle && (
               <h3 className="text-sm font-medium">{coverTitle}</h3>
             )}
-            {!isViewer && (
+            {isViewer && (
               <Box className="flex items-center gap-1">
                 <FaRegHeart /> {likeCount}
               </Box>

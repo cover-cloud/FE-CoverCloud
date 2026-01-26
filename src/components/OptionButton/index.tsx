@@ -47,7 +47,7 @@ const OptionButton = ({
           setIsOptionOpen((prev) => !prev);
         }}
       >
-        {colIcon ? <HiDotsVertical /> : <HiDotsHorizontal />}
+        {colIcon ? <HiDotsVertical /> : <HiDotsHorizontal size={24} />}
       </Box>
 
       {isOptionOpen && isLogin && (

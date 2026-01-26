@@ -10,7 +10,7 @@ export const logout = async (accessToken: string) => {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
-    }
+    },
   );
   useAuthStore.setState({
     accessToken: undefined,

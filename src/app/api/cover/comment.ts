@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useAuthStore } from "@/app/store/useAuthStore";
 
 const fetchCommentList = async (coverId: number) => {
   const res = await axios.get(
@@ -122,14 +123,24 @@ export const useUpdateCommentMutation = () => {
 };
 
 const myCommentList = (accessToken: string) => {
-  return axios.get(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cover/comment/my`,
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
+  try {
+    const res = axios.get(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cover/comment/my`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
       },
-    },
-  );
+    );
+    if (res) {
+      return res;
+    } else {
+      // 로그아웃 로직
+      useAuthStore.setState({ accessToken: "" });
+    }
+  } catch (error) {
+    useAuthStore.setState({ accessToken: "" });
+  }
 };
 export const useMyCommentList = (accessToken: string) => {
   return useQuery({
@@ -137,6 +148,8 @@ export const useMyCommentList = (accessToken: string) => {
     queryFn: () => {
       return myCommentList(accessToken);
     },
+    enabled: !!accessToken,
+    retry: false,
   });
 };
 

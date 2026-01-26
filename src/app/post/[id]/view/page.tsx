@@ -26,7 +26,8 @@ import theme from "@/app/lib/theme";
 import { useFormatCreatedAt } from "@/app/utils/formetCreatedAt";
 import OptionButton from "@/components/OptionButton";
 import { fetchAuthMeWithCookie, useAuthMeQuery } from "@/app/api/auth/authMe";
-import { useModalStore } from "@/app/store/useModalStore";
+import { useMobaileModeStore, useModalStore } from "@/app/store/useModalStore";
+import { formatViewCount } from "@/app/utils/viewCount";
 const PostViewPage = () => {
   const { id } = useParams();
   const router = useRouter();
@@ -48,14 +49,14 @@ const PostViewPage = () => {
   const [originalTitle, setOriginalTitle] = React.useState<string>("");
   const [videoOwner, setVideoOwner] = React.useState<number | null>(null);
   //상태
-  const [isMobile, setIsMobile] = React.useState(false);
+
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
   const [toggleLikeButton, setToggleLikeButton] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const { data: postData, isLoading: isPostLoading } = useReadingPost(
     id as string,
   );
-
+  const isMobile = useMobaileModeStore((state) => state.isMobile);
   const videoId = postData ? getYoutubeVideoId(postData.data.data.link) : "";
   const formetCreatedAt = postData
     ? useFormatCreatedAt(postData.data.data.createdAt)
@@ -76,21 +77,6 @@ const PostViewPage = () => {
     setTags(postData.data.data.tags);
     setVideoOwner(postData.data.data.userId);
   }, [postData]);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 767px)");
-
-    const handleChange = (e: MediaQueryListEvent) => {
-      setIsMobile(e.matches);
-    };
-
-    setIsMobile(mediaQuery.matches);
-    mediaQuery.addEventListener("change", handleChange);
-
-    return () => {
-      mediaQuery.removeEventListener("change", handleChange);
-    };
-  }, []);
 
   if (isPostLoading) return <Box>로딩중..</Box>;
 
@@ -147,13 +133,30 @@ const PostViewPage = () => {
   };
 
   return (
-    <Box className={isMobile ? "flex flex-col" : "flex gap-3"}>
+    <Box className={isMobile ? "flex flex-col" : "flex"} sx={{ gap: "52px" }}>
       <Box className={isMobile ? "w-full" : "w-[66%]"}>
-        <Box className="flex justify-between">
-          <Box className="flex items-center justify-center">
-            <IoIosArrowBack />
+        {isMobile && (
+          <Box
+            className="flex justify-between"
+            sx={{
+              my: "20px",
+              mx: "10px",
+            }}
+            onClick={() => router.back()}
+          >
+            <React.Fragment>
+              <Box className="flex items-center justify-center">
+                <IoIosArrowBack size={24} />
+              </Box>
+
+              <OptionButton
+                isLogin={userInfo.data?.data?.userId === videoOwner}
+                openDeleteModal={() => setIsDeleteModalOpen(true)}
+                navigateToEdit={navigateToEdit}
+              />
+            </React.Fragment>
           </Box>
-        </Box>
+        )}
         <Box sx={{ marginBottom: "12px" }}>
           <iframe
             src={`https://www.youtube.com/embed/${youtubeVideoId}`}
@@ -168,16 +171,57 @@ const PostViewPage = () => {
         <Box>
           <Box className="flex justify-between items-center">
             <h1 className="H1 mb-1">{coverTitle}</h1>
-            <Box className="flex gap-2">
-              <FaPlay />
-              <Button onClick={likeToggleHandler} disabled={isLoading}>
-                {!toggleLikeButton ? <FaRegHeart /> : <FaHeart />}
+            <Box className="flex gap-4">
+              <Box className="flex gap-2 items-center">
+                <FaPlay />
+                <Box sx={{ fontSize: "20px" }}>
+                  {formatViewCount(postData?.data.data.viewCount)}
+                </Box>
+              </Box>
+              <Button
+                className="flex gap-2 items-center"
+                onClick={likeToggleHandler}
+                disabled={isLoading}
+                disableRipple
+                sx={{
+                  minWidth: "auto",
+                  padding: 0,
+                  marginRight: "15px",
+                  backgroundColor: "transparent",
+                  color: "#000",
+                  "&:hover": {
+                    backgroundColor: "transparent",
+                  },
+                  "&:active": {
+                    backgroundColor: "transparent",
+                  },
+                  "&.Mui-disabled": {
+                    color: "#000",
+                    opacity: 0.5,
+                  },
+                }}
+              >
+                {!toggleLikeButton ? (
+                  <FaRegHeart size={20} />
+                ) : (
+                  <FaHeart size={20} />
+                )}
+                <Box
+                  sx={{
+                    fontSize: "20px",
+                  }}
+                >
+                  {postData?.data.data.likeCount}
+                </Box>
               </Button>
-              <OptionButton
-                isLogin={userInfo.data?.data?.userId === videoOwner}
-                openDeleteModal={() => setIsDeleteModalOpen(true)}
-                navigateToEdit={navigateToEdit}
-              />
+
+              {!isMobile && (
+                <OptionButton
+                  isLogin={userInfo.data?.data?.userId === videoOwner}
+                  openDeleteModal={() => setIsDeleteModalOpen(true)}
+                  navigateToEdit={navigateToEdit}
+                />
+              )}
             </Box>
           </Box>
 
@@ -224,7 +268,7 @@ const PostViewPage = () => {
         </Box>
       </Box>
       <Box className={isMobile ? "w-full" : "w-[33%]"}>
-        <PopularVideos />
+        <PopularVideos isViewer={!isMobile} />
       </Box>
       <Modal
         isOpen={isDeleteModalOpen}

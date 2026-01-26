@@ -13,11 +13,14 @@ import AvatarComponent from "../auth/AvatarComponent";
 import { useAuthStore } from "@/app/store/useAuthStore";
 import { IoIosAddCircle } from "react-icons/io";
 import { useRouter } from "next/navigation";
+import { useAuthMeQuery } from "@/app/api/auth/authMe";
 
 const Header = () => {
   const theme = useTheme();
   const openLoginModal = useModalStore((state) => state.openLoginModal);
-  const isLogin = useAuthStore((state) => state.isLogin);
+  const accessToken = useAuthStore((state) => state.accessToken);
+
+  const { data, isLoading, error } = useAuthMeQuery(accessToken);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [openAccountModal, setOpenAccountModal] = React.useState(false);
   const router = useRouter();
@@ -34,6 +37,7 @@ const Header = () => {
   const openAccountModalHandler = () => {
     setOpenAccountModal(!openAccountModal);
   };
+
   return (
     <header>
       <Box
@@ -82,7 +86,7 @@ const Header = () => {
           </Button>
         </Box>
         <Box className="flex justify-end" sx={{ flex: 1 }}>
-          {isLogin ? (
+          {data?.success && !error ? (
             <Box className="flex">
               <Link href="/post/create">
                 <Button
@@ -121,6 +125,7 @@ const Header = () => {
               <Box ml={"50px"} className="flex items-center">
                 <AvatarComponent
                   openAccountModalHandler={openAccountModalHandler}
+                  profileImage={data?.data.profileImage}
                 />
               </Box>
             </Box>

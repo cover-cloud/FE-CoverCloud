@@ -6,14 +6,11 @@ import { useAuthStore } from "@/app/store/useAuthStore";
 import { getProfileImage } from "@/app/utils/profileImage";
 const AvatarComponent = ({
   openAccountModalHandler,
+  profileImage,
 }: {
   openAccountModalHandler: () => void;
+  profileImage: string;
 }) => {
-  const accessToken = useAuthStore((state) => state.accessToken);
-
-  const { data } = useAuthMeQuery(accessToken);
-
-  const profileImage = getProfileImage(data?.data.profileImage || "");
   return (
     <Avatar
       src={profileImage}

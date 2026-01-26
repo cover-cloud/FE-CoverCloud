@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
+import { useAuthStore } from "@/app/store/useAuthStore";
 
 export const fetchAuthMeWithCookie = async (accessToken: string) => {
   try {
@@ -15,8 +16,10 @@ export const fetchAuthMeWithCookie = async (accessToken: string) => {
       return res.data;
     } else {
       // 로그아웃 로직
+      useAuthStore.setState({ accessToken: "" });
     }
   } catch (error) {
+    useAuthStore.setState({ accessToken: "" });
     return {
       success: false,
       message: "로그인 정보를 확인할 수 없습니다.",

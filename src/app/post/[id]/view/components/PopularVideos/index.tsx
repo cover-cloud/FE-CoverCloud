@@ -1,17 +1,18 @@
 "use client";
 import React from "react";
-import { Box, Tabs, Tab, Button } from "@mui/material";
+import { Box, Tabs, Tab, Button, Grid } from "@mui/material";
 import PostCard from "@/components/PostCard";
 import { Period, usePopularCoverListQuery } from "@/app/api/cover/list";
 import theme from "@/app/lib/theme";
 import { contentData } from "@/app/main/type";
+import { is } from "zod/v4/locales";
 
 type PopularTab = {
   title: string;
   value: number;
   period: Period;
 };
-const PopularVideos = () => {
+const PopularVideos = ({ isViewer }: { isViewer: boolean }) => {
   const popularTabs: PopularTab[] = [
     { title: "전체", value: 0, period: "ALL" },
     { title: "월간", value: 1, period: "MONTHLY" },
@@ -55,6 +56,7 @@ const PopularVideos = () => {
       },
     };
   };
+
   return (
     <Box>
       <Box role="tablist" className="flex items-center mb-4">
@@ -82,11 +84,20 @@ const PopularVideos = () => {
           </Box>
         ))}
       </Box>
-      <Box>
+      <Grid container spacing={2}>
         {data?.content.map((post: contentData, idx: number) => (
-          <PostCard {...post} key={idx} isViewer />
+          <Grid
+            key={idx}
+            size={
+              isViewer
+                ? { xs: 12 } // 뷰어 모드 → 항상 한 줄
+                : { xs: 12, sm: 6, md: 4 } // 일반 모드
+            }
+          >
+            <PostCard {...post} key={idx} isViewer={isViewer} />
+          </Grid>
         ))}
-      </Box>
+      </Grid>
     </Box>
   );
 };

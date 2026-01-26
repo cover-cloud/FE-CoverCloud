@@ -6,6 +6,7 @@ import { RiKakaoTalkFill } from "react-icons/ri";
 import { SiNaver } from "react-icons/si";
 import theme from "@/app/lib/theme";
 import axios from "axios";
+import { useMobaileModeStore } from "@/app/store/useModalStore";
 
 const Login = () => {
   const handleLogin = (loginType: "kakao" | "naver") => {
@@ -17,7 +18,7 @@ const Login = () => {
         "https://www.covercloud.kr/oauth2/authorization/naver";
     }
   };
-
+  const isMobile = useMobaileModeStore((state) => state.isMobile);
   return (
     <Box
       sx={{
@@ -29,7 +30,7 @@ const Login = () => {
         width: "100%",
         height: "449px",
         borderRadius: "8px",
-        padding: "50px",
+        padding: isMobile ? "0px" : "50px",
       }}
     >
       <h1
