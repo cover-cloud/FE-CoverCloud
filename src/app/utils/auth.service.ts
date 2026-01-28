@@ -6,7 +6,7 @@ export const completeLogin = async (accessToken: string) => {
   useAuthStore.setState({ accessToken });
 
   // 2. 유저 정보 조회
-  const me = await fetchAuthMeWithCookie(accessToken);
+  const me = await fetchAuthMeWithCookie();
 
   // 3. 로그인 완료
   useAuthStore.setState({

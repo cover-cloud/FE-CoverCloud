@@ -33,7 +33,7 @@ const CommentInput = ({
     e.preventDefault();
     if (!comment.trim()) return;
     //로그인 상태 확인로직
-    const isMyAccount = await fetchAuthMeWithCookie(accessToken);
+    const isMyAccount = await fetchAuthMeWithCookie();
     if (!isMyAccount.success) {
       openLoginModal();
       return;

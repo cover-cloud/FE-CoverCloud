@@ -66,7 +66,7 @@ const CommentItem = ({
   const likeComment = useCommentLikeMutation();
   const likeCommentHandler = async () => {
     if (!accessToken) {
-      const isMyAccount = await fetchAuthMeWithCookie(accessToken);
+      const isMyAccount = await fetchAuthMeWithCookie();
       if (!isMyAccount.success) {
         openLoginModal();
         return;
