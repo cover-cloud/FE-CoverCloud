@@ -23,6 +23,7 @@ const searchTabs: SearchTab[] = [
   { title: "태그", searchType: "tags" },
 ];
 
+export const dynamic = "force-dynamic";
 export default function SearchClient() {
   const theme = useTheme();
   const router = useRouter();
