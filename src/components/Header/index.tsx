@@ -18,6 +18,8 @@ import { IoIosAddCircle } from "react-icons/io";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthMeQuery } from "@/app/api/auth/authMe";
 
+export const dynamic = "force-dynamic";
+
 const Header = () => {
   const searchParams = useSearchParams();
   const keyword = searchParams.get("q") ?? "";
