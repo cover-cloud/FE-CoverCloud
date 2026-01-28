@@ -9,6 +9,7 @@ import ClientModalRender from "../components/modal/ClientModalRender";
 import Footer from "../components/Footer";
 import AuthInit from "@/components/auth/AuthInit";
 import GlobalSnackbar from "@/components/GlobalSnackbar";
+import ClientOnlyWrapper from "@/components/ClientOnlyWarper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,7 +42,10 @@ export default function RootLayout({
         <QueryProvider>
           <AuthInit>
             <MuiProvider>
-              <Header />
+              <ClientOnlyWrapper>
+                <Header />
+              </ClientOnlyWrapper>
+
               <Box className="bg-zinc-50 font-sans min-h-screen">
                 <main className="max-w-7xl mx-auto px-6 py-16 ">
                   {children}

@@ -9,7 +9,6 @@ import { useAuthStore } from "@/app/store/useAuthStore";
 
 export default function CallbackClient() {
   const router = useRouter();
-  const params = useSearchParams();
 
   useEffect(() => {
     const refreshTokenHandler = async () => {
