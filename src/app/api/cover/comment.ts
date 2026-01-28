@@ -1,16 +1,13 @@
-import axios from "axios";
+import { api } from "@/app/lib/api";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useAuthStore } from "@/app/store/useAuthStore";
 
 const fetchCommentList = async (coverId: number) => {
-  const res = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cover/comment/list`,
-    {
-      params: {
-        coverId,
-      },
+  const res = await api.get(`/api/cover/comment/list`, {
+    params: {
+      coverId,
     },
-  );
+  });
   return res.data;
 };
 
@@ -35,15 +32,11 @@ export const useCreateCommentMutation = () => {
       parentCommentId?: number;
       accessToken: string;
     }) =>
-      axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cover/comment/create`,
-        { content: comment, coverId, parentCommentId },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        },
-      ),
+      api.post(`/api/cover/comment/create`, {
+        content: comment,
+        coverId,
+        parentCommentId,
+      }),
 
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
@@ -66,18 +59,11 @@ export const useDeleteCommentMutation = () => {
       accessToken: string;
       coverId: number;
     }) =>
-      axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cover/comment/delete`,
-        null,
-        {
-          params: {
-            commentId,
-          },
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
+      api.post(`/api/cover/comment/delete`, null, {
+        params: {
+          commentId,
         },
-      ),
+      }),
 
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
@@ -101,15 +87,12 @@ export const useUpdateCommentMutation = () => {
       accessToken: string;
       coverId: number;
     }) =>
-      axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cover/comment/update`,
+      api.post(
+        `/api/cover/comment/update`,
         { content },
         {
           params: {
             commentId,
-          },
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
           },
         },
       ),
@@ -122,16 +105,9 @@ export const useUpdateCommentMutation = () => {
   });
 };
 
-const myCommentList = (accessToken: string) => {
+const myCommentList = () => {
   try {
-    const res = axios.get(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cover/comment/my`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
-    );
+    const res = api.get(`/api/cover/comment/my`);
     if (res) {
       return res;
     } else {
@@ -142,13 +118,12 @@ const myCommentList = (accessToken: string) => {
     useAuthStore.setState({ accessToken: "" });
   }
 };
-export const useMyCommentList = (accessToken: string) => {
+export const useMyCommentList = () => {
   return useQuery({
     queryKey: ["my-comment-list"],
     queryFn: () => {
-      return myCommentList(accessToken);
+      return myCommentList();
     },
-    enabled: !!accessToken,
     retry: false,
   });
 };
@@ -166,16 +141,9 @@ export const useCommentLikeMutation = () => {
       coverId: number;
       accessToken: string;
     }) =>
-      axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cover/comment/like`,
-        null,
-        {
-          params: { commentId },
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        },
-      ),
+      api.post(`api/cover/comment/like`, null, {
+        params: { commentId },
+      }),
 
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({

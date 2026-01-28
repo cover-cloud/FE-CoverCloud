@@ -38,11 +38,11 @@ const MainComponent = () => {
   const periodFromUrl = (searchParams.get("period") as Period) || "ALL";
   const genresFromUrl = searchParams.get("genres")
     ? searchParams.get("genres")!.split(",")
-    : ["K_POP"];
+    : [];
   const accessToken = useAuthStore((state) => state.accessToken);
 
   // 페이지네이션
-  const initialPage = Number(searchParams.get("page") || 1);
+  const initialPage = Number(searchParams.get("page") || 0);
   const [page, setPage] = useState(initialPage);
   const [selectedTab, setSelectedTab] = useState<PopularTab>(
     () => popularTabs.find((t) => t.period === periodFromUrl) ?? popularTabs[0],
@@ -52,8 +52,8 @@ const MainComponent = () => {
     genreTabs.filter((g) => genresFromUrl.includes(g.value)),
   );
 
-  const { data } = usePopularCoverListQuery({
-    page: page - 1,
+  const { data, isLoading } = usePopularCoverListQuery({
+    page: page,
     size: 18,
     period: selectedTab.period,
     genres: selectedGenres.map((genre) => genre.value),
@@ -67,7 +67,7 @@ const MainComponent = () => {
   const popularTabChangeHandler = (tab: PopularTab) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("period", tab.period);
-    params.set("page", "1"); // 탭 바뀌면 페이지 초기화
+    params.set("page", "0"); // 탭 바뀌면 페이지 초기화
 
     router.push(`/main?${params.toString()}`, { scroll: false });
   };
@@ -84,12 +84,12 @@ const MainComponent = () => {
     }
 
     params.set("genres", Array.from(current).join(","));
-    params.set("page", "1");
+    params.set("page", "0");
 
     router.push(`/main?${params.toString()}`, { scroll: false });
   };
   useEffect(() => {
-    setPage(Number(searchParams.get("page") || 1));
+    setPage(Number(searchParams.get("page") || 0));
 
     const period = searchParams.get("period") as Period;
     if (period) {
@@ -191,9 +191,17 @@ const MainComponent = () => {
             ))}
           </Grid>
           <Box className="mt-8 flex justify-center">
-            <Pagination count={1} page={page} onChange={pageChangeHandler} />
+            <Pagination
+              count={data?.totalPages}
+              page={page}
+              hidePrevButton={page === 0}
+              hideNextButton={page === data?.totalPages - 1}
+              onChange={pageChangeHandler}
+            />
           </Box>
         </>
+      ) : isLoading ? (
+        <InfoMessage message="게시물을 불러오고있습니다." />
       ) : (
         <InfoMessage message="게시글이 없습니다." />
       )}

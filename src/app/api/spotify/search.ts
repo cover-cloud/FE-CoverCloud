@@ -1,22 +1,15 @@
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-const search = async (keyword: string, accessToken: string) => {
-  const searchResult = await axios.post(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/music/spotify/search`,
-    { keyword },
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
-  );
+import { api } from "@/app/lib/api";
+const search = async (keyword: string) => {
+  const searchResult = await api.post(`/api/music/spotify/search`, { keyword });
   return searchResult.data;
 };
 
-export const useSearchQuery = (keyword: string, accessToken: string) => {
+export const useSearchQuery = (keyword: string) => {
   return useQuery({
     queryKey: ["spotify", keyword],
-    queryFn: () => search(keyword, accessToken),
+    queryFn: () => search(keyword),
     enabled: !!keyword,
   });
 };

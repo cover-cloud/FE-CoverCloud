@@ -20,7 +20,7 @@ const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
   coverId,
   coverTitle,
   createdAt,
-  likeCount,
+  likeIncrement,
   link,
   musicId,
   tags,
@@ -83,14 +83,19 @@ const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
           />
         </Box>
 
-        <Box className="flex flex-col flex-1 min-w-0">
+        <Box
+          className="flex flex-col flex-1 min-w-0"
+          sx={{
+            marginLeft: isViewer ? "16px" : "0",
+          }}
+        >
           <Box className="flex justify-between items-center">
             {coverTitle && (
               <h3 className="text-sm font-medium">{coverTitle}</h3>
             )}
-            {isViewer && (
+            {!isViewer && (
               <Box className="flex items-center gap-1">
-                <FaRegHeart /> {likeCount}
+                <FaRegHeart /> {likeIncrement}
               </Box>
             )}
           </Box>
@@ -117,7 +122,7 @@ const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
           {isViewer && (
             <Box className="flex items-center gap-1">
               <FaRegHeart />
-              {likeCount}
+              {likeIncrement}
             </Box>
           )}
         </Box>

@@ -21,7 +21,7 @@ export default function ActivityClient() {
   const activityTabs = ["추천", "좋아요", "댓글"];
   const accessToken = useAuthStore((state) => state.accessToken);
   const { data, isLoading } = useMyCoverListQuery(accessToken);
-  const { data: authMeData } = useAuthMeQuery(accessToken);
+  const { data: authMeData, isLoading: authMeLoading } = useAuthMeQuery();
   const [selectedTab, setSelectedTab] = React.useState(0);
 
   const activityTabChangeHandler = (_: React.MouseEvent, index: number) => {
@@ -52,7 +52,7 @@ export default function ActivityClient() {
     router.push(`/mypage/activity?page=${value}`, { scroll: false });
   };
 
-  if (isLoading) {
+  if (isLoading || authMeLoading) {
     return <Box>로딩 중...</Box>;
   }
   if (authMeData?.success === false) {

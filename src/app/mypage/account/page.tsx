@@ -15,10 +15,14 @@ import { Box, TextField, Button, Avatar, Typography } from "@mui/material";
 import { TbCirclePlus } from "react-icons/tb";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
+import { useMobaileModeStore } from "@/app/store/useModalStore";
+import Login from "@/components/auth/Login";
+import Loading from "@/app/main/loading";
 
 const AccountPage = () => {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const isMobile = useMobaileModeStore((state) => state.isMobile);
   const [openNickNameModal, setOpenNickNameModal] = React.useState(false);
   const [isDeleteAccountModalOpen, setIsDeleteAccountModalOpen] =
     React.useState(false);
@@ -38,7 +42,7 @@ const AccountPage = () => {
   const [accessedSNS, setAccessedSNS] = React.useState<string>("");
 
   const accessToken = useAuthStore((state) => state.accessToken);
-  const { data } = useAuthMeQuery(accessToken);
+  const { data, isLoading } = useAuthMeQuery();
 
   const accountSx = {
     "& .MuiInputBase-input": {
@@ -46,6 +50,12 @@ const AccountPage = () => {
     },
     "&.MuiFormControl-root": {
       flex: 1,
+    },
+    "& .MuiOutlinedInput-root": {
+      backgroundColor: theme.palette.gray.secondary,
+      borderRadius: "15px",
+      border: "none",
+      height: isMobile ? "40px" : "48px",
     },
   };
   const hasImage = typeof avatar === "string" && avatar.length > 0;
@@ -129,16 +139,20 @@ const AccountPage = () => {
   };
 
   useEffect(() => {
-    if (!data) return;
+    if (!data || data.success === false) return;
     const avatar = getProfileImage(data?.data.profileImage);
     setAvatar(avatar);
     setPrevAvatar(avatar);
     setOriginalNickName(data.data.nickname);
     setAccessedSNS(data.data.provider);
   }, [data]);
-
+  if (isLoading) return <Loading />;
+  if (data?.success === false) return <Login />;
   return (
-    <Box className="flex flex-col gap-4" sx={{ width: "70%", mx: "auto" }}>
+    <Box
+      className="flex flex-col gap-4"
+      sx={{ width: isMobile ? "100%" : "70%", mx: "auto" }}
+    >
       <Box sx={{ fontSize: 24, fontWeight: "bold", mb: 4 }}>내 계정 설정</Box>
 
       <Box className="flex flex-col gap-1 items-center justify-center">
@@ -227,14 +241,18 @@ const AccountPage = () => {
             sx={accountSx}
           />
 
-          <Box>
+          <Box className="flex items-center">
             <PostBasicButton
               onClick={() => setOpenNickNameModal(true)}
               backgroundColor={theme.palette.common.black}
               color={theme.palette.common.white}
               hoverBGColor={theme.palette.gray.secondary}
               hoverColor={theme.palette.common.black}
-              postClass="B1"
+              sxStyle={{
+                minWidth: isMobile ? "64px" : "126px",
+                flex: 1,
+              }}
+              postClass={` ${isMobile ? "S4" : "B1"}`}
             >
               변경
             </PostBasicButton>
@@ -288,6 +306,9 @@ const AccountPage = () => {
             hoverColor={theme.palette.common.black}
             postRadius="50px"
             onClick={logoutHandler}
+            sxStyle={{
+              marginBottom: "24px",
+            }}
             postClass="B1"
           >
             계정 로그아웃
@@ -305,7 +326,9 @@ const AccountPage = () => {
                 },
               }}
             >
-              <Box className="B1">계정삭제</Box>
+              <Box className="B1" sx={{ flex: "1 0 auto" }}>
+                계정삭제
+              </Box>
             </Button>
           </Box>
         </Box>
@@ -317,7 +340,17 @@ const AccountPage = () => {
       >
         <Box
           className="flex flex-col gap-4 items-center"
-          sx={{ minWidth: "637px", p: 2 }}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2,
+            width: "100%",
+            height: "449px",
+            borderRadius: "8px",
+            padding: isMobile ? "30px" : "50px",
+          }}
         >
           <Box className="H1">닉네임 변경</Box>
           <Box className="S2" sx={{ width: "100%" }}>
@@ -328,7 +361,7 @@ const AccountPage = () => {
             onChange={(e) => setOriginalNickName(e.target.value)}
             placeholder="현재 닉네임"
             fullWidth
-            sx={{ mb: 2 }}
+            sx={accountSx}
             disabled
           />
           <Box className="S2" sx={{ width: "100%" }}>
@@ -339,7 +372,7 @@ const AccountPage = () => {
             onChange={(e) => setNewNickName(e.target.value)}
             placeholder="새 닉네임"
             fullWidth
-            sx={{ mb: 2 }}
+            sx={accountSx}
           />
           <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
             <PostBasicButton

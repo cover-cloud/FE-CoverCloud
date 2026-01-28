@@ -1,16 +1,11 @@
-import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "@/app/store/useAuthStore";
+import { api } from "@/app/lib/api";
 
-export const fetchAuthMeWithCookie = async (accessToken: string) => {
+export const fetchAuthMeWithCookie = async () => {
   try {
-    const res = await axios.get(
+    const res = await api.get(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/me`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
     );
     if (res) {
       return res.data;
@@ -27,12 +22,11 @@ export const fetchAuthMeWithCookie = async (accessToken: string) => {
   }
 };
 
-export const useAuthMeQuery = (accessToken: string) => {
-  const hasToken = !!accessToken;
+export const useAuthMeQuery = () => {
   return useQuery({
     queryKey: ["auth-me-cookie"],
-    queryFn: () => fetchAuthMeWithCookie(accessToken),
-    enabled: hasToken,
+    queryFn: () => fetchAuthMeWithCookie(),
+
     retry: false,
   });
 };

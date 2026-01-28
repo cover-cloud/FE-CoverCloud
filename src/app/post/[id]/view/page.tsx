@@ -8,7 +8,12 @@ import { Box, Button } from "@mui/material";
 
 import { getYoutubeVideoId } from "@/app/utils/youtube";
 import { deletePost, useReadingPost } from "@/app/api/cover/post";
-import { fetchLike, fetchUnlike } from "@/app/api/cover/like";
+import {
+  fetchLike,
+  fetchUnlike,
+  useLikeMutation,
+  useUnlikeMutation,
+} from "@/app/api/cover/like";
 import { useMyCommentList } from "@/app/api/cover/comment";
 
 import { FaPlay } from "react-icons/fa";
@@ -32,10 +37,10 @@ const PostViewPage = () => {
   const { id } = useParams();
   const router = useRouter();
   const { isLogin } = useAuthStore();
-  const accessToken = useAuthStore((state) => state.accessToken);
-
-  const { data: myCommentList } = useMyCommentList(accessToken);
-  const userInfo = useAuthMeQuery(accessToken);
+  const { mutate: likeMutate } = useLikeMutation(id as string);
+  const { mutate: unlikeMutate } = useUnlikeMutation(id as string);
+  const { data: myCommentList } = useMyCommentList();
+  const userInfo = useAuthMeQuery();
 
   const openLoginModal = useModalStore((state) => state.openLoginModal);
 
@@ -88,7 +93,7 @@ const PostViewPage = () => {
   }
 
   const navigateToEdit = async () => {
-    const isAuthenticated = await fetchAuthMeWithCookie(accessToken);
+    const isAuthenticated = await fetchAuthMeWithCookie();
     if (!isAuthenticated.success) {
       openLoginModal();
       return;
@@ -98,10 +103,7 @@ const PostViewPage = () => {
   };
   const deletePostHandler = async () => {
     try {
-      const deleteResult = await deletePost(
-        id as string | string[],
-        accessToken,
-      );
+      const deleteResult = await deletePost(id as string | string[]);
       if (deleteResult.success) {
         router.push("/");
       } else {
@@ -113,25 +115,14 @@ const PostViewPage = () => {
     }
   };
   const likeToggleHandler = async () => {
-    // setToggleLikeButton(!toggleLikeButton);
-    setIsLoading(true);
-    try {
-      if (toggleLikeButton) {
-        const likedResult = await fetchUnlike(id as string, accessToken);
-        if (likedResult.success) {
-          setToggleLikeButton(false);
-        }
-      } else {
-        const likedResult = await fetchLike(id as string, accessToken);
-        if (likedResult.success) {
-          setToggleLikeButton(true);
-        }
-      }
-    } finally {
-      setIsLoading(false);
+    if (!toggleLikeButton) {
+      const unlikeResult = await unlikeMutate();
+      console.log("Unlike", unlikeResult);
+    } else {
+      const likeResult = await likeMutate();
+      console.log("Like", likeResult);
     }
   };
-
   return (
     <Box className={isMobile ? "flex flex-col" : "flex"} sx={{ gap: "52px" }}>
       <Box className={isMobile ? "w-full" : "w-[66%]"}>
@@ -142,19 +133,19 @@ const PostViewPage = () => {
               my: "20px",
               mx: "10px",
             }}
-            onClick={() => router.back()}
           >
-            <React.Fragment>
-              <Box className="flex items-center justify-center">
-                <IoIosArrowBack size={24} />
-              </Box>
+            <Box
+              className="flex items-center justify-center"
+              onClick={() => router.back()}
+            >
+              <IoIosArrowBack size={24} />
+            </Box>
 
-              <OptionButton
-                isLogin={userInfo.data?.data?.userId === videoOwner}
-                openDeleteModal={() => setIsDeleteModalOpen(true)}
-                navigateToEdit={navigateToEdit}
-              />
-            </React.Fragment>
+            <OptionButton
+              isLogin={userInfo.data?.data?.userId === videoOwner}
+              openDeleteModal={() => setIsDeleteModalOpen(true)}
+              navigateToEdit={navigateToEdit}
+            />
           </Box>
         )}
         <Box sx={{ marginBottom: "12px" }}>

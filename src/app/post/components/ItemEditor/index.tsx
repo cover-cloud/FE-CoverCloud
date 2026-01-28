@@ -137,7 +137,7 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
         tags: tags,
       };
       try {
-        const createResult = await createPost(sendData, accessToken);
+        const createResult = await createPost(sendData);
 
         if (createResult.success) {
           router.push("/main");
@@ -156,11 +156,7 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
         tags: tags,
       };
 
-      const updateResult = await updatePost(
-        params.id as string,
-        sendData,
-        accessToken,
-      );
+      const updateResult = await updatePost(params.id as string, sendData);
       if (updateResult.success) {
         router.push("/main");
       }

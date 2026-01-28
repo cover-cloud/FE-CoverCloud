@@ -20,7 +20,7 @@ const ArtistListField = ({
   searchsongTitle: string;
   selectedSongData: SongData;
   setSelectedSongData: (
-    songData: SongData & { title: string; spotifyTrackId: string }
+    songData: SongData & { title: string; spotifyTrackId: string },
   ) => void;
   isSongSearchFocus: boolean;
   isManualInput: boolean;
@@ -30,7 +30,7 @@ const ArtistListField = ({
   // const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
   //   useSpotifySearchQuery(searchsongTitle);
   const accessToken = useAuthStore((state) => state.accessToken);
-  const { data, isLoading } = useSearchQuery(searchsongTitle, accessToken);
+  const { data, isLoading } = useSearchQuery(searchsongTitle);
   const observer = useRef<IntersectionObserver | null>(null);
 
   // const lastSongRef = (node: HTMLDivElement | null) => {
@@ -92,7 +92,7 @@ const ArtistListField = ({
             return (
               <Box
                 // ref={isLast ? lastSongRef : null}
-                key={song.spotifyTrackId}
+                key={`${song.spotifyTrackId}-${index}`}
                 onClick={() => setSelectedSongData(song)}
                 className="cursor-pointer"
               >
@@ -150,10 +150,10 @@ const ArtistListField = ({
               {searchsongTitle === ""
                 ? "커버곡의 원곡 정보를 검색해주세요"
                 : isLoading
-                ? "검색 중..."
-                : data?.length === 0
-                ? `"${searchsongTitle}" 의 검색 결과가 없습니다.`
-                : ""}
+                  ? "검색 중..."
+                  : data?.length === 0
+                    ? `"${searchsongTitle}" 의 검색 결과가 없습니다.`
+                    : ""}
             </Typography>
           </Box>
         )}
