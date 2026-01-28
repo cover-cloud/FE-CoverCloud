@@ -12,6 +12,8 @@ import { useMyCoverListQuery } from "@/app/api/mypage/myCoverList";
 import Login from "@/components/auth/Login";
 import { useAuthMeQuery } from "@/app/api/auth/authMe";
 
+export const dynamic = "force-dynamic";
+
 export default function ActivityClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
