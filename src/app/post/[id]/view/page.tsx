@@ -33,12 +33,12 @@ import OptionButton from "@/components/OptionButton";
 import { fetchAuthMeWithCookie, useAuthMeQuery } from "@/app/api/auth/authMe";
 import { useMobaileModeStore, useModalStore } from "@/app/store/useModalStore";
 import { formatViewCount } from "@/app/utils/viewCount";
+import { useSnackbarStore } from "@/app/store/useSnackbar";
 const PostViewPage = () => {
   const { id } = useParams();
   const router = useRouter();
   const { isLogin } = useAuthStore();
-  const { mutate: likeMutate } = useLikeMutation(id as string);
-  const { mutate: unlikeMutate } = useUnlikeMutation(id as string);
+
   const { data: myCommentList } = useMyCommentList();
   const userInfo = useAuthMeQuery();
 
@@ -53,6 +53,7 @@ const PostViewPage = () => {
   const [originalArtist, setOriginalArtist] = React.useState<string>("");
   const [originalTitle, setOriginalTitle] = React.useState<string>("");
   const [videoOwner, setVideoOwner] = React.useState<number | null>(null);
+  const [likeCount, setLikeCount] = React.useState<number>(0);
   //상태
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
@@ -81,6 +82,8 @@ const PostViewPage = () => {
     setCoverGenre(postData.data.data.coverGenre);
     setTags(postData.data.data.tags);
     setVideoOwner(postData.data.data.userId);
+    setToggleLikeButton(postData.data.data.isLiked);
+    setLikeCount(postData.data.data.likeCount);
   }, [postData]);
 
   if (isPostLoading) return <Box>로딩중..</Box>;
@@ -115,13 +118,43 @@ const PostViewPage = () => {
     }
   };
   const likeToggleHandler = async () => {
-    if (!toggleLikeButton) {
-      const unlikeResult = await unlikeMutate();
-      console.log("Unlike", unlikeResult);
+    if (isLoading) return;
+    setIsLoading(true);
+    if (toggleLikeButton) {
+      const unlikeResult = await fetchUnlike(id as string);
+      if (!unlikeResult.success) {
+        useSnackbarStore.setState({
+          open: true,
+          message: "좋아요 취소에 실패했습니다.",
+        });
+        return;
+      } else {
+        useSnackbarStore.setState({
+          open: true,
+          message: "좋아요가 취소되었습니다.",
+        });
+        setToggleLikeButton(false);
+        setLikeCount((prev) => prev - 1);
+      }
     } else {
-      const likeResult = await likeMutate();
+      const likeResult = await fetchLike(id as string);
+      if (!likeResult.success) {
+        useSnackbarStore.setState({
+          open: true,
+          message: "좋아요에 실패했습니다.",
+        });
+        return;
+      } else {
+        useSnackbarStore.setState({
+          open: true,
+          message: "좋아요가 추가되었습니다.",
+        });
+        setToggleLikeButton(true);
+        setLikeCount((prev) => prev + 1);
+      }
       console.log("Like", likeResult);
     }
+    setIsLoading(false);
   };
   return (
     <Box className={isMobile ? "flex flex-col" : "flex"} sx={{ gap: "52px" }}>
@@ -202,7 +235,7 @@ const PostViewPage = () => {
                     fontSize: "20px",
                   }}
                 >
-                  {postData?.data.data.likeCount}
+                  {likeCount}
                 </Box>
               </Button>
 

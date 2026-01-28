@@ -15,33 +15,54 @@ import AccountModal from "../modal/AccountModal";
 import AvatarComponent from "../auth/AvatarComponent";
 import { useAuthStore } from "@/app/store/useAuthStore";
 import { IoIosAddCircle } from "react-icons/io";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthMeQuery } from "@/app/api/auth/authMe";
 
 const Header = () => {
+  const searchParams = useSearchParams();
+  const keyword = searchParams.get("q") ?? "";
+
+  const page = Number(searchParams.get("page") ?? 1);
   const theme = useTheme();
   const openLoginModal = useModalStore((state) => state.openLoginModal);
-  const accessToken = useAuthStore((state) => state.accessToken);
   const isMobile = useMobaileModeStore((state) => state.isMobile);
 
-  const { data, isLoading, error } = useAuthMeQuery();
+  const { data, error } = useAuthMeQuery();
   const [searchQuery, setSearchQuery] = React.useState("");
   const [openAccountModal, setOpenAccountModal] = React.useState(false);
+
   const router = useRouter();
 
-  const handleSearch = () => {
-    console.log(searchQuery);
-    router.push(`/search?q=${searchQuery}`);
-  };
+  const [searchType, setSearchType] = React.useState<"title" | "tags">("title");
 
+  /** ✅ URL 쿼리 → input 동기화 */
+
+  React.useEffect(() => {
+    const q = searchParams.get("q");
+    const type = searchParams.get("searchType");
+
+    if (q !== null) {
+      setSearchQuery(q);
+    }
+
+    if (type === "tags" || type === "title") {
+      setSearchType(type);
+    }
+  }, [searchParams]);
+  const handleSearch = () => {
+    if (!searchQuery.trim()) return;
+
+    router.push(
+      `/search?q=${encodeURIComponent(searchQuery)}&searchType=${searchType}&page=1`,
+    );
+  };
   const handleLogin = () => {
     openLoginModal();
   };
 
   const openAccountModalHandler = () => {
-    setOpenAccountModal(!openAccountModal);
+    setOpenAccountModal((prev) => !prev);
   };
-
   return (
     <header>
       <Box

@@ -16,11 +16,11 @@ export const useLikeMutation = (coverId: string) => {
 
   return useMutation({
     mutationFn: () => fetchLike(coverId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["readingPost", coverId],
-      });
-    },
+    // onSuccess: () => {
+    //   queryClient.invalidateQueries({
+    //     queryKey: ["readingPost", coverId],
+    //   });
+    // },
   });
 };
 
@@ -29,10 +29,10 @@ export const useUnlikeMutation = (coverId: string) => {
 
   return useMutation({
     mutationFn: () => fetchUnlike(coverId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["readingPost", coverId],
-      });
-    },
+    // onSuccess: () => {
+    //   queryClient.invalidateQueries({
+    //     queryKey: ["readingPost", coverId],
+    //   });
+    // },
   });
 };

@@ -9,7 +9,7 @@ interface AuthStore {
 export const useAuthStore = create<AuthStore>((set) => ({
   isLogin: false,
   accessToken:
-    "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwidXNlcklkIjoyLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzY5NTc2MjQwLCJleHAiOjE3Njk1Nzk4NDB9.aYP4bthMu4tjinyiFKcd0NDbOsKPEboK29dpcE3XYhdMOOaX91_6rkeuH8mxRir_xE_dMRP_1C6ZAuy2OdzZeQ",
+    "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwidXNlcklkIjoyLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzY5NTg1OTYxLCJleHAiOjE3Njk1ODk1NjF9.qlgY3sSEbXXtu6iGTpl85IwhOB9MvI51WeWZL8t0bj5JFltdpodoU4Xq0cVoi2JvSmemqd2uiNhfQBOTS0fjlg",
   userId: null,
   setIsLogin: (isLogin: boolean) => set({ isLogin }),
   setAccessToken: (accessToken: string) => set({ accessToken }),

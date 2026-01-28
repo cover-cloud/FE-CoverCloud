@@ -72,31 +72,31 @@ const processQueue = (token: string | null) => {
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
-    console.log("🔴 === INTERCEPTOR 진입 ===");
-    console.log("error.response:", error.response);
-    console.log("status:", error.response?.status);
-    console.log("status type:", typeof error.response?.status);
-    console.log("url:", error.config?.url);
+    // console.log("🔴 === INTERCEPTOR 진입 ===");
+    // console.log("error.response:", error.response);
+    // console.log("status:", error.response?.status);
+    // console.log("status type:", typeof error.response?.status);
+    // console.log("url:", error.config?.url);
 
     const originalRequest = error.config;
-    console.log("originalRequest:", originalRequest);
-    console.log("_retry:", originalRequest?._retry);
-    console.log("_retry type:", typeof originalRequest?._retry);
+    // console.log("originalRequest:", originalRequest);
+    // console.log("_retry:", originalRequest?._retry);
+    // console.log("_retry type:", typeof originalRequest?._retry);
 
     // 조건 하나하나 체크
     const is400 = error.response?.status === 400;
     const notRetried = !originalRequest?._retry;
 
-    console.log("is400?", is400);
-    console.log("notRetried?", notRetried);
-    console.log("조건 통과?", is400 && notRetried);
+    // console.log("is400?", is400);
+    // console.log("notRetried?", notRetried);
+    // console.log("조건 통과?", is400 && notRetried);
 
     if (error.response?.status === 400 && !originalRequest._retry) {
-      console.log("✅✅✅ 400 로직 진입! ✅✅✅");
+      // console.log("✅✅✅ 400 로직 진입! ✅✅✅");
 
       // 이미 refresh 중이면 대기
       if (isRefreshing) {
-        console.log("⏳ 이미 refresh 중...");
+        // console.log("⏳ 이미 refresh 중...");
         return new Promise((resolve) => {
           failedQueue.push((token: string) => {
             originalRequest.headers.Authorization = `Bearer ${token}`;
@@ -105,23 +105,23 @@ api.interceptors.response.use(
         });
       }
 
-      console.log("🔄 refresh 토큰 시작");
+      // console.log("🔄 refresh 토큰 시작");
       originalRequest._retry = true;
       isRefreshing = true;
 
       const refreshResult = await refreshToken();
-      console.log("refreshResult:", refreshResult);
+      // console.log("refreshResult:", refreshResult);
 
       // ❌ refresh 실패
       if (!refreshResult?.success) {
-        console.log("❌ refresh 실패");
+        // console.log("❌ refresh 실패");
         useAuthStore.setState({ accessToken: "" });
         isRefreshing = false;
         return Promise.reject(error);
       }
 
       // ✅ refresh 성공
-      console.log("✅ refresh 성공");
+      // console.log("✅ refresh 성공");
       const newAccessToken = refreshResult.data.accessToken;
 
       useAuthStore.setState({ accessToken: newAccessToken });
@@ -133,7 +133,7 @@ api.interceptors.response.use(
       return api(originalRequest);
     }
 
-    console.log("⚠️ 400 조건 불일치 - reject");
+    // console.log("⚠️ 400 조건 불일치 - reject");
     return Promise.reject(error);
   },
 );

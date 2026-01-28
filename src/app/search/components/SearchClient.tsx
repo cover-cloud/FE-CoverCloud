@@ -3,134 +3,147 @@
 import React from "react";
 import Box from "@mui/material/Box";
 import { Button, Grid, Pagination } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import { useRouter, useSearchParams } from "next/navigation";
+
 import PostCard from "@/components/PostCard";
 import InfoMessage from "@/components/InfoMessage";
 import { contentData } from "@/app/main/type";
-import { usePopularCoverListQuery } from "@/app/api/cover/list";
-import { useSearchParams } from "next/navigation";
 import { useSearchQuery } from "@/app/api/search/saerch";
-import { useTheme } from "@mui/material/styles";
-import { useRouter } from "next/navigation";
 
-interface saerchTab {
+type SearchType = "title" | "tags";
+
+interface SearchTab {
   title: string;
-  value: number;
-  searchType: string;
+  searchType: SearchType;
 }
-const saerchTabs: saerchTab[] = [
-  { title: "제목", value: 0, searchType: "TITLE" },
-  { title: "태그", value: 1, searchType: "TAG" },
+
+const searchTabs: SearchTab[] = [
+  { title: "제목", searchType: "title" },
+  { title: "태그", searchType: "tags" },
 ];
 
 export default function SearchClient() {
   const theme = useTheme();
-  const searchParams = useSearchParams();
-  const query = searchParams.get("q");
   const router = useRouter();
-  const searchTypeFromUrlRaw = searchParams.get("searchType");
-  const searchTypeFromUrl =
-    saerchTabs.find((t) => t.searchType === searchTypeFromUrlRaw)?.searchType ||
-    "TITLE";
-  const [page, setPage] = React.useState(0);
-  const [selectedTab, setSelectedTab] = React.useState<saerchTab>(
-    () =>
-      saerchTabs.find((t) => t.searchType === searchTypeFromUrl) ??
-      saerchTabs[0],
-  );
-  const pageChangeHandler = (_: any, value: number) => {
-    setPage(value);
-  };
+  const searchParams = useSearchParams();
 
-  const { data } = useSearchQuery(query || "", page, 18);
+  /* =========================
+     URL → 상태 파싱
+  ========================= */
+  const query = searchParams.get("q") ?? "";
+  const page = Math.max(1, Number(searchParams.get("page") ?? 1));
 
-  const searchTabChangeHandler = (tab: saerchTab) => {
+  const searchType = (searchParams.get("searchType") as SearchType) ?? "title";
+
+  const selectedTab =
+    searchTabs.find((t) => t.searchType === searchType) ?? searchTabs[0];
+
+  /* =========================
+     검색
+  ========================= */
+  const { data, isLoading } = useSearchQuery({
+    type: searchType,
+    keyword: query,
+    page: page - 1,
+    size: 10,
+  });
+
+  /* =========================
+     URL 변경 헬퍼
+  ========================= */
+  const updateParams = (next: Record<string, string>) => {
     const params = new URLSearchParams(searchParams.toString());
-    params.set("searchType", tab.searchType);
-    params.set("page", "0"); // 탭 바뀌면 페이지 초기화
 
-    router.push(`/search?${params.toString()}`, { scroll: false });
+    Object.entries(next).forEach(([key, value]) => {
+      params.set(key, value);
+    });
+
+    router.push(`/search?${params.toString()}`, {
+      scroll: false,
+    });
   };
-  const searchTabSx = (index: number) => ({
-    color:
-      index === selectedTab.value
-        ? theme.palette.common.black
-        : theme.palette.gray.primary,
+
+  /* =========================
+     핸들러
+  ========================= */
+  const handleTabChange = (tab: SearchTab) => {
+    updateParams({
+      searchType: tab.searchType,
+      page: "1", // 탭 바뀌면 페이지 초기화
+    });
+  };
+
+  const handlePageChange = (_: any, value: number) => {
+    updateParams({
+      page: String(value),
+    });
+  };
+
+  /* =========================
+     스타일
+  ========================= */
+  const tabSx = (active: boolean) => ({
+    color: active ? theme.palette.common.black : theme.palette.gray.primary,
     borderRadius: "10px",
     minWidth: "60px",
     minHeight: "32px",
-    padding: 0,
     fontSize: "20px",
-    marginLeft: index > 1 ? "12px" : "0",
     "&:hover": {
       backgroundColor: theme.palette.gray.secondary,
     },
   });
-  React.useEffect(() => {
-    setPage(Number(searchParams.get("page") || 0));
-
-    const searchType = searchParams.get("searchType") as string;
-    if (searchType) {
-      const tab = saerchTabs.find((t) => t.searchType === searchType);
-      if (tab) setSelectedTab(tab);
-    }
-  }, [searchParams]);
-  if (!data?.data.content.length)
-    return (
-      <InfoMessage
-        subMessage={query ? `“${query}”` : ""}
-        message="검색 결과가 없습니다.\n새로운 곡을 추천하시겠어요?"
-        buttonText="곡 추천하기"
-        onClick={() => {
-          // TODO: 곡 추천 페이지로 이동 로그인 상태 확인후
-        }}
-      />
-    );
+  // TODO: 로딩 상태 처리
+  if (isLoading) {
+    return <InfoMessage message="검색 중입니다..." onClick={() => {}} />;
+  }
+  /* =========================
+     결과 없음
+  ========================= */
 
   return (
     <Box>
-      <Box role="tablist" className="flex items-center mb-4">
-        {saerchTabs.map((tab, index) => (
-          <Box key={index} className="flex items-center">
-            <Button
-              role="tab"
-              aria-selected={selectedTab.searchType === tab.searchType}
-              onClick={(e) => searchTabChangeHandler(tab)}
-              sx={searchTabSx(index)}
-            >
-              {tab.title}
-            </Button>
-          </Box>
+      {/* 탭 */}
+      <Box className="flex items-center mb-4">
+        {searchTabs.map((tab) => (
+          <Button
+            key={tab.searchType}
+            onClick={() => handleTabChange(tab)}
+            sx={tabSx(selectedTab.searchType === tab.searchType)}
+          >
+            {tab.title}
+          </Button>
         ))}
       </Box>
-      {data?.data.content.length > 0 ? (
-        <React.Fragment>
-          <Grid container spacing={2}>
-            {data?.data.content.map((post: contentData, idx: number) => (
-              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={idx}>
-                <PostCard {...post} />
-              </Grid>
-            ))}
-          </Grid>
-          <Box className="mt-8 flex justify-center">
-            {/* 여기 토탈카운트로 조합? 페이지 숫자 만들기 나머지값이 있으면 +1 기본 랭스받아오기 */}
-            <Pagination
-              count={data?.data.totalPages}
-              page={page}
-              onChange={pageChangeHandler}
-              hideNextButton={page === data?.data.totalPages - 1}
-              hidePrevButton={page === 0}
-            />
-          </Box>
-        </React.Fragment>
-      ) : (
+      {!data?.data.content.length ? (
         <InfoMessage
           subMessage={query ? `“${query}”` : ""}
           message="검색 결과가 없습니다.\n새로운 곡을 추천하시겠어요?"
           buttonText="곡 추천하기"
-          onClick={() => {
-            // TODO: 곡 추천 페이지로 이동 로그인 상태 확인후
-          }}
+          onClick={() => {}}
         />
+      ) : (
+        <React.Fragment>
+          {/* 리스트 */}
+          <Grid container spacing={2}>
+            {data.data.content.map((post: contentData) => (
+              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={post.coverId}>
+                <PostCard {...post} />
+              </Grid>
+            ))}
+          </Grid>
+
+          {/* 페이지네이션 */}
+          <Box className="mt-8 flex justify-center">
+            <Pagination
+              count={data.data.totalPages}
+              page={page}
+              onChange={handlePageChange}
+              hidePrevButton={page === 1}
+              hideNextButton={page === data.data.totalPages}
+            />
+          </Box>
+        </React.Fragment>
       )}
     </Box>
   );

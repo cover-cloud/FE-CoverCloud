@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Grid from "@mui/material/Grid";
 import PostCard from "../../../../components/PostCard";
 import Box from "@mui/material/Box";
@@ -10,20 +10,19 @@ import { Button } from "@mui/material";
 import { usePopularCoverListQuery } from "../../../../app/api/cover/list";
 import { contentData, Genre } from "../../../../app/main/type";
 import { useTheme } from "@mui/material/styles";
-import { useAuthStore } from "@/app/store/useAuthStore";
 import InfoMessage from "@/components/InfoMessage";
 import { Period } from "@/app/api/cover/list";
 
 type PopularTab = {
   title: string;
-  value: number;
   period: Period;
 };
+
 const popularTabs: PopularTab[] = [
-  { title: "전체", value: 0, period: "ALL" },
-  { title: "월간", value: 1, period: "MONTHLY" },
-  { title: "일간", value: 2, period: "DAILY" },
-  { title: "주간", value: 3, period: "WEEKLY" },
+  { title: "전체", period: "ALL" },
+  { title: "월간", period: "MONTHLY" },
+  { title: "일간", period: "DAILY" },
+  { title: "주간", period: "WEEKLY" },
 ];
 
 const genreTabs: Genre[] = [
@@ -31,87 +30,85 @@ const genreTabs: Genre[] = [
   { title: "J-POP", value: "J_POP", label: "jpop" },
   { title: "POP", value: "POP", label: "pop" },
 ];
+
 const MainComponent = () => {
   const theme = useTheme();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const periodFromUrl = (searchParams.get("period") as Period) || "ALL";
-  const genresFromUrl = searchParams.get("genres")
+
+  /* =========================
+     URL → 상태 (UI 기준)
+  ========================= */
+  const page = Math.max(1, Number(searchParams.get("page") ?? 1));
+  const period = (searchParams.get("period") as Period) ?? "ALL";
+  const genreValues = searchParams.get("genres")
     ? searchParams.get("genres")!.split(",")
     : [];
-  const accessToken = useAuthStore((state) => state.accessToken);
 
-  // 페이지네이션
-  const initialPage = Number(searchParams.get("page") || 0);
-  const [page, setPage] = useState(initialPage);
-  const [selectedTab, setSelectedTab] = useState<PopularTab>(
-    () => popularTabs.find((t) => t.period === periodFromUrl) ?? popularTabs[0],
-  );
+  const selectedTab =
+    popularTabs.find((t) => t.period === period) ?? popularTabs[0];
 
-  const [selectedGenres, setSelectedGenres] = useState<Genre[]>(() =>
-    genreTabs.filter((g) => genresFromUrl.includes(g.value)),
-  );
+  const selectedGenres = genreTabs.filter((g) => genreValues.includes(g.value));
 
+  /* =========================
+     API 호출 (0부터)
+  ========================= */
   const { data, isLoading } = usePopularCoverListQuery({
-    page: page,
-    size: 18,
-    period: selectedTab.period,
-    genres: selectedGenres.map((genre) => genre.value),
+    page: page - 1,
+    size: 10,
+    period,
+    genres: selectedGenres.map((g) => g.value),
   });
 
-  const pageChangeHandler = (_: any, value: number) => {
-    setPage(value);
-    router.push(`/main?page=${value}`, { scroll: false });
+  /* =========================
+     URL 변경 헬퍼
+  ========================= */
+  const updateParams = (next: Record<string, string>) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    Object.entries(next).forEach(([key, value]) => {
+      params.set(key, value);
+    });
+
+    router.push(`/main?${params.toString()}`, { scroll: false });
+  };
+
+  /* =========================
+     핸들러
+  ========================= */
+  const handlePageChange = (_: any, value: number) => {
+    updateParams({ page: String(value) });
   };
 
   const popularTabChangeHandler = (tab: PopularTab) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("period", tab.period);
-    params.set("page", "0"); // 탭 바뀌면 페이지 초기화
-
-    router.push(`/main?${params.toString()}`, { scroll: false });
+    updateParams({
+      period: tab.period,
+      page: "1",
+    });
   };
 
   const genreTabChangeHandler = (genre: Genre) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const current = new Set(genreValues);
 
-    const current = new Set(searchParams.get("genres")?.split(",") ?? []);
+    current.has(genre.value)
+      ? current.delete(genre.value)
+      : current.add(genre.value);
 
-    if (current.has(genre.value)) {
-      current.delete(genre.value);
-    } else {
-      current.add(genre.value);
-    }
-
-    params.set("genres", Array.from(current).join(","));
-    params.set("page", "0");
-
-    router.push(`/main?${params.toString()}`, { scroll: false });
+    updateParams({
+      genres: Array.from(current).join(","),
+      page: "1",
+    });
   };
-  useEffect(() => {
-    setPage(Number(searchParams.get("page") || 0));
 
-    const period = searchParams.get("period") as Period;
-    if (period) {
-      const tab = popularTabs.find((t) => t.period === period);
-      if (tab) setSelectedTab(tab);
-    }
-
-    const genres = searchParams.get("genres")?.split(",") ?? [];
-    setSelectedGenres(genreTabs.filter((g) => genres.includes(g.value)));
-  }, [searchParams]);
-
-  const popularTabSx = (index: number) => ({
-    color:
-      index === selectedTab.value
-        ? theme.palette.common.black
-        : theme.palette.gray.primary,
+  /* =========================
+     스타일
+  ========================= */
+  const popularTabSx = (active: boolean) => ({
+    color: active ? theme.palette.common.black : theme.palette.gray.primary,
     borderRadius: "10px",
     minWidth: "60px",
     minHeight: "32px",
-    padding: 0,
     fontSize: "20px",
-    marginLeft: index > 1 ? "12px" : "0",
     "&:hover": {
       backgroundColor: theme.palette.gray.secondary,
     },
@@ -127,81 +124,66 @@ const MainComponent = () => {
     minHeight: "32px",
     padding: "0 12px",
     fontSize: "14px",
-    marginRight: "8px",
     "&:hover": {
       backgroundColor: theme.palette.genre.secondary,
       color: theme.palette.common.black,
     },
   });
 
-  const isGenreSelected = (value: string) =>
-    selectedGenres.some((item) => item.value === value);
-
+  /* =========================
+     렌더링
+  ========================= */
   return (
     <div>
       {/* 인기 탭 */}
-      <Box role="tablist" className="flex items-center mb-4">
-        {popularTabs.map((tab, index) => (
-          <Box key={index} className="flex items-center">
-            <Button
-              role="tab"
-              aria-selected={selectedTab.period === tab.period}
-              onClick={(e) => popularTabChangeHandler(tab)}
-              sx={popularTabSx(index)}
-            >
-              {tab.title}
-            </Button>
-            {index === 0 && (
-              <Box
-                sx={{
-                  width: "1px",
-                  height: "14px",
-                  backgroundColor: theme.palette.common.black,
-                  marginLeft: "12px",
-                  marginRight: "12px",
-                }}
-              />
-            )}
-          </Box>
-        ))}
-      </Box>
-
-      {/* 장르 탭 */}
-      <Box className="flex flex-wrap gap-2 mb-4">
-        {genreTabs.map((tab, idx) => (
+      <Box className="flex items-center mb-4">
+        {popularTabs.map((tab) => (
           <Button
-            key={idx}
-            role="tab"
-            onClick={() => genreTabChangeHandler(tab)}
-            sx={genreTabSx(isGenreSelected(tab.value))}
+            key={tab.period}
+            onClick={() => popularTabChangeHandler(tab)}
+            sx={popularTabSx(tab.period === period)}
           >
             {tab.title}
           </Button>
         ))}
       </Box>
 
-      {/* 게시글 리스트 */}
+      {/* 장르 탭 */}
+      <Box className="flex flex-wrap gap-2 mb-4">
+        {genreTabs.map((tab) => (
+          <Button
+            key={tab.value}
+            onClick={() => genreTabChangeHandler(tab)}
+            sx={genreTabSx(genreValues.includes(tab.value))}
+          >
+            {tab.title}
+          </Button>
+        ))}
+      </Box>
+
+      {/* 리스트 */}
       {data?.content.length ? (
         <>
           <Grid container spacing={2}>
-            {data.content.map((post: contentData, idx: number) => (
-              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={idx}>
+            {data.content.map((post: contentData) => (
+              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={post.coverId}>
                 <PostCard {...post} />
               </Grid>
             ))}
           </Grid>
+
           <Box className="mt-8 flex justify-center">
             <Pagination
-              count={data?.totalPages}
+              count={data.totalPages}
               page={page}
-              hidePrevButton={page === 0}
-              hideNextButton={page === data?.totalPages - 1}
-              onChange={pageChangeHandler}
+              onChange={handlePageChange}
+              hidePrevButton={page === 1}
+              hideNextButton={page === data.totalPages}
             />
           </Box>
         </>
       ) : isLoading ? (
-        <InfoMessage message="게시물을 불러오고있습니다." />
+        <InfoMessage message="게시물을 불러오고 있습니다." />
       ) : (
         <InfoMessage message="게시글이 없습니다." />
       )}

@@ -1,25 +1,43 @@
 import { api } from "@/app/lib/api";
 import { useQuery } from "@tanstack/react-query";
+type SearchType = "title" | "tags";
 
-const fetchSearch = async (title: string, page: number, size: number) => {
-  try {
-    const res = await api.get(`/api/cover/search/title`, {
-      params: {
-        title,
-        page,
-        size,
-      },
-    });
-    return res.data;
-  } catch (error) {
-    console.log(error);
-  }
+const search = async (
+  type: SearchType,
+  keyword: string,
+  page: number,
+  size: number,
+) => {
+  const endpoint =
+    type === "title" ? "/api/cover/search/title" : "/api/cover/search/tags";
+
+  const paramKey = type === "title" ? "title" : "tags";
+
+  const res = await api.get(endpoint, {
+    params: {
+      [paramKey]: keyword,
+      page,
+      size,
+    },
+  });
+
+  return res.data;
 };
 
-export const useSearchQuery = (title: string, page: number, size: number) => {
+export const useSearchQuery = ({
+  type,
+  keyword,
+  page,
+  size,
+}: {
+  type: SearchType;
+  keyword: string;
+  page: number;
+  size: number;
+}) => {
   return useQuery({
-    queryKey: ["search", title],
-    queryFn: () => fetchSearch(title, page, size),
-    enabled: !!title,
+    queryKey: ["search", type, keyword, page, size],
+    queryFn: () => search(type, keyword, page, size),
+    enabled: !!type && !!keyword,
   });
 };
