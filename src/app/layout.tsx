@@ -9,7 +9,7 @@ import ClientModalRender from "../components/modal/ClientModalRender";
 import Footer from "../components/Footer";
 import AuthInit from "@/components/auth/AuthInit";
 import GlobalSnackbar from "@/components/GlobalSnackbar";
-import ClientOnlyWrapper from "@/components/ClientOnlyWarper";
+import ClientOnlyWrapper from "@/components/ClientOnlyWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

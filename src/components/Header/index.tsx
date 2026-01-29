@@ -13,7 +13,6 @@ import Link from "next/link";
 import { useTheme } from "@mui/material/styles";
 import AccountModal from "../modal/AccountModal";
 import AvatarComponent from "../auth/AvatarComponent";
-import { useAuthStore } from "@/app/store/useAuthStore";
 import { IoIosAddCircle } from "react-icons/io";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthMeQuery } from "@/app/api/auth/authMe";
@@ -98,8 +97,60 @@ const Header = () => {
             <Box>CoverCloud</Box>
           </Link>
         )}
-        {!isMobile ? (
-          <Box className="relative" sx={{ flex: 1.5 }}>
+
+        <Box
+          className="relative"
+          sx={{ flex: 1.5, display: { xs: "none", md: "flex" } }}
+        >
+          <TextField
+            className="H1"
+            placeholder="검색어를 입력해주세요."
+            value={searchQuery}
+            fullWidth
+            onChange={(e) => setSearchQuery(e.target.value)}
+            sx={{
+              "& .MuiInputBase-input": {
+                padding: "12px",
+                border: "none",
+              },
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSearch();
+              }
+            }}
+          />
+
+          <Button
+            disableRipple
+            disableFocusRipple
+            onClick={handleSearch}
+            sx={{
+              all: "unset",
+              position: "absolute",
+              right: 0,
+              top: 0,
+              width: "48px",
+              height: "48px",
+              color: "black",
+              cursor: "pointer",
+            }}
+          >
+            <SearchIcon />
+          </Button>
+        </Box>
+
+        <Box
+          className="relative flex justify-end"
+          sx={{ flex: 1, display: { xs: "flex", md: "none" } }}
+        >
+          <Box
+            className="relative"
+            sx={{
+              flex: openSearchBar ? 1 : "0 0 48px",
+              transition: "flex 0.3s ease",
+            }}
+          >
             <TextField
               className="H1"
               placeholder="검색어를 입력해주세요."
@@ -107,93 +158,47 @@ const Header = () => {
               fullWidth
               onChange={(e) => setSearchQuery(e.target.value)}
               sx={{
+                "& .MuiInputBase-root": {
+                  height: "48px",
+                  transition: "width 0.3s ease, flex 0.3s ease",
+                  width: "100%",
+                  borderRadius: "50px",
+                  padding: "0 12px",
+                  paddingLeft: openSearchBar ? "48px" : "12px",
+                },
                 "& .MuiInputBase-input": {
                   padding: "12px",
-                  border: "none",
                 },
               }}
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleSearch();
-                }
+                if (e.key === "Enter") handleSearch();
               }}
             />
 
             <Button
               disableRipple
               disableFocusRipple
-              onClick={handleSearch}
-              sx={{
-                all: "unset",
-                position: "absolute",
-                right: 0,
-                top: 0,
-                width: "48px",
-                height: "48px",
-                color: "black",
-                cursor: "pointer",
-              }}
+              sx={{ ...buttonSx, left: 0 }}
+              onClick={() => searchBarHandler(openSearchBar)}
             >
               <SearchIcon />
             </Button>
-          </Box>
-        ) : (
-          <Box className="relative flex justify-end" sx={{ flex: 1 }}>
-            <Box
-              className="relative"
-              sx={{
-                flex: openSearchBar ? 1 : "0 0 48px",
-                transition: "flex 0.3s ease",
-              }}
-            >
-              <TextField
-                className="H1"
-                placeholder="검색어를 입력해주세요."
-                value={searchQuery}
-                fullWidth
-                onChange={(e) => setSearchQuery(e.target.value)}
-                sx={{
-                  "& .MuiInputBase-root": {
-                    height: "48px",
-                    transition: "width 0.3s ease, flex 0.3s ease",
-                    width: "100%",
-                    borderRadius: "50px",
-                    padding: "0 12px",
-                    paddingLeft: openSearchBar ? "48px" : "12px",
-                  },
-                  "& .MuiInputBase-input": {
-                    padding: "12px",
-                  },
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSearch();
-                }}
-              />
-
+            {openSearchBar && (
               <Button
                 disableRipple
                 disableFocusRipple
-                sx={{ ...buttonSx, left: 0 }}
-                onClick={() => searchBarHandler(openSearchBar)}
+                sx={{
+                  ...buttonSx,
+                  right: 0,
+                }}
+                onClick={() => setOpenSearchBar(false)}
               >
-                <SearchIcon />
+                <IoClose />
               </Button>
-              {openSearchBar && (
-                <Button
-                  disableRipple
-                  disableFocusRipple
-                  sx={{
-                    ...buttonSx,
-                    right: 0,
-                  }}
-                  onClick={() => setOpenSearchBar(false)}
-                >
-                  <IoClose />
-                </Button>
-              )}
-            </Box>
+            )}
           </Box>
-        )}
+        </Box>
+
         {!openSearchBar && (
           <Box className="flex justify-end" sx={{ flex: 1 }}>
             {data?.success && !error ? (
