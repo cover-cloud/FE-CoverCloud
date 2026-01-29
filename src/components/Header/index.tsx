@@ -17,6 +17,7 @@ import { useAuthStore } from "@/app/store/useAuthStore";
 import { IoIosAddCircle } from "react-icons/io";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthMeQuery } from "@/app/api/auth/authMe";
+import { IoClose } from "react-icons/io5";
 
 export const dynamic = "force-dynamic";
 
@@ -28,10 +29,12 @@ const Header = () => {
   const theme = useTheme();
   const openLoginModal = useModalStore((state) => state.openLoginModal);
   const isMobile = useMobaileModeStore((state) => state.isMobile);
+  // const isLogin = useAuthStore((state) => state.isLogin);
 
   const { data, error } = useAuthMeQuery();
   const [searchQuery, setSearchQuery] = React.useState("");
   const [openAccountModal, setOpenAccountModal] = React.useState(false);
+  const [openSearchBar, setOpenSearchBar] = React.useState(false);
 
   const router = useRouter();
 
@@ -65,16 +68,37 @@ const Header = () => {
   const openAccountModalHandler = () => {
     setOpenAccountModal((prev) => !prev);
   };
+  const searchBarHandler = (open: boolean) => {
+    if (open) {
+      handleSearch();
+    } else {
+      setOpenSearchBar(true);
+    }
+  };
+  const buttonSx = {
+    all: "unset",
+    position: "absolute",
+    top: 0,
+    color: "black",
+    cursor: "pointer",
+    width: "48px",
+    height: "48px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  };
   return (
     <header>
       <Box
         className="flex items-center justify-between gap-4 max-w-7xl mx-auto px-6"
         sx={{ height: "120px", top: 0, left: 0 }}
       >
-        <Link href="/" style={{ flex: 1 }}>
-          <Box>CoverCloud</Box>
-        </Link>
-        {!isMobile && (
+        {!openSearchBar && (
+          <Link href="/" style={{ flex: 1 }}>
+            <Box>CoverCloud</Box>
+          </Link>
+        )}
+        {!isMobile ? (
           <Box className="relative" sx={{ flex: 1.5 }}>
             <TextField
               className="H1"
@@ -113,69 +137,127 @@ const Header = () => {
               <SearchIcon />
             </Button>
           </Box>
-        )}
-        <Box className="flex justify-end" sx={{ flex: 1 }}>
-          {data?.success && !error ? (
-            <Box className="flex">
-              <Link href="/post/create">
-                {isMobile ? (
-                  <Box sx={{}}>
-                    <IoIosAddCircle
-                      size={58}
-                      color={theme.palette.orange.primary}
-                    />
-                  </Box>
-                ) : (
-                  <Button
-                    variant="outlined"
-                    sx={{
-                      width: "160px",
-                      height: "48px",
-                      backgroundColor: theme.palette.orange.primary,
-                      color: theme.palette.common.white,
-                      border: "none",
-                      borderRadius: "50px",
-                      "&:hover": {
-                        backgroundColor: theme.palette.orange.secondary,
-                        color: theme.palette.common.black,
-                      },
-                    }}
-                  >
-                    <Box className="H3">곡 추천하기</Box>
-                  </Button>
-                )}
-              </Link>
-
-              <Box ml={"50px"} className="flex items-center">
-                <AvatarComponent
-                  openAccountModalHandler={openAccountModalHandler}
-                  profileImage={data?.data.profileImage}
-                />
-              </Box>
-            </Box>
-          ) : (
-            <Button
-              variant="contained"
-              onClick={handleLogin}
+        ) : (
+          <Box className="relative flex justify-end" sx={{ flex: 1 }}>
+            <Box
+              className="relative"
               sx={{
-                width: "126px",
-                height: "48px",
-                borderRadius: "50px",
-                backgroundColor: theme.palette.orange.primary,
-                "&:hover": {
-                  backgroundColor: theme.palette.orange.secondary,
-                  color: theme.palette.common.black,
-                },
+                flex: openSearchBar ? 1 : "0 0 48px",
+                transition: "flex 0.3s ease",
               }}
             >
-              <Box className="H3">로그인하기</Box>
-            </Button>
-          )}
+              <TextField
+                className="H1"
+                placeholder="검색어를 입력해주세요."
+                value={searchQuery}
+                fullWidth
+                onChange={(e) => setSearchQuery(e.target.value)}
+                sx={{
+                  "& .MuiInputBase-root": {
+                    height: "48px",
+                    transition: "width 0.3s ease, flex 0.3s ease",
+                    width: "100%",
+                    borderRadius: "50px",
+                    padding: "0 12px",
+                    paddingLeft: openSearchBar ? "48px" : "12px",
+                  },
+                  "& .MuiInputBase-input": {
+                    padding: "12px",
+                  },
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSearch();
+                }}
+              />
 
-          {openAccountModal && (
-            <AccountModal openAccountModalHandler={openAccountModalHandler} />
-          )}
-        </Box>
+              <Button
+                disableRipple
+                disableFocusRipple
+                sx={{ ...buttonSx, left: 0 }}
+                onClick={() => searchBarHandler(openSearchBar)}
+              >
+                <SearchIcon />
+              </Button>
+              {openSearchBar && (
+                <Button
+                  disableRipple
+                  disableFocusRipple
+                  sx={{
+                    ...buttonSx,
+                    right: 0,
+                  }}
+                  onClick={() => setOpenSearchBar(false)}
+                >
+                  <IoClose />
+                </Button>
+              )}
+            </Box>
+          </Box>
+        )}
+        {!openSearchBar && (
+          <Box className="flex justify-end" sx={{ flex: 1 }}>
+            {data?.success && !error ? (
+              <Box className="flex">
+                <Link href="/post/create">
+                  {isMobile ? (
+                    <Box sx={{}}>
+                      <IoIosAddCircle
+                        size={58}
+                        color={theme.palette.orange.primary}
+                      />
+                    </Box>
+                  ) : (
+                    <Button
+                      variant="outlined"
+                      sx={{
+                        width: "160px",
+                        height: "48px",
+                        backgroundColor: theme.palette.orange.primary,
+                        color: theme.palette.common.white,
+                        border: "none",
+                        borderRadius: "50px",
+                        "&:hover": {
+                          backgroundColor: theme.palette.orange.secondary,
+                          color: theme.palette.common.black,
+                        },
+                      }}
+                    >
+                      <Box className="H3">곡 추천하기</Box>
+                    </Button>
+                  )}
+                </Link>
+
+                <Box ml={"50px"} className="flex items-center">
+                  <AvatarComponent
+                    openAccountModalHandler={openAccountModalHandler}
+                    profileImage={data?.data.profileImage}
+                  />
+                </Box>
+              </Box>
+            ) : (
+              <Button
+                variant="contained"
+                onClick={handleLogin}
+                sx={{
+                  width: "126px",
+                  height: "48px",
+                  borderRadius: "50px",
+                  backgroundColor: theme.palette.orange.primary,
+                  "&:hover": {
+                    backgroundColor: theme.palette.orange.secondary,
+                    color: theme.palette.common.black,
+                  },
+                }}
+              >
+                <Box className="H3">로그인하기</Box>
+              </Button>
+            )}
+
+            {openAccountModal && (
+              <AccountModal openAccountModalHandler={openAccountModalHandler} />
+            )}
+          </Box>
+        )}
       </Box>
     </header>
   );

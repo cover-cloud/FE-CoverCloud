@@ -100,7 +100,7 @@ const AccountPage = () => {
   const logoutHandler = async () => {
     // TODO: 로그아웃 API 호출
     const result = await logout(accessToken);
-    if (result.data.success) {
+    if (result.success) {
       useAuthStore.setState({ accessToken: "" });
       useAuthStore.setState({ isLogin: false });
       useSnackbarStore.getState().show("로그아웃되었습니다.", "success");
