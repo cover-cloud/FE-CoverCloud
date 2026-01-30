@@ -19,7 +19,33 @@ const nextConfig: NextConfig = {
       "source.unsplash.com",
       "i.scdn.co",
       "img.youtube.com",
-    ], // 허용할 외부 도메인
+    ],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "i1.sndcdn.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "i.ytimg.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "p16-tiktok-sign-va.tiktokcdn.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "p16-sign-sg.tiktokcdn.com", // ✅ 여기에 추가
+        port: "",
+        pathname: "/**",
+      },
+    ],
   },
 };
 

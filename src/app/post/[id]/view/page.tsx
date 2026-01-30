@@ -6,7 +6,12 @@ import { useAuthStore } from "@/app/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import { Box, Button, Typography } from "@mui/material";
 
-import { getYoutubeVideoId } from "@/app/utils/youtube";
+import {
+  detectAndValidateMediaUrl,
+  exampleUsage,
+  getYoutubeVideoId,
+  MediaUrlResult,
+} from "@/app/utils/youtube";
 import { deletePost, useReadingPost } from "@/app/api/cover/post";
 import {
   fetchLike,
@@ -37,9 +42,7 @@ import { useSnackbarStore } from "@/app/store/useSnackbar";
 const PostViewPage = () => {
   const { id } = useParams();
   const router = useRouter();
-  const { isLogin } = useAuthStore();
 
-  const { data: myCommentList } = useMyCommentList();
   const userInfo = useAuthMeQuery();
 
   const openLoginModal = useModalStore((state) => state.openLoginModal);
@@ -63,15 +66,31 @@ const PostViewPage = () => {
     id as string,
   );
   const isMobile = useMobaileModeStore((state) => state.isMobile);
-  const videoId = postData ? getYoutubeVideoId(postData.data.data.link) : "";
+  const videoId: MediaUrlResult = postData
+    ? detectAndValidateMediaUrl(postData.data.data.link)
+    : { platform: null, id: null, isValid: false, originalUrl: "" };
   const formetCreatedAt = postData
     ? useFormatCreatedAt(postData.data.data.createdAt)
     : "";
+  const getAspectRatio = (videoId: MediaUrlResult | null) => {
+    if (!videoId || !videoId.platform) return "16 / 9"; // 기본값
 
+    switch (videoId.platform) {
+      case "youtube":
+        return "16 / 9"; // 와이드 영상
+      case "tiktok":
+        return "9 / 10"; // 세로 영상
+      case "soundcloud":
+        return "100 / 20"; // 사운드클라우드 플레이어는 세로가 얕고 가로가 넓음
+      default:
+        return "16 / 9";
+    }
+  };
   React.useEffect(() => {
     if (!postData) return;
-    if (videoId) {
-      setYoutubeVideoId(videoId); // 원본url
+    if (videoId && videoId.embedUrl) {
+      console.log(videoId);
+      setYoutubeVideoId(videoId.embedUrl); // 원본url
     }
 
     setCoverTitle(postData.data.data.coverTitle);
@@ -182,15 +201,18 @@ const PostViewPage = () => {
           </Box>
         )}
         <Box sx={{ marginBottom: "12px" }}>
-          <iframe
-            src={`https://www.youtube.com/embed/${youtubeVideoId}`}
-            title="YouTube video player"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            className="rounded-lg"
-            style={{ aspectRatio: "16 / 9" }}
-          />
+          {youtubeVideoId && (
+            <iframe
+              src={youtubeVideoId}
+              width="100%"
+              height={videoId?.platform === "tiktok" ? "723px" : "auto"}
+              style={{
+                aspectRatio: getAspectRatio(videoId),
+                borderRadius: "12px",
+              }}
+              allowFullScreen
+            />
+          )}
         </Box>
         <Box>
           <Box className="flex justify-between items-center">

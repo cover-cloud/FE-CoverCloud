@@ -4,6 +4,7 @@ import { TextField } from "@mui/material";
 import { CgAdd } from "react-icons/cg";
 import { FormField } from "../../../../components/ItemEditor/type";
 import React from "react";
+import { MediaPlatform } from "@/app/utils/youtube";
 
 const VideoInputField = ({
   field,
@@ -11,12 +12,14 @@ const VideoInputField = ({
   fieldState,
   link,
   youtubeVideoId,
+  videoType,
 }: {
   field: FormField;
   controllerField: any;
   fieldState: any;
   link: string;
-  youtubeVideoId: string | null;
+  youtubeVideoId: string | undefined;
+  videoType: MediaPlatform;
 }) => {
   return (
     <React.Fragment>
@@ -92,18 +95,19 @@ const VideoInputField = ({
               !!fieldState.error ||
               (field.key === "link" && !!link && !youtubeVideoId)
             }
-            // helperText={
-            //   fieldState.error?.message ||
-            //   (field.key === "link" && !!link && !youtubeVideoId
-            //     ? "존재하지 않는 유튜브 URL입니다."
-            //     : "")
-            // }
           />
           <Box className="mt-3">
             <iframe
               width="100%"
-              height="315"
-              src={`https://www.youtube.com/embed/${youtubeVideoId}`}
+              style={{
+                minHeight:
+                  videoType === "youtube"
+                    ? "505px"
+                    : videoType === "tiktok"
+                      ? "750px"
+                      : "200px",
+              }}
+              src={youtubeVideoId}
               className="rounded-lg"
               allowFullScreen
             />

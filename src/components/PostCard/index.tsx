@@ -9,10 +9,11 @@ import router from "next/router";
 import Link from "next/link";
 import { FaRegHeart } from "react-icons/fa";
 import { contentData } from "../../app/main/type";
-import { getYoutubeVideoId } from "../../app/utils/youtube";
+import { getMediaThumbnail, getYoutubeVideoId } from "../../app/utils/youtube";
 import { useTheme } from "@mui/material/styles";
+import { detectAndValidateMediaUrl } from "../../app/utils/youtube";
 
-const DEFAULT_IMAGE = "https://via.placeholder.com/150";
+const DEFAULT_IMAGE = "/asset/image/defaultProfile.png";
 
 const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
   coverArtist,
@@ -28,18 +29,33 @@ const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
   viewCount,
   isViewer,
 }) => {
-  const videoId = getYoutubeVideoId(link);
-  const imgSrc = videoId
-    ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
-    : DEFAULT_IMAGE;
-
   const theme = useTheme();
+  const videoId = detectAndValidateMediaUrl(link);
+
+  const [imageSrc, setImageSrc] = useState(DEFAULT_IMAGE);
   const [loading, setLoading] = useState(true);
-  const [imageSrc, setImageSrc] = useState(imgSrc);
+
+  // ✅ useEffect 안에서 async 처리
   React.useEffect(() => {
-    setImageSrc(imgSrc);
-    setLoading(true);
-  }, [imgSrc]);
+    const fetchThumbnail = async () => {
+      if (!videoId) {
+        setImageSrc(DEFAULT_IMAGE);
+        return;
+      }
+
+      try {
+        const thumbnail = await getMediaThumbnail(videoId);
+        setImageSrc(thumbnail || DEFAULT_IMAGE);
+      } catch (error) {
+        console.error("Thumbnail fetch failed:", error);
+        setImageSrc(DEFAULT_IMAGE);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchThumbnail();
+  }, [videoId]);
   return (
     <Link href={`/post/${coverId}/view`}>
       <Box
@@ -53,28 +69,34 @@ const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
         }}
       >
         <Box
-          className={`relative flex-shrink-0 ${
-            isViewer ? "w-[148px] h-[107px]" : "w-full h-40"
-          }`}
-          sx={{ zIndex: 10 }}
+          className={`relative flex-shrink-0 ${isViewer ? "w-[148px] h-[107px]" : "w-full h-40"}`}
         >
+          {/* Skeleton */}
           {loading && (
             <Skeleton
               variant="rectangular"
               width="100%"
               height="100%"
               animation="wave"
-              style={{ position: "absolute", inset: 0 }}
+              sx={{
+                position: "absolute",
+                inset: 0,
+                zIndex: 1,
+              }}
             />
           )}
 
+          {/* Image */}
           <Image
             src={imageSrc}
             alt={coverTitle || "Post Image"}
             fill
             sizes={isViewer ? "148px" : "(max-width: 768px) 100vw, 33vw"}
             className="object-cover"
-            loading="eager"
+            style={{
+              opacity: loading ? 0 : 1,
+              transition: "opacity 0.3s ease",
+            }}
             onLoad={() => setLoading(false)}
             onError={() => {
               setImageSrc(DEFAULT_IMAGE);

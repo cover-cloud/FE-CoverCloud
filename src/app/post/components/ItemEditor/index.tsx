@@ -7,7 +7,10 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormSchema, formSchema, FormField, SongData } from "./type";
 import { useState } from "react";
-import { getYoutubeVideoId } from "@/app/utils/youtube";
+import {
+  detectAndValidateMediaUrl,
+  getYoutubeVideoId,
+} from "@/app/utils/youtube";
 import {
   createPost,
   updatePost,
@@ -82,7 +85,7 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
   const tagInput = watch("tag");
   const selectedSongData = watch("selectedSongData");
 
-  const youtubeVideoId = getYoutubeVideoId(link);
+  const videoUrl = detectAndValidateMediaUrl(link);
 
   const toggleInputMode = () => {
     setIsManualInput((prev) => !prev);
@@ -343,7 +346,8 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
                   controllerField={controllerField}
                   fieldState={fieldState}
                   link={link}
-                  youtubeVideoId={youtubeVideoId}
+                  youtubeVideoId={videoUrl.embedUrl}
+                  videoType={videoUrl.platform}
                 />
               ) : (
                 <TextField

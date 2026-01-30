@@ -1,6 +1,13 @@
+import { detectAndValidateMediaUrl } from "@/app/utils/youtube";
 import { z } from "zod";
 export const formSchema = z.object({
-  link: z.string().min(1, "링크를 입력해주세요"),
+  link: z
+    .string()
+    .min(1, "링크를 입력해주세요")
+    .refine((value) => {
+      const result = detectAndValidateMediaUrl(value);
+      return result.isValid;
+    }, "유효한 YouTube / TikTok / SoundCloud 링크가 아닙니다"),
   songTitle: z.string(),
   selectedSongData: z.object({
     key: z.string(),
