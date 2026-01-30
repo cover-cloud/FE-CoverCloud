@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useAuthStore } from "@/app/store/useAuthStore";
 import { useRouter } from "next/navigation";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 
 import { getYoutubeVideoId } from "@/app/utils/youtube";
 import { deletePost, useReadingPost } from "@/app/api/cover/post";
@@ -298,12 +298,56 @@ const PostViewPage = () => {
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
       >
-        <Box>
-          <h1>삭제</h1>
-          <p>삭제하시겠습니까?</p>
-          <Box>
-            <Button onClick={() => setIsDeleteModalOpen(false)}>취소</Button>
-            <Button onClick={deletePostHandler}>삭제</Button>
+        <Box
+          className="flex flex-col items-center"
+          sx={{
+            width: "100%",
+            bgcolor: "#fff",
+            borderRadius: "12px",
+            p: "40px",
+          }}
+        >
+          {/* 제목 */}
+          <Typography variant="h6" sx={{ fontWeight: 700, mb: "8px" }}>
+            게시글 삭제
+          </Typography>
+
+          {/* 설명 */}
+          <Typography
+            sx={{
+              fontSize: "20px",
+              color: "#666",
+              mb: "24px",
+            }}
+          >
+            삭제한 게시글은 다시 복구할 수 없습니다.
+            <br />
+            정말 삭제하시겠습니까?
+          </Typography>
+
+          {/* 버튼 영역 */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "16px",
+              width: "100%",
+            }}
+          >
+            <Button
+              variant="outlined"
+              onClick={() => setIsDeleteModalOpen(false)}
+            >
+              취소
+            </Button>
+
+            <Button
+              variant="contained"
+              color="error"
+              onClick={deletePostHandler}
+            >
+              삭제
+            </Button>
           </Box>
         </Box>
       </Modal>
