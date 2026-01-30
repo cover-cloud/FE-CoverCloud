@@ -53,6 +53,11 @@ const Header = () => {
       setSearchType(type);
     }
   }, [searchParams]);
+  React.useEffect(() => {
+    if (!isMobile) {
+      setOpenSearchBar(false);
+    }
+  }, [isMobile]);
   const handleSearch = () => {
     if (!searchQuery.trim()) return;
 
@@ -100,7 +105,15 @@ const Header = () => {
 
         <Box
           className="relative"
-          sx={{ flex: 1.5, display: { xs: "none", md: "flex" } }}
+          sx={{
+            flex: 1.5,
+            display: {
+              xs: "none",
+            },
+            "@media (min-width:767px)": {
+              display: "flex",
+            },
+          }}
         >
           <TextField
             className="H1"
@@ -142,7 +155,15 @@ const Header = () => {
 
         <Box
           className="relative flex justify-end"
-          sx={{ flex: 1, display: { xs: "flex", md: "none" } }}
+          sx={{
+            flex: 1,
+            display: {
+              xs: "flex",
+            },
+            "@media (min-width:767px)": {
+              display: "none",
+            },
+          }}
         >
           <Box
             className="relative"
