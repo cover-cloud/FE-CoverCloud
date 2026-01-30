@@ -2,7 +2,16 @@
 
 import React from "react";
 import Box from "@mui/material/Box";
-import { Button, Grid, Pagination } from "@mui/material";
+import {
+  Button,
+  Grid,
+  ListItemIcon,
+  ListItemText,
+  MenuItem,
+  Pagination,
+  Select,
+  Typography,
+} from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -10,7 +19,9 @@ import PostCard from "@/components/PostCard";
 import InfoMessage from "@/components/InfoMessage";
 import { contentData } from "@/app/main/type";
 import { useSearchQuery } from "@/app/api/search/saerch";
-
+import TuneIcon from "@mui/icons-material/Tune";
+import AccessTimeSharpIcon from "@mui/icons-material/AccessTimeSharp";
+import FavoriteBorderSharpIcon from "@mui/icons-material/FavoriteBorderSharp";
 type SearchType = "title" | "tags";
 
 interface SearchTab {
@@ -22,7 +33,12 @@ const searchTabs: SearchTab[] = [
   { title: "제목", searchType: "title" },
   { title: "태그", searchType: "tags" },
 ];
+type SortType = "latest" | "popular";
 
+const sortOptions: { label: string; value: SortType }[] = [
+  { label: "최신순", value: "latest" },
+  { label: "인기순", value: "popular" },
+];
 export const dynamic = "force-dynamic";
 export default function SearchClient() {
   const theme = useTheme();
@@ -34,7 +50,7 @@ export default function SearchClient() {
   ========================= */
   const query = searchParams.get("q") ?? "";
   const page = Math.max(1, Number(searchParams.get("page") ?? 1));
-
+  const sort = (searchParams.get("sort") as SortType) ?? "latest";
   const searchType = (searchParams.get("searchType") as SearchType) ?? "title";
 
   const selectedTab =
@@ -48,6 +64,7 @@ export default function SearchClient() {
     keyword: query,
     page: page - 1,
     size: 10,
+    sort,
   });
 
   /* =========================
@@ -80,7 +97,12 @@ export default function SearchClient() {
       page: String(value),
     });
   };
-
+  const handleSortChange = (value: SortType) => {
+    updateParams({
+      sort: value,
+      page: "1", // 정렬 바꾸면 페이지 초기화
+    });
+  };
   /* =========================
      스타일
   ========================= */
@@ -115,6 +137,88 @@ export default function SearchClient() {
             {tab.title}
           </Button>
         ))}
+      </Box>
+      <Box
+        className="flex items-center justify-between"
+        sx={{ mb: "44px", pl: "8px" }}
+      >
+        <Typography variant="h5">
+          <strong style={{ marginRight: "8px" }}>{`“${query}”`}</strong>
+          {searchType === "title" ? "제목" : "태그"} 검색 결과.
+        </Typography>
+        <Box sx={{ minWidth: 120 }}>
+          <Select
+            size="small"
+            renderValue={(value) => (
+              <Box
+                sx={{
+                  fontWeight: 700,
+                  mr: "8px",
+                  p: "0px 5px",
+                }}
+              >
+                {value === "latest" ? "최신순" : "인기순"}
+              </Box>
+            )}
+            value={sort}
+            onChange={(e) => handleSortChange(e.target.value as SortType)}
+            IconComponent={TuneIcon}
+            sx={{
+              fontSize: "14px",
+
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: "#ddd",
+              },
+              "&:hover .MuiOutlinedInput-notchedOutline": {
+                borderColor: "#aaa",
+              },
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: "#aaa",
+              },
+              "&.Mui-focused .MuiSelect-icon": {
+                color: "#4f4f4fff",
+              },
+            }}
+            MenuProps={{
+              PaperProps: {
+                sx: {
+                  "& .MuiMenuItem-root": {
+                    fontSize: "14px",
+                  },
+
+                  "& .MuiMenuItem-root:hover": {
+                    backgroundColor: "#f0f0f0",
+                  },
+
+                  "& .MuiMenuItem-root.Mui-selected": {
+                    backgroundColor: "transparent !important",
+                    color: "#000",
+                    fontWeight: 700,
+                  },
+
+                  "& .MuiMenuItem-root.Mui-selected:hover": {
+                    backgroundColor: "#f0f0f0",
+                  },
+                },
+              },
+            }}
+          >
+            <MenuItem value="latest">
+              <AccessTimeSharpIcon
+                fontSize="small"
+                sx={{ marginRight: "8px" }}
+              />
+              <Box>최신순</Box>
+            </MenuItem>
+            <MenuItem value="popular">
+              <FavoriteBorderSharpIcon
+                fontSize="small"
+                sx={{ marginRight: "8px" }}
+              />
+              <Box>인기순</Box>
+            </MenuItem>
+          </Select>
+        </Box>
       </Box>
       {!data?.data.content.length ? (
         <InfoMessage
