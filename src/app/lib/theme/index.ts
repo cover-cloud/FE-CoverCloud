@@ -140,7 +140,7 @@ const theme = createTheme({
           color: "#0D0D0D",
 
           "&:hover": {
-            backgroundColor: "#f0f0f0",
+            // backgroundColor: "#f0f0f0",
           },
         },
       },

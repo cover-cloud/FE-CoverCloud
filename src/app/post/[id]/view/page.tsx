@@ -205,7 +205,13 @@ const PostViewPage = () => {
             <iframe
               src={youtubeVideoId}
               width="100%"
-              height={videoId?.platform === "tiktok" ? "723px" : "auto"}
+              height={
+                videoId?.platform === "tiktok"
+                  ? "723px"
+                  : videoId?.platform === "soundcloud"
+                    ? "200px"
+                    : "auto"
+              }
               style={{
                 aspectRatio: getAspectRatio(videoId),
                 borderRadius: "12px",
