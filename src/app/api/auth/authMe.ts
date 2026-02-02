@@ -4,9 +4,7 @@ import { api } from "@/app/lib/api";
 
 export const fetchAuthMeWithCookie = async () => {
   try {
-    const res = await api.get(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/me`,
-    );
+    const res = await api.get(`/api/auth/me`);
     if (res) {
       return res.data;
     } else {
@@ -23,10 +21,11 @@ export const fetchAuthMeWithCookie = async () => {
 };
 
 export const useAuthMeQuery = () => {
-  return useQuery({
-    queryKey: ["auth-me-cookie"],
-    queryFn: () => fetchAuthMeWithCookie(),
+  const accessToken = useAuthStore((state) => state.accessToken);
 
+  return useQuery({
+    queryKey: ["auth-me-cookie", accessToken], // ✅ 핵심
+    queryFn: fetchAuthMeWithCookie,
     retry: false,
   });
 };

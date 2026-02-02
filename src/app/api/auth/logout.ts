@@ -12,11 +12,11 @@ export const logout = async (accessToken: string) => {
       },
     },
   );
-  // useAuthStore.setState({
-  //   accessToken: "",
-  //   userId: undefined,
-  //   isLogin: false,
-  // });
+  useAuthStore.setState({
+    accessToken: "",
+    userId: undefined,
+    isLogin: false,
+  });
 
   return response.data;
 };

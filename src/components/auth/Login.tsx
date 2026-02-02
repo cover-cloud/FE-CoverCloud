@@ -52,7 +52,11 @@ const Login = () => {
             height: "48px",
             fontSize: "20px",
             fontWeight: 400,
+
             mb: 2,
+            ":hover": {
+              backgroundColor: "#FEE500",
+            },
           }}
         >
           <RiKakaoTalkFill
@@ -79,6 +83,9 @@ const Login = () => {
             maxWidth: "300px",
             fontSize: "18px",
             fontWeight: 400,
+            ":hover": {
+              backgroundColor: "#03C75A",
+            },
           }}
           onClick={() => handleLogin("naver")}
         >
