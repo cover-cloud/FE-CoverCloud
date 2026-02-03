@@ -1,16 +1,10 @@
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "@/app/store/useAuthStore";
-const myCoverList = async (accessToken: string) => {
+import { api } from "@/app/lib/api";
+const myCoverList = async (accessToken: string, page: number, size: number) => {
   try {
-    const res = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cover/my`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
-    );
+    const res = await api.get(`/api/cover/my?page=${page}&size=${size}`);
     if (res) {
       return res.data;
     } else {
@@ -25,12 +19,25 @@ const myCoverList = async (accessToken: string) => {
     };
   }
 };
-
-export const useMyCoverListQuery = (accessToken: string) => {
+const myCommentPostList = async (page: number, size: number) => {
+  const res = await api.get(`/api/cover/my/comments?page=${page}&size=${size}`);
+  if (res) {
+    return res.data;
+  }
+};
+export const useMyCoverListQuery = (
+  accessToken: string,
+  page: number,
+  size: number,
+  type: "recommend" | "like" | "comment",
+) => {
   const hasToken = !!accessToken;
   return useQuery({
-    queryKey: ["myCoverList"],
-    queryFn: () => myCoverList(accessToken),
+    queryKey: ["myCoverList", page, size, type],
+    queryFn:
+      type === "comment"
+        ? () => myCommentPostList(page, size)
+        : () => myCoverList(accessToken, page, size),
     enabled: hasToken,
     retry: false,
   });

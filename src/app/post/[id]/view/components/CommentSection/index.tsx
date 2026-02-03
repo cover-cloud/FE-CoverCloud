@@ -42,20 +42,7 @@ const CommentSection = ({
     setCommentsData(comments);
   }, [commentList]);
 
-  const conmmentSubmitHandler = (data: string) => {
-    // setCommentsData((prev) => [
-    //   ...prev,
-    //   {
-    //     coverId: prev[prev.length - 1]?.coverId + 1 || 0,
-    //     userId: prev[prev.length - 1]?.userId + 1 || 0,
-    //     commentId: prev.length + 1,
-    //     createdAt: new Date().toISOString(),
-    //     parentCommentId: null,
-    //     content: data,
-    //     replies: [],
-    //   },
-    // ]);
-  };
+  const conmmentSubmitHandler = (data: string) => {};
   const [selectedCommentId, setSelectedCommentId] = React.useState<
     number | null
   >(null);
@@ -63,29 +50,7 @@ const CommentSection = ({
   const openCommentInputHandler = (id: number) => {
     setSelectedCommentId(selectedCommentId === id ? null : id);
   };
-  const replySubmitHandler = (data: string, parentId: number) => {
-    // setCommentsData((prev) =>
-    //   prev.map((comment: CommentListData) => {
-    //     if (comment.commentId === parentId) {
-    //       return {
-    //         ...comment,
-    //         replies: [
-    //           ...comment.replies,
-    //           {
-    //             commentId: comment.replies.length + 1,
-    //             content: data,
-    //             coverId: 0,
-    //             userId: 0,
-    //             parentCommentId: null,
-    //             replies: [],
-    //           },
-    //         ],
-    //       };
-    //     }
-    //     return comment;
-    //   })
-    // );
-  };
+  const replySubmitHandler = (data: string, parentId: number) => {};
 
   return (
     <section>

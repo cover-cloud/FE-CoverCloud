@@ -1,4 +1,11 @@
-import { Box, Typography, Button, alpha, TextField } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  alpha,
+  TextField,
+  CircularProgress,
+} from "@mui/material";
 import React, { useRef, useEffect } from "react";
 import { SongData } from "../../../../components/ItemEditor/type";
 import ArtistProfile from "../../../../components/ArtistProfile";
@@ -128,14 +135,6 @@ const ArtistListField = ({
             </Box>
           </Box>
         )}
-        {/* 
-        {isFetchingNextPage && <p className="text-center py-2">로딩 중...</p>} */}
-
-        {/* {!hasNextPage && allSongs.length > 0 && (
-          <p className="text-center py-2 text-gray-500">
-            더 이상 결과가 없습니다
-          </p>
-        )} */}
 
         {!isManualInput && (
           <Box
@@ -147,13 +146,28 @@ const ArtistListField = ({
             }}
           >
             <Typography>
-              {searchsongTitle === ""
-                ? "커버곡의 원곡 정보를 검색해주세요"
-                : isLoading
-                  ? "검색 중..."
-                  : data?.length === 0
-                    ? `"${searchsongTitle}" 의 검색 결과가 없습니다.`
-                    : ""}
+              {searchsongTitle === "" ? (
+                "커버곡의 원곡 정보를 검색해주세요"
+              ) : isLoading ? (
+                <Box
+                  className="mt-8"
+                  sx={{
+                    minHeight: "60vh",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <CircularProgress
+                    size={64}
+                    sx={{ color: theme.palette.orange.primary }}
+                  />
+                </Box>
+              ) : data?.length === 0 ? (
+                `"${searchsongTitle}" 의 검색 결과가 없습니다.`
+              ) : (
+                ""
+              )}
             </Typography>
           </Box>
         )}

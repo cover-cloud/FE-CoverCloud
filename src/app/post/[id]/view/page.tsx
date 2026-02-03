@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useAuthStore } from "@/app/store/useAuthStore";
 import { useRouter } from "next/navigation";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Typography } from "@mui/material";
 
 import {
   detectAndValidateMediaUrl,
@@ -39,12 +39,15 @@ import { fetchAuthMeWithCookie, useAuthMeQuery } from "@/app/api/auth/authMe";
 import { useMobaileModeStore, useModalStore } from "@/app/store/useModalStore";
 import { formatViewCount } from "@/app/utils/viewCount";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
+import { requireAuth } from "@/app/utils/requireAuth";
+import { reportPost } from "@/app/api/cover/reportPost";
 const PostViewPage = () => {
   const { id } = useParams();
   const router = useRouter();
 
   const userInfo = useAuthMeQuery();
-
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const isLogin = useAuthStore((state) => state.isLogin);
   const openLoginModal = useModalStore((state) => state.openLoginModal);
 
   const [youtubeVideoId, setYoutubeVideoId] = React.useState<string>("");
@@ -60,6 +63,7 @@ const PostViewPage = () => {
   //상태
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = React.useState(false);
   const [toggleLikeButton, setToggleLikeButton] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const { data: postData, isLoading: isPostLoading } = useReadingPost(
@@ -105,7 +109,23 @@ const PostViewPage = () => {
     setLikeCount(postData.data.data.likeCount);
   }, [postData]);
 
-  if (isPostLoading) return <Box>로딩중..</Box>;
+  if (isPostLoading)
+    return (
+      <Box
+        className="mt-8"
+        sx={{
+          minHeight: "60vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <CircularProgress
+          size={64}
+          sx={{ color: theme.palette.orange.primary }}
+        />
+      </Box>
+    );
 
   if (!postData) {
     return <Box>페이지 로드에 실패하였습니다.</Box>;
@@ -118,12 +138,46 @@ const PostViewPage = () => {
     const isAuthenticated = await fetchAuthMeWithCookie();
     if (!isAuthenticated.success) {
       openLoginModal();
+      useSnackbarStore
+        .getState()
+        .show("로그인 후 수정할 수 있습니다.", "error");
       return;
     } else {
       router.push(`/post/${id}/edit`);
     }
   };
+  const reportPostHandler = async () => {
+    const isAuthenticated = await fetchAuthMeWithCookie();
+    if (!isAuthenticated.success) {
+      openLoginModal();
+      useSnackbarStore
+        .getState()
+        .show("로그인 후 삭제할 수 있습니다.", "error");
+      return;
+    }
+    try {
+      const reportResult = await reportPost(id as string);
+      if (reportResult.data.success) {
+        setIsReportModalOpen(false);
+      } else {
+        alert("신고 실패");
+        setIsReportModalOpen(false);
+      }
+      setIsDeleteModalOpen(false);
+    } catch (error) {
+      console.log(error);
+      setIsDeleteModalOpen(false);
+    }
+  };
   const deletePostHandler = async () => {
+    const isAuthenticated = await fetchAuthMeWithCookie();
+    if (!isAuthenticated.success) {
+      openLoginModal();
+      useSnackbarStore
+        .getState()
+        .show("로그인 후 삭제할 수 있습니다.", "error");
+      return;
+    }
     try {
       const deleteResult = await deletePost(id as string | string[]);
       if (deleteResult.success) {
@@ -134,9 +188,17 @@ const PostViewPage = () => {
       setIsDeleteModalOpen(false);
     } catch (error) {
       console.log(error);
+      setIsDeleteModalOpen(false);
     }
   };
   const likeToggleHandler = async () => {
+    if (!isLogin && !accessToken) {
+      openLoginModal();
+      useSnackbarStore
+        .getState()
+        .show("로그인 후 좋아요를 할 수 있습니다.", "error");
+      return;
+    }
     if (isLoading) return;
     setIsLoading(true);
     if (toggleLikeButton) {
@@ -197,6 +259,7 @@ const PostViewPage = () => {
               isLogin={userInfo.data?.data?.userId === videoOwner}
               openDeleteModal={() => setIsDeleteModalOpen(true)}
               navigateToEdit={navigateToEdit}
+              openReportModal={() => setIsReportModalOpen(true)}
             />
           </Box>
         )}
@@ -272,6 +335,7 @@ const PostViewPage = () => {
                   isLogin={userInfo.data?.data?.userId === videoOwner}
                   openDeleteModal={() => setIsDeleteModalOpen(true)}
                   navigateToEdit={navigateToEdit}
+                  openReportModal={() => setIsReportModalOpen(true)}
                 />
               )}
             </Box>
@@ -341,6 +405,7 @@ const PostViewPage = () => {
           </Typography>
 
           {/* 설명 */}
+
           <Typography
             sx={{
               fontSize: "20px",
@@ -375,6 +440,62 @@ const PostViewPage = () => {
               onClick={deletePostHandler}
             >
               삭제
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
+      <Modal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+      >
+        <Box
+          className="flex flex-col items-center"
+          sx={{
+            width: "100%",
+            bgcolor: "#fff",
+            borderRadius: "12px",
+            p: "40px",
+          }}
+        >
+          {/* 제목 */}
+          <Typography variant="h6" sx={{ fontWeight: 700, mb: "8px" }}>
+            게시글 신고
+          </Typography>
+
+          {/* 설명 */}
+
+          <Typography
+            sx={{
+              fontSize: "20px",
+              color: "#666",
+              mb: "24px",
+            }}
+          >
+            게시글을 신고하시겠습니까?
+          </Typography>
+
+          {/* 버튼 영역 */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "16px",
+              width: "100%",
+            }}
+          >
+            <Button
+              variant="outlined"
+              onClick={() => setIsReportModalOpen(false)}
+            >
+              취소
+            </Button>
+
+            <Button
+              variant="contained"
+              color="error"
+              onClick={reportPostHandler}
+            >
+              신고
             </Button>
           </Box>
         </Box>

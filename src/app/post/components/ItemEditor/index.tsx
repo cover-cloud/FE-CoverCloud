@@ -2,7 +2,14 @@
 
 import React from "react";
 import { useParams } from "next/navigation";
-import { Box, Button, TextField, Chip, MenuItem } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  Chip,
+  MenuItem,
+  CircularProgress,
+} from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormSchema, formSchema, FormField, SongData } from "./type";
@@ -23,6 +30,8 @@ import VideoInputField from "../../[id]/edit/components/VideoInputField";
 import SearchSong from "../../[id]/edit/components/SearchSong";
 import ErrorMessageComponent from "../ErrorMessageComponent";
 import { useAuthStore } from "@/app/store/useAuthStore";
+import { useAuthMeQuery } from "@/app/api/auth/authMe";
+import Login from "@/components/auth/Login";
 
 const fields: FormField[] = [
   { key: "title", label: "제목", placeholder: "게시글의 제목을 입력해주세요." },
@@ -48,7 +57,11 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
   const params = useParams();
   const router = useRouter();
   const songSearchWrapperRef = React.useRef<HTMLDivElement | null>(null);
-  const accessToken = useAuthStore((state) => state.accessToken);
+  const {
+    data,
+    isLoading: authMeLoading,
+    error: authMeError,
+  } = useAuthMeQuery();
   const { data: postData, isLoading: isPostLoading } = useReadingPost(
     params.id as string,
   );
@@ -204,7 +217,9 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
   const onClickOutside = () => {
     setIsSongSearchFocus(false);
   };
-
+  React.useEffect(() => {
+    console.log(authMeError);
+  }, [authMeError]);
   React.useEffect(() => {
     if (mode !== "edit") return;
 
@@ -230,151 +245,175 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col gap-4 mt-4"
     >
-      {fields.map((field) => (
-        <Controller
-          key={field.key}
-          name={field.key}
-          control={control}
-          render={({ field: controllerField, fieldState }) => (
-            <Box className="mb-4 relative">
-              {/* 레이블과 에러 */}
-              <Box className="flex items-center justify-between mb-1">
-                {fieldState.error && (
-                  <ErrorMessageComponent>입력필수</ErrorMessageComponent>
-                )}
+      {authMeLoading ? (
+        <Box
+          className="mt-8"
+          sx={{
+            minHeight: "60vh",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <CircularProgress
+            size={64}
+            sx={{ color: theme.palette.orange.primary }}
+          />
+        </Box>
+      ) : data.success === false ? (
+        <Box>
+          <Login />
+        </Box>
+      ) : (
+        <React.Fragment>
+          {fields.map((field) => (
+            <Controller
+              key={field.key}
+              name={field.key}
+              control={control}
+              render={({ field: controllerField, fieldState }) => (
+                <Box className="mb-4 relative">
+                  {/* 레이블과 에러 */}
+                  <Box className="flex items-center justify-between mb-1">
+                    {fieldState.error && (
+                      <ErrorMessageComponent>입력필수</ErrorMessageComponent>
+                    )}
 
-                {/* 노래 검색 전용 에러 */}
-                {field.key === "songTitle" &&
-                  formState.isSubmitted &&
-                  (!selectedSongData.artist || !selectedSongData.songTitle) && (
-                    <ErrorMessageComponent>입력필수</ErrorMessageComponent>
+                    {/* 노래 검색 전용 에러 */}
+                    {field.key === "songTitle" &&
+                      formState.isSubmitted &&
+                      (!selectedSongData.artist ||
+                        !selectedSongData.songTitle) && (
+                        <ErrorMessageComponent>입력필수</ErrorMessageComponent>
+                      )}
+
+                    {field.key === "tag" && (
+                      <Button
+                        type="button"
+                        onClick={handleAddTag}
+                        disabled={!tagInput.trim()}
+                      >
+                        추가
+                      </Button>
+                    )}
+                  </Box>
+                  {field.key === "songTitle" ? (
+                    <Box
+                      ref={songSearchWrapperRef}
+                      onFocusCapture={() => {
+                        setIsSongSearchFocus(true);
+                      }}
+                      onBlurCapture={(e) => {
+                        if (
+                          songSearchWrapperRef.current &&
+                          !songSearchWrapperRef.current.contains(
+                            e.relatedTarget as Node,
+                          )
+                        ) {
+                          setIsSongSearchFocus(false);
+                        }
+                      }}
+                      className="relative"
+                    >
+                      <TextField
+                        placeholder={field.placeholder}
+                        fullWidth
+                        {...controllerField}
+                        slotProps={{
+                          input: {
+                            readOnly: isManualInput,
+                          },
+                        }}
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            backgroundColor: theme.palette.gray.secondary,
+                            borderRadius: "15px",
+                            border: "none",
+                          },
+                        }}
+                      />
+
+                      <SearchSong
+                        selectedSongData={selectedSongData}
+                        selectSongHandler={selectSongHandler}
+                        songTitle={songTitle}
+                        isSongSearchFocus={isSongSearchFocus}
+                        toggleInputMode={toggleInputMode}
+                        isManualInput={isManualInput}
+                        songTitleManualChangeHandler={
+                          songTitleManualChangeHandler
+                        }
+                        onClickOutside={onClickOutside}
+                      />
+                    </Box>
+                  ) : field.key === "genre" ? (
+                    /* 기존 genre 로직 */
+
+                    <TextField
+                      select
+                      fullWidth
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          backgroundColor: theme.palette.gray.secondary,
+                          borderRadius: "15px",
+                          border: "none",
+                        },
+                      }}
+                      {...controllerField}
+                      value={controllerField.value ?? ""}
+                      SelectProps={{
+                        displayEmpty: true,
+                        renderValue: (selected) =>
+                          selected ? (
+                            genres.find((g) => g.value === selected)?.title
+                          ) : (
+                            <span style={{ color: "#9CA3AF" }}>장르 선택</span>
+                          ),
+                      }}
+                      error={!!fieldState.error}
+                      helperText={fieldState.error?.message}
+                    >
+                      {genres.map((genre) => (
+                        <MenuItem key={genre.value} value={genre.value}>
+                          {genre.title}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  ) : field.key === "link" ? (
+                    <VideoInputField
+                      field={field}
+                      controllerField={controllerField}
+                      fieldState={fieldState}
+                      link={link}
+                      youtubeVideoId={videoUrl.embedUrl}
+                      videoType={videoUrl.platform}
+                    />
+                  ) : (
+                    <TextField
+                      placeholder={field.placeholder}
+                      fullWidth
+                      // slotProps={{
+                      //   input: {
+                      //     readOnly: field.key === "songTitle" && isManualInput,
+                      //   },
+                      // }}
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          backgroundColor: theme.palette.gray.secondary,
+                          borderRadius: "15px",
+                          border: "none",
+                        },
+                      }}
+                      {...controllerField}
+                      onFocus={() => songTitleFocusHandler(field.key)}
+                      onKeyDown={(e) =>
+                        handleTagKeyDown(field.key, e, controllerField)
+                      }
+                    />
                   )}
 
-                {field.key === "tag" && (
-                  <Button
-                    type="button"
-                    onClick={handleAddTag}
-                    disabled={!tagInput.trim()}
-                  >
-                    추가
-                  </Button>
-                )}
-              </Box>
-              {field.key === "songTitle" ? (
-                <Box
-                  ref={songSearchWrapperRef}
-                  onFocusCapture={() => {
-                    setIsSongSearchFocus(true);
-                  }}
-                  onBlurCapture={(e) => {
-                    if (
-                      songSearchWrapperRef.current &&
-                      !songSearchWrapperRef.current.contains(
-                        e.relatedTarget as Node,
-                      )
-                    ) {
-                      setIsSongSearchFocus(false);
-                    }
-                  }}
-                  className="relative"
-                >
-                  <TextField
-                    placeholder={field.placeholder}
-                    fullWidth
-                    {...controllerField}
-                    slotProps={{
-                      input: {
-                        readOnly: isManualInput,
-                      },
-                    }}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        backgroundColor: theme.palette.gray.secondary,
-                        borderRadius: "15px",
-                        border: "none",
-                      },
-                    }}
-                  />
-
-                  <SearchSong
-                    selectedSongData={selectedSongData}
-                    selectSongHandler={selectSongHandler}
-                    songTitle={songTitle}
-                    isSongSearchFocus={isSongSearchFocus}
-                    toggleInputMode={toggleInputMode}
-                    isManualInput={isManualInput}
-                    songTitleManualChangeHandler={songTitleManualChangeHandler}
-                    onClickOutside={onClickOutside}
-                  />
-                </Box>
-              ) : field.key === "genre" ? (
-                /* 기존 genre 로직 */
-
-                <TextField
-                  select
-                  fullWidth
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      backgroundColor: theme.palette.gray.secondary,
-                      borderRadius: "15px",
-                      border: "none",
-                    },
-                  }}
-                  {...controllerField}
-                  value={controllerField.value ?? ""}
-                  SelectProps={{
-                    displayEmpty: true,
-                    renderValue: (selected) =>
-                      selected ? (
-                        genres.find((g) => g.value === selected)?.title
-                      ) : (
-                        <span style={{ color: "#9CA3AF" }}>장르 선택</span>
-                      ),
-                  }}
-                  error={!!fieldState.error}
-                  helperText={fieldState.error?.message}
-                >
-                  {genres.map((genre) => (
-                    <MenuItem key={genre.value} value={genre.value}>
-                      {genre.title}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              ) : field.key === "link" ? (
-                <VideoInputField
-                  field={field}
-                  controllerField={controllerField}
-                  fieldState={fieldState}
-                  link={link}
-                  youtubeVideoId={videoUrl.embedUrl}
-                  videoType={videoUrl.platform}
-                />
-              ) : (
-                <TextField
-                  placeholder={field.placeholder}
-                  fullWidth
-                  // slotProps={{
-                  //   input: {
-                  //     readOnly: field.key === "songTitle" && isManualInput,
-                  //   },
-                  // }}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      backgroundColor: theme.palette.gray.secondary,
-                      borderRadius: "15px",
-                      border: "none",
-                    },
-                  }}
-                  {...controllerField}
-                  onFocus={() => songTitleFocusHandler(field.key)}
-                  onKeyDown={(e) =>
-                    handleTagKeyDown(field.key, e, controllerField)
-                  }
-                />
-              )}
-
-              {/* 노래 검색 컴포넌트 */}
-              {/* {field.key === "songTitle" && (
+                  {/* 노래 검색 컴포넌트 */}
+                  {/* {field.key === "songTitle" && (
                 <SearchSong
                   selectedSongData={selectedSongData}
                   selectSongHandler={selectSongHandler}
@@ -387,44 +426,46 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
                 />
               )} */}
 
-              {/* 태그 렌더링 */}
-              {field.key === "tag" && tags.length > 0 && (
-                <Box className="flex flex-wrap gap-2 mt-2">
-                  {tags.map((tag) => (
-                    <Chip
-                      key={tag}
-                      label={tag}
-                      onDelete={() => handleDeleteTag(tag)}
-                      color="primary"
-                      variant="outlined"
-                    />
-                  ))}
+                  {/* 태그 렌더링 */}
+                  {field.key === "tag" && tags.length > 0 && (
+                    <Box className="flex flex-wrap gap-2 mt-2">
+                      {tags.map((tag) => (
+                        <Chip
+                          key={tag}
+                          label={tag}
+                          onDelete={() => handleDeleteTag(tag)}
+                          color="primary"
+                          variant="outlined"
+                        />
+                      ))}
+                    </Box>
+                  )}
                 </Box>
               )}
-            </Box>
-          )}
-        />
-      ))}
+            />
+          ))}
 
-      {/* 제출 버튼 */}
-      <Box className="flex justify-center">
-        <Button
-          type="submit"
-          sx={{
-            width: "196px",
-            fontSize: "20px",
-            backgroundColor: theme.palette.orange.primary,
-            color: theme.palette.common.white,
-            borderRadius: "25px",
-            "&:hover": {
-              backgroundColor: theme.palette.orange.secondary,
-              color: theme.palette.common.black,
-            },
-          }}
-        >
-          커버곡 추천하기
-        </Button>
-      </Box>
+          {/* 제출 버튼 */}
+          <Box className="flex justify-center">
+            <Button
+              type="submit"
+              sx={{
+                width: "196px",
+                fontSize: "20px",
+                backgroundColor: theme.palette.orange.primary,
+                color: theme.palette.common.white,
+                borderRadius: "25px",
+                "&:hover": {
+                  backgroundColor: theme.palette.orange.secondary,
+                  color: theme.palette.common.black,
+                },
+              }}
+            >
+              커버곡 추천하기
+            </Button>
+          </Box>
+        </React.Fragment>
+      )}
     </Box>
   );
 };

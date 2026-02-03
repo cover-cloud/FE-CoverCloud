@@ -9,6 +9,7 @@ import { useAuthStore } from "@/app/store/useAuthStore";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
 import { fetchAuthMeWithCookie, useAuthMeQuery } from "@/app/api/auth/authMe";
 import { useModalStore } from "@/app/store/useModalStore";
+import { requireAuth } from "@/app/utils/requireAuth";
 
 interface CommentInputProps {
   onSubmit: (data: string) => void;
@@ -25,6 +26,7 @@ const CommentInput = ({
 }: CommentInputProps) => {
   const [comment, setComment] = React.useState("");
   const accessToken = useAuthStore((state) => state.accessToken);
+  const isLogin = useAuthStore((state) => state.isLogin);
   const createMutation = useCreateCommentMutation();
 
   const openLoginModal = useModalStore((state) => state.openLoginModal);
@@ -32,10 +34,11 @@ const CommentInput = ({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!comment.trim()) return;
-    //로그인 상태 확인로직
-    const isMyAccount = await fetchAuthMeWithCookie();
-    if (!isMyAccount.success) {
+    if (!isLogin && !accessToken) {
       openLoginModal();
+      useSnackbarStore
+        .getState()
+        .show("로그인 후 댓글을 작성할 수 있습니다.", "error");
       return;
     }
 

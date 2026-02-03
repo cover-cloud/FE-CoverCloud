@@ -6,13 +6,14 @@ export const fetchAuthMeWithCookie = async () => {
   try {
     const res = await api.get(`/api/auth/me`);
     if (res) {
+      useAuthStore.setState({ isLogin: true });
       return res.data;
     } else {
       // 로그아웃 로직
-      useAuthStore.setState({ accessToken: "" });
+      useAuthStore.setState({ isLogin: false });
     }
   } catch (error) {
-    useAuthStore.setState({ accessToken: "" });
+    useAuthStore.setState({ isLogin: false });
     return {
       success: false,
       message: "로그인 정보를 확인할 수 없습니다.",
@@ -22,7 +23,6 @@ export const fetchAuthMeWithCookie = async () => {
 
 export const useAuthMeQuery = () => {
   const accessToken = useAuthStore((state) => state.accessToken);
-
   return useQuery({
     queryKey: ["auth-me-cookie", accessToken], // ✅ 핵심
     queryFn: fetchAuthMeWithCookie,

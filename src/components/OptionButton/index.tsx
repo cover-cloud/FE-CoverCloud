@@ -1,10 +1,12 @@
 import React, { useEffect, useRef } from "react";
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { HiDotsHorizontal, HiDotsVertical } from "react-icons/hi";
+import Modal from "../modal/Modal";
 
 interface OptionButtonProps {
   isLogin: boolean;
   openDeleteModal: () => void;
+  openReportModal: () => void;
   navigateToEdit: () => void;
   colIcon?: boolean;
 }
@@ -12,10 +14,12 @@ interface OptionButtonProps {
 const OptionButton = ({
   isLogin,
   openDeleteModal,
+  openReportModal,
   navigateToEdit,
   colIcon = false,
 }: OptionButtonProps) => {
   const [isOptionOpen, setIsOptionOpen] = React.useState(false);
+
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   // 🔹 밖 클릭 감지
@@ -54,7 +58,8 @@ const OptionButton = ({
         <Box className="absolute top-7 right-0 bg-white w-24 border-2 border-gray-200 z-50">
           <Box
             className="hover:bg-gray-100 p-2"
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               openDeleteModal();
               setIsOptionOpen(false);
             }}
@@ -63,7 +68,8 @@ const OptionButton = ({
           </Box>
           <Box
             className="hover:bg-gray-100 p-2"
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               navigateToEdit();
               setIsOptionOpen(false);
             }}
@@ -74,7 +80,14 @@ const OptionButton = ({
       )}
 
       {isOptionOpen && !isLogin && (
-        <Box className="absolute top-7 right-0 bg-white w-24 border-2 border-gray-200 z-50">
+        <Box
+          className="absolute top-7 right-0 bg-white w-24 border-2 border-gray-200 z-50"
+          onClick={(e) => {
+            e.stopPropagation();
+            openReportModal();
+            setIsOptionOpen(false);
+          }}
+        >
           <Box className="hover:bg-gray-100 p-2">신고</Box>
         </Box>
       )}

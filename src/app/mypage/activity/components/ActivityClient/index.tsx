@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { Box, Button, Grid, Pagination } from "@mui/material";
+import { Box, Button, CircularProgress, Grid, Pagination } from "@mui/material";
 import theme from "@/app/lib/theme";
 import InfoMessage from "@/components/InfoMessage";
 import { useAuthStore } from "@/app/store/useAuthStore";
@@ -20,11 +20,27 @@ export default function ActivityClient() {
 
   const initialPage = Number(searchParams.get("page") || 1);
   const [page, setPage] = React.useState(initialPage);
-  const activityTabs = ["추천", "좋아요", "댓글"];
+  const activityTabs: {
+    type: "recommend" | "like" | "comment";
+    name: string;
+  }[] = [
+    {
+      type: "recommend",
+      name: "추천",
+    },
+    { type: "like", name: "좋아요" },
+    { type: "comment", name: "댓글" },
+  ];
   const accessToken = useAuthStore((state) => state.accessToken);
-  const { data, isLoading } = useMyCoverListQuery(accessToken);
-  const { data: authMeData, isLoading: authMeLoading } = useAuthMeQuery();
   const [selectedTab, setSelectedTab] = React.useState(0);
+  const { data, isLoading } = useMyCoverListQuery(
+    accessToken,
+    page,
+    10,
+    activityTabs[selectedTab].type,
+  );
+
+  const { data: authMeData, isLoading: authMeLoading } = useAuthMeQuery();
 
   const activityTabChangeHandler = (_: React.MouseEvent, index: number) => {
     setSelectedTab(index);
@@ -54,9 +70,6 @@ export default function ActivityClient() {
     router.push(`/mypage/activity?page=${value}`, { scroll: false });
   };
 
-  if (isLoading || authMeLoading) {
-    return <Box>로딩 중...</Box>;
-  }
   if (authMeData?.success === false) {
     return <Login />;
   }
@@ -68,17 +81,32 @@ export default function ActivityClient() {
       <Box>
         {activityTabs.map((tab, index) => (
           <Button
-            key={tab}
+            key={tab.type}
             role="tab"
             aria-selected={selectedTab === index}
             onClick={(e) => activityTabChangeHandler(e, index)}
             sx={activityTabSx(index)}
           >
-            <Box className="B1">{tab}</Box>
+            <Box className="B1">{tab.name}</Box>
           </Button>
         ))}
 
-        {data?.data.content.length > 0 ? (
+        {isLoading || authMeLoading ? (
+          <Box
+            className="mt-8"
+            sx={{
+              minHeight: "60vh",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <CircularProgress
+              size={64}
+              sx={{ color: theme.palette.orange.primary }}
+            />
+          </Box>
+        ) : data?.data.content.length > 0 ? (
           <>
             <Grid container spacing={2}>
               {data.data.content.map((post: contentData, idx: number) => (

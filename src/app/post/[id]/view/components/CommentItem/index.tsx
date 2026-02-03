@@ -24,6 +24,7 @@ import Image from "next/image";
 import { fetchAuthMeWithCookie } from "@/app/api/auth/authMe";
 import { useModalStore } from "@/app/store/useModalStore";
 import { useFormatCreatedAt } from "@/app/utils/formetCreatedAt";
+import { requireAuth } from "@/app/utils/requireAuth";
 
 interface CommentItemProps extends CommentListData {
   depth?: number; // 뎁스 정보 추가
@@ -54,6 +55,7 @@ const CommentItem = ({
   const deleteCommentMutation = useDeleteCommentMutation();
   const updateCommentMutation = useUpdateCommentMutation();
   const accessToken = useAuthStore((state) => state.accessToken);
+  const isLogin = useAuthStore((state) => state.isLogin);
 
   const [isImageLoading, setIsImageLoading] = React.useState(true);
   const [isCommentEdit, setIsCommentEdit] = React.useState(false);
@@ -65,12 +67,11 @@ const CommentItem = ({
   const openLoginModal = useModalStore((state) => state.openLoginModal);
   const likeComment = useCommentLikeMutation();
   const likeCommentHandler = async () => {
-    if (!accessToken) {
-      const isMyAccount = await fetchAuthMeWithCookie();
-      if (!isMyAccount.success) {
-        openLoginModal();
-        return;
-      }
+    if (!isLogin && !accessToken) {
+      openLoginModal();
+      useSnackbarStore
+        .getState()
+        .show("로그인 후 좋아요를 할 수 있습니다.", "error");
       return;
     }
 
@@ -82,6 +83,13 @@ const CommentItem = ({
   };
 
   const deleteCommentHandler = () => {
+    if (!isLogin && !accessToken) {
+      openLoginModal();
+      useSnackbarStore
+        .getState()
+        .show("로그인 후 댓글을 삭제할 수 있습니다.", "error");
+      return;
+    }
     deleteCommentMutation.mutate(
       {
         commentId,
@@ -110,6 +118,13 @@ const CommentItem = ({
     if (!editContent.trim() || editContent === content) {
       return;
     }
+    if (!isLogin && !accessToken) {
+      openLoginModal();
+      useSnackbarStore
+        .getState()
+        .show("로그인 후 댓글을 수정할 수 있습니다.", "error");
+      return;
+    }
     updateCommentMutation.mutate(
       {
         commentId,
@@ -131,7 +146,7 @@ const CommentItem = ({
       },
     );
   };
-
+  const reportCommentHandler = () => {};
   return (
     <Box className={`mb-2`} ml={depth * 2}>
       <Box className="flex gap-2 items-start flex-col">
@@ -240,6 +255,7 @@ const CommentItem = ({
             isLogin={userId === currentUserId}
             openDeleteModal={deleteCommentHandler}
             navigateToEdit={() => setIsCommentEdit(true)}
+            openReportModal={reportCommentHandler}
           />
         </Box>
         {/* 대댓글 */}

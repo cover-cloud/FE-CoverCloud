@@ -6,7 +6,7 @@ import PostCard from "../../../../components/PostCard";
 import Box from "@mui/material/Box";
 import Pagination from "@mui/material/Pagination";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Button } from "@mui/material";
+import { Button, CircularProgress } from "@mui/material";
 import { usePopularCoverListQuery } from "../../../../app/api/cover/list";
 import { contentData, Genre } from "../../../../app/main/type";
 import { useTheme } from "@mui/material/styles";
@@ -183,7 +183,20 @@ const MainComponent = () => {
           </Box>
         </>
       ) : isLoading ? (
-        <InfoMessage message="게시물을 불러오고 있습니다." />
+        <Box
+          className="mt-8"
+          sx={{
+            minHeight: "60vh",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <CircularProgress
+            size={64}
+            sx={{ color: theme.palette.orange.primary }}
+          />
+        </Box>
       ) : (
         <InfoMessage message="게시글이 없습니다." />
       )}

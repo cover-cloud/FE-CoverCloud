@@ -4,9 +4,8 @@ import React from "react";
 import Box from "@mui/material/Box";
 import {
   Button,
+  CircularProgress,
   Grid,
-  ListItemIcon,
-  ListItemText,
   MenuItem,
   Pagination,
   Select,
@@ -118,7 +117,22 @@ export default function SearchClient() {
   });
   // TODO: 로딩 상태 처리
   if (isLoading) {
-    return <InfoMessage message="검색 중입니다..." onClick={() => {}} />;
+    return (
+      <Box
+        className="mt-8"
+        sx={{
+          minHeight: "60vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <CircularProgress
+          size={64}
+          sx={{ color: theme.palette.orange.primary }}
+        />
+      </Box>
+    );
   }
   /* =========================
      결과 없음

@@ -17,6 +17,7 @@ import { IoIosAddCircle } from "react-icons/io";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthMeQuery } from "@/app/api/auth/authMe";
 import { IoClose } from "react-icons/io5";
+import { useAuthStore } from "@/app/store/useAuthStore";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +29,7 @@ const Header = () => {
   const theme = useTheme();
   const openLoginModal = useModalStore((state) => state.openLoginModal);
   const isMobile = useMobaileModeStore((state) => state.isMobile);
+  const isLogin = useAuthStore((state) => state.isLogin);
   // const isLogin = useAuthStore((state) => state.isLogin);
 
   const { data, error } = useAuthMeQuery();
@@ -222,7 +224,7 @@ const Header = () => {
 
         {!openSearchBar && (
           <Box className="flex justify-end" sx={{ flex: 1 }}>
-            {data?.success && !error ? (
+            {isLogin ? (
               <Box className="flex">
                 <Link href="/post/create">
                   {isMobile ? (
