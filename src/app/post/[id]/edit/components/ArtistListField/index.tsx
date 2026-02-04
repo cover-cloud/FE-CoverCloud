@@ -145,30 +145,28 @@ const ArtistListField = ({
               border: "none",
             }}
           >
-            <Typography>
-              {searchsongTitle === "" ? (
-                "커버곡의 원곡 정보를 검색해주세요"
-              ) : isLoading ? (
-                <Box
-                  className="mt-8"
-                  sx={{
-                    minHeight: "60vh",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <CircularProgress
-                    size={64}
-                    sx={{ color: theme.palette.orange.primary }}
-                  />
-                </Box>
-              ) : data?.length === 0 ? (
-                `"${searchsongTitle}" 의 검색 결과가 없습니다.`
-              ) : (
-                ""
-              )}
-            </Typography>
+            {searchsongTitle === "" ? (
+              "커버곡의 원곡 정보를 검색해주세요"
+            ) : isLoading ? (
+              <Box
+                className="mt-8"
+                sx={{
+                  minHeight: "60vh",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <CircularProgress
+                  size={40}
+                  sx={{ color: theme.palette.orange.primary }}
+                />
+              </Box>
+            ) : data?.length === 0 ? (
+              `"${searchsongTitle}" 의 검색 결과가 없습니다.`
+            ) : (
+              ""
+            )}
           </Box>
         )}
       </Box>

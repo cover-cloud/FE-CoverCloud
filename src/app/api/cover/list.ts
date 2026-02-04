@@ -1,3 +1,4 @@
+import { api } from "@/app/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
@@ -35,15 +36,7 @@ const fetchPopularCoverList = async ({
     body.genres = genres.map((g) => GENRE_MAP[g]).filter(Boolean);
   }
 
-  const res = await axios.post(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cover/trending/search`,
-    body,
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    },
-  );
+  const res = await api.post(`/api/cover/list`, body);
 
   return res.data.data;
 };

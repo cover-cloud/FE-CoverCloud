@@ -13,7 +13,7 @@ import { getMediaThumbnail, getYoutubeVideoId } from "../../app/utils/youtube";
 import { useTheme } from "@mui/material/styles";
 import { detectAndValidateMediaUrl } from "../../app/utils/youtube";
 
-const DEFAULT_IMAGE = "/asset/image/defaultProfile.png";
+const DEFAULT_IMAGE = "/asset/image/default-image.png";
 
 const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
   coverArtist,
@@ -32,7 +32,7 @@ const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
   const theme = useTheme();
   const videoId = detectAndValidateMediaUrl(link);
 
-  const [imageSrc, setImageSrc] = useState(DEFAULT_IMAGE);
+  const [imageSrc, setImageSrc] = useState("");
   const [loading, setLoading] = useState(true);
 
   // ✅ useEffect 안에서 async 처리
@@ -45,7 +45,7 @@ const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
 
       try {
         const thumbnail = await getMediaThumbnail(videoId);
-        setImageSrc(thumbnail || DEFAULT_IMAGE);
+        setImageSrc(thumbnail);
       } catch (error) {
         console.error("Thumbnail fetch failed:", error);
         setImageSrc(DEFAULT_IMAGE);
@@ -71,40 +71,37 @@ const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
         <Box
           className={`relative flex-shrink-0 ${isViewer ? "w-[148px] h-[107px]" : "w-full h-40"}`}
         >
-          {/* Skeleton */}
-          {loading && (
+          {/* Skeleton: 로딩 중이거나 이미지 소스가 없을 때 표시 */}
+          {(loading || !imageSrc) && (
             <Skeleton
               variant="rectangular"
               width="100%"
               height="100%"
               animation="wave"
-              sx={{
-                position: "absolute",
-                inset: 0,
-                zIndex: 1,
-              }}
+              sx={{ position: "absolute", inset: 0, zIndex: 1 }}
             />
           )}
 
-          {/* Image */}
-          <Image
-            src={imageSrc}
-            alt={coverTitle || "Post Image"}
-            fill
-            sizes={isViewer ? "148px" : "(max-width: 768px) 100vw, 33vw"}
-            className="object-cover"
-            style={{
-              opacity: loading ? 0 : 1,
-              transition: "opacity 0.3s ease",
-            }}
-            onLoad={() => setLoading(false)}
-            onError={() => {
-              setImageSrc(DEFAULT_IMAGE);
-              setLoading(false);
-            }}
-          />
+          {/* Image: 소스가 있을 때만 렌더링 */}
+          {imageSrc && (
+            <Image
+              src={imageSrc}
+              alt={coverTitle || "Post Image"}
+              fill
+              sizes={isViewer ? "148px" : "(max-width: 768px) 100vw, 33vw"}
+              className="object-cover"
+              style={{
+                opacity: loading ? 0 : 1,
+                transition: "opacity 0.3s ease",
+              }}
+              onLoad={() => setLoading(false)}
+              onError={() => {
+                setImageSrc(DEFAULT_IMAGE);
+                setLoading(false);
+              }}
+            />
+          )}
         </Box>
-
         <Box
           className="flex flex-col flex-1 min-w-0"
           sx={{

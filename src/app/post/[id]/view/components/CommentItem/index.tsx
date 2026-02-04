@@ -60,7 +60,6 @@ const CommentItem = ({
   const [isImageLoading, setIsImageLoading] = React.useState(true);
   const [isCommentEdit, setIsCommentEdit] = React.useState(false);
   const [editContent, setEditContent] = React.useState(content);
-  const [liked, setLiked] = React.useState(isLiked);
 
   const size = Math.max(48 - depth * 12, 24);
 
@@ -229,7 +228,7 @@ const CommentItem = ({
                   }}
                   onClick={() => likeCommentHandler()}
                 >
-                  {liked ? <FaHeart /> : <FaRegHeart />}
+                  {isLiked ? <FaHeart /> : <FaRegHeart />}
                   {likeCount}
                 </Button>
 

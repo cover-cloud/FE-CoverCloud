@@ -62,7 +62,7 @@ const AccountPage = () => {
 
   const handleRemoveImage = async () => {
     try {
-      const result = await changeAccount(accessToken, undefined, null);
+      const result = await changeAccount(undefined, null);
 
       if (result.data.success) {
         setAvatar("");
@@ -76,7 +76,7 @@ const AccountPage = () => {
 
   const changedNickNameHandler = async () => {
     try {
-      const result = await changeAccount(accessToken, newNickName, undefined);
+      const result = await changeAccount(newNickName, undefined);
 
       if (result.data.success) {
         setOriginalNickName(newNickName);
@@ -115,7 +115,7 @@ const AccountPage = () => {
     try {
       setIsImageChanging(true);
 
-      const result = await changeAccount(accessToken, tempAvatar, undefined);
+      const result = await changeAccount(undefined, tempAvatar);
 
       if (result.data.success) {
         setAvatar(tempAvatar);

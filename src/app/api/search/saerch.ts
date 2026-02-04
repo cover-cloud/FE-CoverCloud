@@ -7,7 +7,7 @@ const search = async (
   keyword: string,
   page: number,
   size: number,
-  sort: string,
+  sort: "LATEST" | "POPULAR",
 ) => {
   const endpoint =
     type === "title" ? "/api/cover/search/title" : "/api/cover/search/tags";
@@ -37,7 +37,7 @@ export const useSearchQuery = ({
   keyword: string;
   page: number;
   size: number;
-  sort: string;
+  sort: "LATEST" | "POPULAR";
 }) => {
   return useQuery({
     queryKey: ["search", type, keyword, page, size, sort],

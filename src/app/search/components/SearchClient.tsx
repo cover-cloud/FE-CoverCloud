@@ -32,11 +32,11 @@ const searchTabs: SearchTab[] = [
   { title: "제목", searchType: "title" },
   { title: "태그", searchType: "tags" },
 ];
-type SortType = "latest" | "popular";
+type SortType = "LATEST" | "POPULAR";
 
 const sortOptions: { label: string; value: SortType }[] = [
-  { label: "최신순", value: "latest" },
-  { label: "인기순", value: "popular" },
+  { label: "최신순", value: "LATEST" },
+  { label: "인기순", value: "POPULAR" },
 ];
 export const dynamic = "force-dynamic";
 export default function SearchClient() {
@@ -49,7 +49,7 @@ export default function SearchClient() {
   ========================= */
   const query = searchParams.get("q") ?? "";
   const page = Math.max(1, Number(searchParams.get("page") ?? 1));
-  const sort = (searchParams.get("sort") as SortType) ?? "latest";
+  const sort = (searchParams.get("sort") as SortType) ?? "LATEST";
   const searchType = (searchParams.get("searchType") as SearchType) ?? "title";
 
   const selectedTab =
@@ -171,7 +171,7 @@ export default function SearchClient() {
                   p: "0px 5px",
                 }}
               >
-                {value === "latest" ? "최신순" : "인기순"}
+                {value === "LATEST" ? "최신순" : "인기순"}
               </Box>
             )}
             value={sort}
@@ -217,14 +217,14 @@ export default function SearchClient() {
               },
             }}
           >
-            <MenuItem value="latest">
+            <MenuItem value="LATEST">
               <AccessTimeSharpIcon
                 fontSize="small"
                 sx={{ marginRight: "8px" }}
               />
               <Box>최신순</Box>
             </MenuItem>
-            <MenuItem value="popular">
+            <MenuItem value="POPULAR">
               <FavoriteBorderSharpIcon
                 fontSize="small"
                 sx={{ marginRight: "8px" }}

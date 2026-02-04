@@ -81,11 +81,11 @@ const PostViewPage = () => {
 
     switch (videoId.platform) {
       case "youtube":
-        return "16 / 9"; // 와이드 영상
+        return "16 / 9";
       case "tiktok":
-        return "9 / 10"; // 세로 영상
+        return "16 / 9";
       case "soundcloud":
-        return "100 / 20"; // 사운드클라우드 플레이어는 세로가 얕고 가로가 넓음
+        return "100 / 20";
       default:
         return "16 / 9";
     }
@@ -136,6 +136,7 @@ const PostViewPage = () => {
 
   const navigateToEdit = async () => {
     const isAuthenticated = await fetchAuthMeWithCookie();
+
     if (!isAuthenticated.success) {
       openLoginModal();
       useSnackbarStore
@@ -268,13 +269,7 @@ const PostViewPage = () => {
             <iframe
               src={youtubeVideoId}
               width="100%"
-              height={
-                videoId?.platform === "tiktok"
-                  ? "723px"
-                  : videoId?.platform === "soundcloud"
-                    ? "200px"
-                    : "auto"
-              }
+              height={videoId?.platform === "soundcloud" ? "200px" : "auto"}
               style={{
                 aspectRatio: getAspectRatio(videoId),
                 borderRadius: "12px",

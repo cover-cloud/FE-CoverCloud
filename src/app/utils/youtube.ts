@@ -69,7 +69,7 @@ export const detectAndValidateMediaUrl = (url: string): MediaUrlResult => {
         id: match[1],
         isValid: true,
         originalUrl: url,
-        embedUrl: `https://www.tiktok.com/embed/v2/${match[1]}`,
+        embedUrl: `https://www.tiktok.com/player/v1/${match[1]}`,
       };
     }
   }
