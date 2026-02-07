@@ -30,8 +30,10 @@ import VideoInputField from "../../[id]/edit/components/VideoInputField";
 import SearchSong from "../../[id]/edit/components/SearchSong";
 import ErrorMessageComponent from "../ErrorMessageComponent";
 import { useAuthStore } from "@/app/store/useAuthStore";
-import { useAuthMeQuery } from "@/app/api/auth/authMe";
+import { fetchAuthMeWithCookie, useAuthMeQuery } from "@/app/api/auth/authMe";
 import Login from "@/components/auth/Login";
+import { useSnackbarStore } from "@/app/store/useSnackbar";
+import { useModalStore } from "@/app/store/useModalStore";
 
 const fields: FormField[] = [
   { key: "title", label: "제목", placeholder: "게시글의 제목을 입력해주세요." },
@@ -56,6 +58,7 @@ const genres = [
 const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
   const params = useParams();
   const router = useRouter();
+  const { openLoginModal } = useModalStore();
   const songSearchWrapperRef = React.useRef<HTMLDivElement | null>(null);
   const {
     data,
@@ -142,6 +145,15 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
   };
 
   const onSubmit = async (formData: FormSchema) => {
+    const isAuthenticated = await fetchAuthMeWithCookie();
+    if (!isAuthenticated.success) {
+      openLoginModal();
+      useSnackbarStore
+        .getState()
+        .show("로그인 후 추천할 수 있습니다.", "error");
+      return;
+    }
+
     if (mode === "create") {
       const sendData: PostData = {
         videoUrl: formData.link,

@@ -1,10 +1,9 @@
-import axios from "axios";
-import { useAuthStore } from "@/app/store/useAuthStore";
+import { api } from "@/app/lib/api";
 
 export const refreshToken = async () => {
   try {
-    const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/refresh`,
+    const response = await api.post(
+      `/api/auth/refresh`,
       {},
       {
         withCredentials: true,
@@ -16,7 +15,7 @@ export const refreshToken = async () => {
 
     // 2. 중요: 에러를 다시 던지지(throw) 마세요!
     // 대신 null이나 에러 객체를 반환하여 호출한 곳에서 처리하게 합니다.
-    if (axios.isAxiosError(error) && error.response?.status === 401) {
+    if (error instanceof Error && error.message.includes("401")) {
       return { success: false }; // 401 에러 시 안전하게 null 반환
     }
 

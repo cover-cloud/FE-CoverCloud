@@ -21,6 +21,9 @@ import { useSearchQuery } from "@/app/api/search/saerch";
 import TuneIcon from "@mui/icons-material/Tune";
 import AccessTimeSharpIcon from "@mui/icons-material/AccessTimeSharp";
 import FavoriteBorderSharpIcon from "@mui/icons-material/FavoriteBorderSharp";
+import { fetchAuthMeWithCookie } from "@/app/api/auth/authMe";
+import { useSnackbarStore } from "@/app/store/useSnackbar";
+import { useModalStore } from "@/app/store/useModalStore";
 type SearchType = "title" | "tags";
 
 interface SearchTab {
@@ -43,7 +46,7 @@ export default function SearchClient() {
   const theme = useTheme();
   const router = useRouter();
   const searchParams = useSearchParams();
-
+  const { openLoginModal } = useModalStore();
   /* =========================
      URL → 상태 파싱
   ========================= */
@@ -101,6 +104,17 @@ export default function SearchClient() {
       sort: value,
       page: "1", // 정렬 바꾸면 페이지 초기화
     });
+  };
+  const handleRecommendClick = async () => {
+    const isAuthenticated = await fetchAuthMeWithCookie();
+    if (!isAuthenticated.success) {
+      openLoginModal();
+      useSnackbarStore
+        .getState()
+        .show("로그인 후 추천할 수 있습니다.", "error");
+      return;
+    }
+    router.push("/post/create");
   };
   /* =========================
      스타일
@@ -239,7 +253,7 @@ export default function SearchClient() {
           subMessage={query ? `“${query}”` : ""}
           message="검색 결과가 없습니다.\n새로운 곡을 추천하시겠어요?"
           buttonText="곡 추천하기"
-          onClick={() => {}}
+          onClick={handleRecommendClick}
         />
       ) : (
         <React.Fragment>

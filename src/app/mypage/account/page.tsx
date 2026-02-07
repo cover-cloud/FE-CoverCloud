@@ -7,7 +7,7 @@ import Modal from "@/components/modal/Modal";
 import { useAuthStore } from "@/app/store/useAuthStore";
 import { useAuthMeQuery } from "@/app/api/auth/authMe";
 import { getProfileImage } from "@/app/utils/profileImage";
-import { changeAccount } from "@/app/api/auth/changeAccount";
+import { changeAccount, fetchImageUrl } from "@/app/api/auth/changeAccount";
 import { logout } from "@/app/api/auth/logout";
 import { useRouter } from "next/navigation";
 
@@ -59,10 +59,23 @@ const AccountPage = () => {
     },
   };
   const hasImage = typeof avatar === "string" && avatar.length > 0;
+  const handleImageChange = async (file: File) => {
+    setOpenImageConfirmModal(true);
+    try {
+      const result = await fetchImageUrl(file);
 
+      if (result) {
+        const tempAvatarUrl = `https://storage.googleapis.com/covercloud-bucket/${result}`;
+        setTempAvatar(tempAvatarUrl);
+        setAvatar(tempAvatarUrl);
+      }
+    } catch {
+      useSnackbarStore.getState().show("이미지 변경에 실패했습니다.", "error");
+    }
+  };
   const handleRemoveImage = async () => {
     try {
-      const result = await changeAccount(undefined, null);
+      const result = await changeAccount(undefined, "");
 
       if (result.data.success) {
         setAvatar("");
@@ -70,7 +83,7 @@ const AccountPage = () => {
         useSnackbarStore.getState().show("이미지가 삭제되었습니다.", "success");
       }
     } catch {
-      useSnackbarStore.getState().show("이미지 삭제 실패", "error");
+      useSnackbarStore.getState().show("이미지 삭제에 실패했습니다.", "error");
     }
   };
 
@@ -204,8 +217,7 @@ const AccountPage = () => {
 
               const reader = new FileReader();
               reader.onload = () => {
-                setTempAvatar(reader.result as string);
-                setOpenImageConfirmModal(true);
+                handleImageChange(file);
               };
               reader.readAsDataURL(file);
             }}

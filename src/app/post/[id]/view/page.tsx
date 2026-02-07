@@ -153,7 +153,8 @@ const PostViewPage = () => {
       openLoginModal();
       useSnackbarStore
         .getState()
-        .show("로그인 후 삭제할 수 있습니다.", "error");
+        .show("로그인 후 신고할 수 있습니다.", "error");
+      setIsReportModalOpen(false);
       return;
     }
     try {
@@ -177,6 +178,7 @@ const PostViewPage = () => {
       useSnackbarStore
         .getState()
         .show("로그인 후 삭제할 수 있습니다.", "error");
+      setIsDeleteModalOpen(false);
       return;
     }
     try {

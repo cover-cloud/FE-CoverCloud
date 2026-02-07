@@ -10,13 +10,16 @@ import PostCard from "@/components/PostCard";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useMyCoverListQuery } from "@/app/api/mypage/myCoverList";
 import Login from "@/components/auth/Login";
-import { useAuthMeQuery } from "@/app/api/auth/authMe";
+import { fetchAuthMeWithCookie, useAuthMeQuery } from "@/app/api/auth/authMe";
+import { useModalStore } from "@/app/store/useModalStore";
+import { useSnackbarStore } from "@/app/store/useSnackbar";
 
 export const dynamic = "force-dynamic";
 
 export default function ActivityClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { openLoginModal } = useModalStore();
 
   const initialPage = Number(searchParams.get("page") || 1);
   const [page, setPage] = React.useState(initialPage);
@@ -68,6 +71,17 @@ export default function ActivityClient() {
   ) => {
     setPage(value);
     router.push(`/mypage/activity?page=${value}`, { scroll: false });
+  };
+  const handleRecommendClick = async () => {
+    const isAuthenticated = await fetchAuthMeWithCookie();
+    if (!isAuthenticated.success) {
+      openLoginModal();
+      useSnackbarStore
+        .getState()
+        .show("로그인 후 추천할 수 있습니다.", "error");
+      return;
+    }
+    router.push("/post/create");
   };
 
   if (authMeData?.success === false) {
@@ -122,8 +136,8 @@ export default function ActivityClient() {
         ) : (
           <InfoMessage
             message="아직 추천한 곡이 없습니다.\n새로운 곡을 추천하시겠어요?"
-            buttonText="게시물 작성하기"
-            onClick={() => {}}
+            buttonText="곡 추천하기"
+            onClick={handleRecommendClick}
           />
         )}
       </Box>
