@@ -2,6 +2,9 @@ import React from "react";
 import { Box } from "@mui/material";
 import ArtistProfile from "../../../../components/ArtistProfile";
 import { ArtistProfileMobileProps } from "../../../../components/ArtistProfile/type";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import theme from "@/app/lib/theme";
 
 const ArtistInfo = ({
   coverArtist = "아티스트",
@@ -17,8 +20,19 @@ const ArtistInfo = ({
     <section style={{ marginBottom: "20px" }}>
       {isMobile ? (
         <Box>
-          <Box className="mt-3" onClick={openArtistInfoHandler}>
-            원곡정보 보기
+          <Box
+            className=" flex"
+            onClick={openArtistInfoHandler}
+            sx={{ margin: "8px" }}
+          >
+            <Box>원곡정보 보기</Box>
+            <Box>
+              {isArtistInfoOpen ? (
+                <KeyboardArrowUpIcon />
+              ) : (
+                <KeyboardArrowDownIcon />
+              )}
+            </Box>
           </Box>
           <Box
             className={`
@@ -28,8 +42,13 @@ const ArtistInfo = ({
                   ? "max-h-[500px] opacity-100"
                   : "max-h-0 opacity-0"
               }
-              border border-black
+       
             `}
+            sx={{
+              padding: "16px",
+              backgroundColor: theme.palette.gray.tertiary,
+              borderRadius: "20px",
+            }}
           >
             <ArtistProfile
               coverArtist={coverArtist}

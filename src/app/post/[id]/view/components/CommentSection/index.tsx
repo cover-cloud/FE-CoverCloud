@@ -5,6 +5,7 @@ import { Box, Typography } from "@mui/material";
 import CommentItem from "../CommentItem";
 import CommentInput from "../CommentInput";
 import { useCommentListQuery } from "@/app/api/cover/comment";
+import { useMobaileModeStore } from "@/app/store/useModalStore";
 interface CommentFormInput {
   comment: string;
 }
@@ -20,7 +21,7 @@ const CommentSection = ({
   const [totalCommentCount, setTotalCommentCount] = React.useState(0);
 
   const { data: commentList } = useCommentListQuery(id);
-
+  const isMobile = useMobaileModeStore((state) => state.isMobile);
   useEffect(() => {
     if (!commentList?.data) {
       setCommentsData([]);
@@ -55,24 +56,27 @@ const CommentSection = ({
   return (
     <section>
       <Box className="H2">댓글 {totalCommentCount}</Box>
-
-      <CommentInput onSubmit={conmmentSubmitHandler} id={id} />
-      <Box className="mt-2">
-        {commentsData.length > 0
-          ? commentsData.map((comment: CommentListData) => (
-              <CommentItem
-                key={comment.commentId}
-                {...comment}
-                currentUserId={currentUserId}
-                onReplySubmit={(data) =>
-                  replySubmitHandler(data, comment.commentId)
-                }
-                openCommentInputHandler={openCommentInputHandler}
-                openCmmentInput={selectedCommentId === comment.commentId}
-              />
-            ))
-          : null}
-      </Box>
+      {
+        <Box>
+          <CommentInput onSubmit={conmmentSubmitHandler} id={id} />
+          <Box className="mt-2">
+            {commentsData.length > 0
+              ? commentsData.map((comment: CommentListData) => (
+                  <CommentItem
+                    key={comment.commentId}
+                    {...comment}
+                    currentUserId={currentUserId}
+                    onReplySubmit={(data) =>
+                      replySubmitHandler(data, comment.commentId)
+                    }
+                    openCommentInputHandler={openCommentInputHandler}
+                    openCmmentInput={selectedCommentId === comment.commentId}
+                  />
+                ))
+              : null}
+          </Box>
+        </Box>
+      }
     </section>
   );
 };
