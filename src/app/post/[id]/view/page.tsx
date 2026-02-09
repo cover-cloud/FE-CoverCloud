@@ -4,7 +4,13 @@ import React, { useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useAuthStore } from "@/app/store/useAuthStore";
 import { useRouter } from "next/navigation";
-import { Box, Button, CircularProgress, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  SwipeableDrawer,
+  Typography,
+} from "@mui/material";
 
 import {
   detectAndValidateMediaUrl,
@@ -25,7 +31,7 @@ import { FaPlay } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa";
 import { FaRegHeart } from "react-icons/fa";
 import { IoIosArrowBack } from "react-icons/io";
-import { HiDotsHorizontal } from "react-icons/hi";
+import { IoCloseSharp } from "react-icons/io5";
 
 import ArtistInfo from "./components/ArtistInfo";
 import CommentSection from "./components/CommentSection";
@@ -61,7 +67,7 @@ const PostViewPage = () => {
   const [videoOwner, setVideoOwner] = React.useState<number | null>(null);
   const [likeCount, setLikeCount] = React.useState<number>(0);
   //상태
-
+  const [isCommentOpen, setIsCommentOpen] = React.useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = React.useState(false);
   const [toggleLikeButton, setToggleLikeButton] = React.useState(false);
@@ -240,6 +246,7 @@ const PostViewPage = () => {
     }
     setIsLoading(false);
   };
+
   return (
     <Box className={isMobile ? "flex flex-col" : "flex"} sx={{ gap: "52px" }}>
       <Box className={isMobile ? "w-full" : "w-[66%]"}>
@@ -374,15 +381,79 @@ const PostViewPage = () => {
             coverUrl=""
             isMobile={isMobile}
           />
-          <CommentSection
-            id={Number(id)}
-            currentUserId={userInfo.data?.data?.userId}
-          />
+          {isMobile && (
+            <Box
+              onClick={() => setIsCommentOpen(true)}
+              sx={{
+                p: 2,
+                my: 2,
+                bgcolor: theme.palette.gray.secondary,
+                borderRadius: "8px",
+                cursor: "pointer",
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography className="B1">댓글 보기</Typography>
+              <Typography
+                sx={{ color: theme.palette.gray.primary }}
+              ></Typography>
+            </Box>
+          )}
+          {!isMobile && (
+            <CommentSection
+              id={Number(id)}
+              currentUserId={userInfo.data?.data?.userId}
+            />
+          )}
         </Box>
       </Box>
       <Box className={isMobile ? "w-full" : "w-[33%]"}>
         <PopularVideos isViewer={!isMobile} />
       </Box>
+      {isMobile && (
+        <SwipeableDrawer
+          anchor="bottom"
+          open={isCommentOpen}
+          onClose={() => setIsCommentOpen(false)}
+          onOpen={() => setIsCommentOpen(true)}
+          // 드로어 높이 및 리사이징 설정
+          PaperProps={{
+            sx: {
+              height: "75dvh", // 화면의 75% 차지
+              borderTopLeftRadius: "20px",
+              borderTopRightRadius: "20px",
+              display: "flex",
+              flexDirection: "column",
+              overflow: "hidden",
+            },
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              p: 2,
+              borderBottom: "1px solid #eee",
+            }}
+          >
+            <Typography variant="h6" fontWeight={700}>
+              댓글
+            </Typography>
+            <Button onClick={() => setIsCommentOpen(false)}>
+              <IoCloseSharp size={32} />
+            </Button>
+          </Box>
+
+          <Box sx={{ flexGrow: 1, overflowY: "auto", p: 2 }}>
+            <CommentSection
+              id={Number(id)}
+              currentUserId={userInfo.data?.data?.userId}
+            />
+          </Box>
+        </SwipeableDrawer>
+      )}
       <Modal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}

@@ -41,6 +41,7 @@ const CommentSection = ({
       profileImageUrl: comment.profileImageUrl,
     }));
     setCommentsData(comments);
+    setTotalCommentCount(commentList.data.length);
   }, [commentList]);
 
   const conmmentSubmitHandler = (data: string) => {};
@@ -56,27 +57,26 @@ const CommentSection = ({
   return (
     <section>
       <Box className="H2">댓글 {totalCommentCount}</Box>
-      {
-        <Box>
-          <CommentInput onSubmit={conmmentSubmitHandler} id={id} />
-          <Box className="mt-2">
-            {commentsData.length > 0
-              ? commentsData.map((comment: CommentListData) => (
-                  <CommentItem
-                    key={comment.commentId}
-                    {...comment}
-                    currentUserId={currentUserId}
-                    onReplySubmit={(data) =>
-                      replySubmitHandler(data, comment.commentId)
-                    }
-                    openCommentInputHandler={openCommentInputHandler}
-                    openCmmentInput={selectedCommentId === comment.commentId}
-                  />
-                ))
-              : null}
-          </Box>
+
+      <Box>
+        <CommentInput onSubmit={conmmentSubmitHandler} id={id} />
+        <Box className="mt-2">
+          {commentsData.length > 0
+            ? commentsData.map((comment: CommentListData) => (
+                <CommentItem
+                  key={comment.commentId}
+                  {...comment}
+                  currentUserId={currentUserId}
+                  onReplySubmit={(data) =>
+                    replySubmitHandler(data, comment.commentId)
+                  }
+                  openCommentInputHandler={openCommentInputHandler}
+                  openCmmentInput={selectedCommentId === comment.commentId}
+                />
+              ))
+            : null}
         </Box>
-      }
+      </Box>
     </section>
   );
 };
