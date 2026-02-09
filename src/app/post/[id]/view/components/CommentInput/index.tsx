@@ -33,7 +33,8 @@ const CommentInput = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!comment.trim()) return;
+    const normalizedComment = comment.trim();
+    if (!normalizedComment) return;
     if (!isLogin && !accessToken) {
       openLoginModal();
       useSnackbarStore
@@ -42,12 +43,12 @@ const CommentInput = ({
       return;
     }
 
-    onSubmit(comment);
+    onSubmit(normalizedComment);
     setComment("");
     if (parentId) {
       createMutation.mutate(
         {
-          comment,
+          comment: normalizedComment,
           coverId: id,
           parentCommentId: parentId,
           accessToken,
@@ -67,7 +68,7 @@ const CommentInput = ({
       );
     } else {
       createMutation.mutate(
-        { comment, coverId: id, accessToken },
+        { comment: normalizedComment, coverId: id, accessToken },
         {
           onSuccess: () => {
             useSnackbarStore

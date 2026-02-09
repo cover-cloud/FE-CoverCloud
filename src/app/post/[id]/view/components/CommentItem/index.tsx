@@ -110,11 +110,14 @@ const CommentItem = ({
 
   const cancleEditHabler = () => {
     setIsCommentEdit(false);
+
     setEditContent(content);
   };
 
   const commentEditHandler = () => {
-    if (!editContent.trim() || editContent === content) {
+    const normalizedComment = editContent.trim();
+    if (!normalizedComment) return;
+    if (normalizedComment === content) {
       return;
     }
     if (!isLogin && !accessToken) {
@@ -127,7 +130,7 @@ const CommentItem = ({
     updateCommentMutation.mutate(
       {
         commentId,
-        content: editContent,
+        content: normalizedComment,
         accessToken,
         coverId,
       },
