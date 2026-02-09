@@ -272,7 +272,7 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
             sx={{ color: theme.palette.orange.primary }}
           />
         </Box>
-      ) : data.success === false ? (
+      ) : data?.data?.success === false ? (
         <Box>
           <Login />
         </Box>
