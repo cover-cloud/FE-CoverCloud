@@ -4,12 +4,13 @@ import { api } from "@/app/lib/api";
 import axios from "axios";
 
 export const fetchAuthMeWithCookie = async () => {
+  const accessToken = useAuthStore.getState().accessToken;
   try {
     const res = await axios.get(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/me`,
       {
         headers: {
-          Authorization: `Bearer ${document.cookie}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       },
     );
