@@ -18,10 +18,7 @@ export const fetchAuthMeWithCookie = async () => {
     if (res && res.data) {
       useAuthStore.setState({ isLogin: true });
       // 반환 형식을 통일합니다.
-      return {
-        success: true,
-        data: res.data,
-      };
+      return res.data;
     }
 
     throw new Error("No data received");

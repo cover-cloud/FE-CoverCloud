@@ -152,6 +152,7 @@ const AccountPage = () => {
   };
 
   useEffect(() => {
+    console.log(data);
     if (!data || data.success === false) return;
     const avatar = getProfileImage(data?.data.profileImage);
     setAvatar(avatar);
