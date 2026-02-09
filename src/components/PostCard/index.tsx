@@ -21,7 +21,7 @@ const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
   coverId,
   coverTitle,
   createdAt,
-  likeIncrement,
+  likeCount,
   link,
   musicId,
   tags,
@@ -61,7 +61,7 @@ const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
       <Box
         className={` ${isViewer ? "flex" : "flex-col"}`}
         sx={{
-          padding: "12px 8px 14px 8px",
+          padding: isViewer ? "0px" : "12px 20px 14px 20px",
           borderRadius: "12px",
           "&:hover": {
             backgroundColor: theme.palette.gray.tertiary,
@@ -105,28 +105,33 @@ const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
         <Box
           className="flex flex-col flex-1 min-w-0"
           sx={{
+            marginTop: isViewer ? "8px" : "20px",
+            marginBottom: isViewer ? "10px" : "0",
             marginLeft: isViewer ? "16px" : "0",
+            gap: "8px",
           }}
         >
           <Box className="flex justify-between items-center">
             {coverTitle && (
-              <h3 className="text-sm font-medium">{coverTitle}</h3>
+              <h3 className="text-sm font-medium S2 overflow-hidden text-ellipsis whitespace-nowrap min-w-0 flex-1">
+                {coverTitle}
+              </h3>
             )}
             {!isViewer && (
-              <Box className="flex items-center gap-1">
-                <FaRegHeart /> {likeIncrement}
+              <Box className="flex items-center gap-1 ">
+                <FaRegHeart /> <Box className="S4">{likeCount}</Box>
               </Box>
             )}
           </Box>
 
           <Box className="flex gap-2 items-center overflow-hidden min-w-0">
-            <Box className="flex-shrink-0">{coverGenre}</Box>
+            <Box className="flex-shrink-0 S4">{coverGenre}</Box>
 
             <Box className="w-[1px] h-4 bg-black flex-shrink-0" />
 
             {/* 태그 묶음 */}
             <Box
-              className={`overflow-hidden text-ellipsis whitespace-nowrap min-w-0 flex-1`}
+              className={`overflow-hidden text-ellipsis whitespace-nowrap min-w-0 flex-1 S4`}
               sx={{
                 color: theme.palette.genre.primary,
               }}
@@ -141,7 +146,7 @@ const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
           {isViewer && (
             <Box className="flex items-center gap-1">
               <FaRegHeart />
-              {likeIncrement}
+              {likeCount}
             </Box>
           )}
         </Box>

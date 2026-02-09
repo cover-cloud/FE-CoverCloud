@@ -15,7 +15,7 @@ export type contentData = {
   coverId: number;
   coverTitle: string;
   createdAt: string;
-  likeIncrement: number;
+  likeCount: number;
   link: string;
   musicId: number;
   tags: string[];

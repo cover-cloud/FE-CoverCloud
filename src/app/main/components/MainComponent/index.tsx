@@ -143,7 +143,7 @@ const MainComponent = () => {
             onClick={() => popularTabChangeHandler(tab)}
             sx={popularTabSx(tab.period === period)}
           >
-            {tab.title}
+            <Box className="S1">{tab.title}</Box>
           </Button>
         ))}
       </Box>
@@ -156,7 +156,7 @@ const MainComponent = () => {
             onClick={() => genreTabChangeHandler(tab)}
             sx={genreTabSx(genreValues.includes(tab.value))}
           >
-            {tab.title}
+            <Box className="S3">{tab.title}</Box>
           </Button>
         ))}
       </Box>

@@ -14,13 +14,13 @@ type PopularTab = {
 };
 const PopularVideos = ({ isViewer }: { isViewer: boolean }) => {
   const popularTabs: PopularTab[] = [
-    { title: "전체", value: 0, period: "ALL" },
-    { title: "월간", value: 1, period: "MONTHLY" },
-    { title: "일간", value: 2, period: "DAILY" },
-    { title: "주간", value: 3, period: "WEEKLY" },
+    { title: "최신", value: 0, period: "ALL" },
+    { title: "일간", value: 1, period: "MONTHLY" },
+    { title: "주간", value: 2, period: "DAILY" },
+    { title: "월간", value: 3, period: "WEEKLY" },
   ];
   const [selectedTab, setSelectedTab] = React.useState<PopularTab>({
-    title: "전체",
+    title: "최신",
     value: 0,
     period: "ALL",
   });
@@ -68,7 +68,7 @@ const PopularVideos = ({ isViewer }: { isViewer: boolean }) => {
               onClick={(e) => popularTabChangeHandler(e, tab)}
               sx={popularTabSx(index)}
             >
-              {tab.title}
+              <Box className="S1">{tab.title}</Box>
             </Button>
             {index === 0 && (
               <Box
