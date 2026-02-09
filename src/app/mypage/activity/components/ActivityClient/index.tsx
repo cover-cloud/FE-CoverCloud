@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { Box, Button, CircularProgress, Grid, Pagination } from "@mui/material";
 import theme from "@/app/lib/theme";
 import InfoMessage from "@/components/InfoMessage";
@@ -16,62 +16,74 @@ import { useSnackbarStore } from "@/app/store/useSnackbar";
 
 export const dynamic = "force-dynamic";
 
+type ActivityType = "recommend" | "like" | "comment";
+
+const activityTabs: { type: ActivityType; name: string }[] = [
+  { type: "recommend", name: "추천" },
+  { type: "like", name: "좋아요" },
+  { type: "comment", name: "댓글" },
+];
+
 export default function ActivityClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { openLoginModal } = useModalStore();
-
-  const initialPage = Number(searchParams.get("page") || 1);
-  const [page, setPage] = React.useState(initialPage);
-  const activityTabs: {
-    type: "recommend" | "like" | "comment";
-    name: string;
-  }[] = [
-    {
-      type: "recommend",
-      name: "추천",
-    },
-    { type: "like", name: "좋아요" },
-    { type: "comment", name: "댓글" },
-  ];
   const accessToken = useAuthStore((state) => state.accessToken);
-  const [selectedTab, setSelectedTab] = React.useState(0);
-  const { data, isLoading } = useMyCoverListQuery(
-    accessToken,
-    page,
-    10,
-    activityTabs[selectedTab].type,
+
+  /* =========================
+     URL → 상태 파싱 (상태값 제거)
+  ========================= */
+  const page = Math.max(1, Number(searchParams.get("page") ?? 1));
+  const currentTabType =
+    (searchParams.get("tab") as ActivityType) ?? "recommend";
+
+  // 현재 선택된 탭의 인덱스 찾기
+  const selectedTabIndex = activityTabs.findIndex(
+    (t) => t.type === currentTabType,
   );
 
+  /* =========================
+     API 데이터 페칭
+  ========================= */
   const { data: authMeData, isLoading: authMeLoading } = useAuthMeQuery();
 
-  const activityTabChangeHandler = (_: React.MouseEvent, index: number) => {
-    setSelectedTab(index);
+  const { data, isLoading } = useMyCoverListQuery(
+    accessToken,
+    page - 1, // API가 0-base index라면 page-1 처리
+    10,
+    currentTabType,
+  );
+
+  /* =========================
+     URL 변경 헬퍼 (updateParams)
+  ========================= */
+  const updateParams = (next: Record<string, string>) => {
+    const params = new URLSearchParams(searchParams.toString());
+    Object.entries(next).forEach(([key, value]) => {
+      params.set(key, value);
+    });
+
+    router.push(`/mypage/activity?${params.toString()}`, {
+      scroll: false,
+    });
   };
 
-  useEffect(() => {}, [data]);
-
-  const activityTabSx = (index: number) => ({
-    color:
-      index === selectedTab
-        ? theme.palette.common.black
-        : theme.palette.gray.primary,
-    borderRadius: "10px",
-    minWidth: "60px",
-    minHeight: "32px",
-    padding: "0",
-    "&:hover": {
-      backgroundColor: theme.palette.gray.secondary,
-    },
-  });
-
-  const pageChangeHandler = (
-    event: React.ChangeEvent<unknown>,
-    value: number,
-  ) => {
-    setPage(value);
-    router.push(`/mypage/activity?page=${value}`, { scroll: false });
+  /* =========================
+     핸들러
+  ========================= */
+  const activityTabChangeHandler = (type: ActivityType) => {
+    updateParams({
+      tab: type,
+      page: "1", // 탭 변경 시 페이지 1로 초기화
+    });
   };
+
+  const pageChangeHandler = (_: React.ChangeEvent<unknown>, value: number) => {
+    updateParams({
+      page: String(value),
+    });
+  };
+
   const handleRecommendClick = async () => {
     const isAuthenticated = await fetchAuthMeWithCookie();
     if (!isAuthenticated.success) {
@@ -84,63 +96,87 @@ export default function ActivityClient() {
     router.push("/post/create");
   };
 
+  /* =========================
+     조건부 렌더링
+  ========================= */
+  const activityTabSx = (type: ActivityType) => ({
+    color:
+      type === currentTabType
+        ? theme.palette.common.black
+        : theme.palette.gray.primary,
+    borderRadius: "10px",
+    minWidth: "60px",
+    minHeight: "32px",
+    padding: "0 12px",
+    fontSize: "16px",
+    fontWeight: type === currentTabType ? 700 : 400,
+    "&:hover": {
+      backgroundColor: theme.palette.gray.secondary,
+    },
+  });
+
   if (authMeData?.success === false) {
     return <Login />;
   }
+
   return (
     <Box>
-      <Box className="H1" sx={{ width: "100%", textAlign: "center" }}>
+      <Box className="H1" sx={{ width: "100%", textAlign: "center", mb: 4 }}>
         내 활동 내역
       </Box>
-      <Box>
-        {activityTabs.map((tab, index) => (
+
+      {/* 탭 메뉴 */}
+      <Box sx={{ mb: 3, display: "flex", gap: 1 }}>
+        {activityTabs.map((tab) => (
           <Button
             key={tab.type}
-            role="tab"
-            aria-selected={selectedTab === index}
-            onClick={(e) => activityTabChangeHandler(e, index)}
-            sx={activityTabSx(index)}
+            onClick={() => activityTabChangeHandler(tab.type)}
+            sx={activityTabSx(tab.type)}
           >
-            <Box className="B1">{tab.name}</Box>
+            {tab.name}
           </Button>
         ))}
+      </Box>
 
-        {isLoading || authMeLoading ? (
-          <Box
-            className="mt-8"
-            sx={{
-              minHeight: "60vh",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <CircularProgress
-              size={64}
-              sx={{ color: theme.palette.orange.primary }}
+      {/* 로딩 및 리스트 영역 */}
+      {isLoading || authMeLoading ? (
+        <Box
+          sx={{
+            minHeight: "60vh",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <CircularProgress
+            size={64}
+            sx={{ color: theme.palette.orange.primary }}
+          />
+        </Box>
+      ) : data?.data.content.length > 0 ? (
+        <>
+          <Grid container spacing={2}>
+            {data.data.content.map((post: contentData, idx: number) => (
+              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={post.coverId || idx}>
+                <PostCard {...post} />
+              </Grid>
+            ))}
+          </Grid>
+          <Box className="mt-8 flex justify-center">
+            <Pagination
+              count={data.data.totalPages || 1}
+              page={page}
+              onChange={pageChangeHandler}
             />
           </Box>
-        ) : data?.data.content.length > 0 ? (
-          <>
-            <Grid container spacing={2}>
-              {data.data.content.map((post: contentData, idx: number) => (
-                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={idx}>
-                  <PostCard {...post} />
-                </Grid>
-              ))}
-            </Grid>
-            <Box className="mt-8 flex justify-center">
-              <Pagination count={1} page={page} onChange={pageChangeHandler} />
-            </Box>
-          </>
-        ) : (
-          <InfoMessage
-            message="아직 추천한 곡이 없습니다.\n새로운 곡을 추천하시겠어요?"
-            buttonText="곡 추천하기"
-            onClick={handleRecommendClick}
-          />
-        )}
-      </Box>
+        </>
+      ) : (
+        <InfoMessage
+          message={`아직 ${activityTabs[selectedTabIndex].name}한 곡이 없습니다.\n새로운 곡을 추천하시겠어요?`}
+          buttonText="곡 추천하기"
+          onClick={handleRecommendClick}
+        />
+      )}
     </Box>
   );
 }

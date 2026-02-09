@@ -2,7 +2,7 @@ import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "@/app/store/useAuthStore";
 import { api } from "@/app/lib/api";
-const myCoverList = async (accessToken: string, page: number, size: number) => {
+const myCoverList = async (page: number, size: number) => {
   try {
     const res = await api.get(`/api/cover/my?page=${page}&size=${size}`);
     if (res) {
@@ -25,6 +25,12 @@ const myCommentPostList = async (page: number, size: number) => {
     return res.data;
   }
 };
+const myLikePostList = async (page: number, size: number) => {
+  const res = await api.get(`/api/cover/my/likes?page=${page}&size=${size}`);
+  if (res) {
+    return res.data;
+  }
+};
 export const useMyCoverListQuery = (
   accessToken: string,
   page: number,
@@ -37,7 +43,9 @@ export const useMyCoverListQuery = (
     queryFn:
       type === "comment"
         ? () => myCommentPostList(page, size)
-        : () => myCoverList(accessToken, page, size),
+        : type === "like"
+          ? () => myLikePostList(page, size)
+          : () => myCoverList(page, size),
     enabled: hasToken,
     retry: false,
   });
