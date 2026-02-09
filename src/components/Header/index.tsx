@@ -18,6 +18,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthMeQuery } from "@/app/api/auth/authMe";
 import { IoClose } from "react-icons/io5";
 import { useAuthStore } from "@/app/store/useAuthStore";
+import Image from "next/image";
 
 export const dynamic = "force-dynamic";
 
@@ -101,7 +102,14 @@ const Header = () => {
       >
         {!openSearchBar && (
           <Link href="/" style={{ flex: 1 }}>
-            <Box>CoverCloud</Box>
+            <Box>
+              <Image
+                src="/asset/logo/coverLogo.png"
+                alt="CoverCloud"
+                width={180}
+                height={32}
+              />
+            </Box>
           </Link>
         )}
 

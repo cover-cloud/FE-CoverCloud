@@ -39,7 +39,6 @@ api.interceptors.response.use(
   (res) => res,
   async (error) => {
     const originalRequest = error.config as CustomAxiosConfig;
-
     // 401 에러이고, 재시도한 적이 없는 요청일 때
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {

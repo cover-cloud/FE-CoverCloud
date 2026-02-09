@@ -106,7 +106,9 @@ export default function SearchClient() {
     });
   };
   const handleRecommendClick = async () => {
+    console.log("실행");
     const isAuthenticated = await fetchAuthMeWithCookie();
+
     if (!isAuthenticated.success) {
       openLoginModal();
       useSnackbarStore

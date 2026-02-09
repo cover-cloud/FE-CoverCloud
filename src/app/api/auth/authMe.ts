@@ -14,10 +14,6 @@ export const fetchAuthMeWithCookie = async () => {
     }
   } catch (error) {
     useAuthStore.setState({ isLogin: false });
-    return {
-      success: false,
-      message: "로그인 정보를 확인할 수 없습니다.",
-    };
   }
 };
 
