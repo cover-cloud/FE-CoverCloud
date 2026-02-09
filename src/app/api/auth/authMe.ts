@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "@/app/store/useAuthStore";
-import { api } from "@/app/lib/api";
 import axios from "axios";
 
 export const fetchAuthMeWithCookie = async () => {
