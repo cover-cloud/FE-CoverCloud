@@ -10,6 +10,7 @@ import Footer from "../components/Footer";
 import AuthInit from "@/components/auth/AuthInit";
 import GlobalSnackbar from "@/components/GlobalSnackbar";
 import ClientOnlyWrapper from "@/components/ClientOnlyWrapper";
+import ScrollToTop from "@/app/utils/scrollToTop";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -56,6 +57,7 @@ export default function RootLayout({
               </Box>
               <GlobalSnackbar />
             </MuiProvider>
+            <ScrollToTop />
           </AuthInit>
         </QueryProvider>
       </body>
