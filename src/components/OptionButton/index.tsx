@@ -54,7 +54,7 @@ const OptionButton = ({
         {colIcon ? <HiDotsVertical /> : <HiDotsHorizontal size={24} />}
       </Box>
 
-      {isOptionOpen && !isLogin && (
+      {isOptionOpen && isLogin && (
         <Box className="absolute top-7 right-0 bg-white w-24 border-2 border-gray-200 z-50">
           <Box
             className="hover:bg-gray-100 p-2"
@@ -79,7 +79,7 @@ const OptionButton = ({
         </Box>
       )}
 
-      {isOptionOpen && isLogin && (
+      {isOptionOpen && !isLogin && (
         <Box
           className="absolute top-7 right-0 bg-white w-24 border-2 border-gray-200 z-50"
           onClick={(e) => {
