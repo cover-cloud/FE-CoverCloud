@@ -10,6 +10,7 @@ import {
   CircularProgress,
   SwipeableDrawer,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 
 import {
@@ -42,7 +43,7 @@ import theme from "@/app/lib/theme";
 import { useFormatCreatedAt } from "@/app/utils/formetCreatedAt";
 import OptionButton from "@/components/OptionButton";
 import { fetchAuthMeWithCookie, useAuthMeQuery } from "@/app/api/auth/authMe";
-import { useMobaileModeStore, useModalStore } from "@/app/store/useModalStore";
+import { useModalStore } from "@/app/store/useModalStore";
 import { formatViewCount } from "@/app/utils/viewCount";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
 import { requireAuth } from "@/app/utils/requireAuth";
@@ -72,10 +73,12 @@ const PostViewPage = () => {
   const [isReportModalOpen, setIsReportModalOpen] = React.useState(false);
   const [toggleLikeButton, setToggleLikeButton] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
-  const { data: postData, isLoading: isPostLoading } = useReadingPost(
-    id as string,
-  );
-  const isMobile = useMobaileModeStore((state) => state.isMobile);
+  const {
+    data: postData,
+    isLoading: isPostLoading,
+    error,
+  } = useReadingPost(id as string);
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const videoId: MediaUrlResult = postData
     ? detectAndValidateMediaUrl(postData.data.data.link)
     : { platform: null, id: null, isValid: false, originalUrl: "" };
@@ -99,7 +102,6 @@ const PostViewPage = () => {
   React.useEffect(() => {
     if (!postData) return;
     if (videoId && videoId.embedUrl) {
-      console.log(videoId);
       setYoutubeVideoId(videoId.embedUrl); // 원본url
     }
 
@@ -133,7 +135,7 @@ const PostViewPage = () => {
       </Box>
     );
 
-  if (!postData) {
+  if (error) {
     return <Box>페이지 로드에 실패하였습니다.</Box>;
   }
   if (!id) {
@@ -167,14 +169,15 @@ const PostViewPage = () => {
       const reportResult = await reportPost(id as string);
       if (reportResult.data.success) {
         setIsReportModalOpen(false);
+        useSnackbarStore.getState().show("신고가 접수되었습니다.", "success");
       } else {
-        alert("신고 실패");
+        useSnackbarStore.getState().show("신고 실패", "error");
         setIsReportModalOpen(false);
       }
       setIsDeleteModalOpen(false);
     } catch (error) {
-      console.log(error);
       setIsDeleteModalOpen(false);
+      useSnackbarStore.getState().show("신고 실패", "error");
     }
   };
   const deletePostHandler = async () => {

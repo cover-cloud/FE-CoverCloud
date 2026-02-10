@@ -11,18 +11,25 @@ import { changeAccount, fetchImageUrl } from "@/app/api/auth/changeAccount";
 import { logout } from "@/app/api/auth/logout";
 import { useRouter } from "next/navigation";
 
-import { Box, TextField, Button, Avatar, Typography } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  Avatar,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
 import { TbCirclePlus } from "react-icons/tb";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
-import { useMobaileModeStore } from "@/app/store/useModalStore";
+
 import Login from "@/components/auth/Login";
 import Loading from "@/app/main/loading";
 
 const AccountPage = () => {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const isMobile = useMobaileModeStore((state) => state.isMobile);
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [openNickNameModal, setOpenNickNameModal] = React.useState(false);
   const [isDeleteAccountModalOpen, setIsDeleteAccountModalOpen] =
     React.useState(false);

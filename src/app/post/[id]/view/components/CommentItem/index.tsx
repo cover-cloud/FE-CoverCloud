@@ -25,6 +25,7 @@ import { fetchAuthMeWithCookie } from "@/app/api/auth/authMe";
 import { useModalStore } from "@/app/store/useModalStore";
 import { useFormatCreatedAt } from "@/app/utils/formetCreatedAt";
 import { requireAuth } from "@/app/utils/requireAuth";
+import { reportComment } from "@/app/api/cover/reportPost";
 
 interface CommentItemProps extends CommentListData {
   depth?: number; // 뎁스 정보 추가
@@ -148,7 +149,16 @@ const CommentItem = ({
       },
     );
   };
-  const reportCommentHandler = () => {};
+  const reportCommentHandler = async () => {
+    if (!isLogin && !accessToken) {
+      openLoginModal();
+      useSnackbarStore
+        .getState()
+        .show("로그인 후 댓글을 신고할 수 있습니다.", "error");
+      return;
+    }
+    const result = await reportComment(commentId);
+  };
   return (
     <Box className={`mb-2`} ml={depth * 2}>
       <Box className="flex gap-2 items-start flex-col">

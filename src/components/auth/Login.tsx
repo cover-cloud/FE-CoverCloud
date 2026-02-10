@@ -5,8 +5,7 @@ import Box from "@mui/material/Box";
 import { RiKakaoTalkFill } from "react-icons/ri";
 import { SiNaver } from "react-icons/si";
 import theme from "@/app/lib/theme";
-import axios from "axios";
-import { useMobaileModeStore } from "@/app/store/useModalStore";
+import { useMediaQuery } from "@mui/material";
 
 const Login = () => {
   const handleLogin = (loginType: "kakao" | "naver") => {
@@ -18,7 +17,7 @@ const Login = () => {
         "https://www.covercloud.kr/oauth2/authorization/naver";
     }
   };
-  const isMobile = useMobaileModeStore((state) => state.isMobile);
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   return (
     <Box
       sx={{

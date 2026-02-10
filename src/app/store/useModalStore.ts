@@ -15,7 +15,7 @@ export const useModalStore = create<ModalStore>((set) => ({
   openLoginModal: () => set({ isLoginModalOpen: true }),
   closeLoginModal: () => set({ isLoginModalOpen: false }),
 }));
-export const useMobaileModeStore = create<MobaileModeStore>((set) => ({
-  isMobile: false,
-  setIsMobile: (isMobile: boolean) => set({ isMobile }),
-}));
+// export const useMobaileModeStore = create<MobaileModeStore>((set) => ({
+//   isMobile: false,
+//   setIsMobile: (isMobile: boolean) => set({ isMobile }),
+// }));

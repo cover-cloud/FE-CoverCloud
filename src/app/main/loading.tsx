@@ -1,3 +1,21 @@
+import { Box, CircularProgress } from "@mui/material";
+import theme from "../lib/theme";
+
 export default function Loading() {
-  return <div>데이터를 불러오는 중입니다... (잠시만 기다려주세요)</div>;
+  return (
+    <Box
+      className="mt-8"
+      sx={{
+        minHeight: "60vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <CircularProgress
+        size={64}
+        sx={{ color: theme.palette.orange.primary }}
+      />
+    </Box>
+  );
 }

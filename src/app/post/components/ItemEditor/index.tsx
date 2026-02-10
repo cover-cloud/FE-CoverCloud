@@ -9,6 +9,7 @@ import {
   Chip,
   MenuItem,
   CircularProgress,
+  useMediaQuery,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -58,6 +59,7 @@ const genres = [
 const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
   const params = useParams();
   const router = useRouter();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const { openLoginModal } = useModalStore();
   const songSearchWrapperRef = React.useRef<HTMLDivElement | null>(null);
   const {
@@ -256,6 +258,7 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
       component="form"
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col gap-4 mt-4"
+      sx={{ width: isMobile ? "100%" : "70%", mx: "auto" }}
     >
       {authMeLoading ? (
         <Box

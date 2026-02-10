@@ -27,8 +27,12 @@ export const deletePost = async (coverId: string | string[]) => {
 };
 
 export const readingPost = async (coverId: string) => {
-  const res = await api.get(`/api/cover/list/${coverId}`);
-  return res;
+  try {
+    const res = await api.get(`/api/cover/list/${coverId}`);
+    return res;
+  } catch (error) {
+    throw error;
+  }
 };
 export const useReadingPost = (coverId: string) => {
   return useQuery({

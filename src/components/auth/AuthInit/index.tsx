@@ -4,7 +4,6 @@ import { refreshToken } from "@/app/api/auth/refresh";
 import { useEffect } from "react";
 import { useAuthStore } from "@/app/store/useAuthStore";
 import { usePathname } from "next/navigation";
-import { useMobaileModeStore } from "@/app/store/useModalStore";
 
 const AuthInit = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
@@ -25,24 +24,24 @@ const AuthInit = ({ children }: { children: React.ReactNode }) => {
 
     refreshTokenHandler();
   }, []);
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 767px)");
+  // useEffect(() => {
+  //   const mediaQuery = window.matchMedia("(max-width: 767px)");
 
-    const handleChange = (e: MediaQueryListEvent) => {
-      useMobaileModeStore.setState({
-        isMobile: e.matches,
-      });
-    };
+  //   const handleChange = (e: MediaQueryListEvent) => {
+  //     useMobaileModeStore.setState({
+  //       isMobile: e.matches,
+  //     });
+  //   };
 
-    useMobaileModeStore.setState({
-      isMobile: mediaQuery.matches,
-    });
-    mediaQuery.addEventListener("change", handleChange);
+  //   useMobaileModeStore.setState({
+  //     isMobile: mediaQuery.matches,
+  //   });
+  //   mediaQuery.addEventListener("change", handleChange);
 
-    return () => {
-      mediaQuery.removeEventListener("change", handleChange);
-    };
-  }, []);
+  //   return () => {
+  //     mediaQuery.removeEventListener("change", handleChange);
+  //   };
+  // }, []);
   return <>{children}</>;
 };
 

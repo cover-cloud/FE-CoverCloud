@@ -5,10 +5,7 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import SearchIcon from "@mui/icons-material/Search";
-import {
-  useMobaileModeStore,
-  useModalStore,
-} from "../../app/store/useModalStore";
+import { useModalStore } from "../../app/store/useModalStore";
 import Link from "next/link";
 import { useTheme } from "@mui/material/styles";
 import AccountModal from "../modal/AccountModal";
@@ -19,6 +16,7 @@ import { useAuthMeQuery } from "@/app/api/auth/authMe";
 import { IoClose } from "react-icons/io5";
 import { useAuthStore } from "@/app/store/useAuthStore";
 import Image from "next/image";
+import { useMediaQuery } from "@mui/material";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +27,7 @@ const Header = () => {
   const page = Number(searchParams.get("page") ?? 1);
   const theme = useTheme();
   const openLoginModal = useModalStore((state) => state.openLoginModal);
-  const isMobile = useMobaileModeStore((state) => state.isMobile);
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const isLogin = useAuthStore((state) => state.isLogin);
   // const isLogin = useAuthStore((state) => state.isLogin);
 

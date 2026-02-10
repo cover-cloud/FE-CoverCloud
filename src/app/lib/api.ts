@@ -40,7 +40,11 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config as CustomAxiosConfig;
     // 401 에러이고, 재시도한 적이 없는 요청일 때
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !error.response?.data?.message?.includes("Cover not found with id")
+    ) {
       if (isRefreshing) {
         // 이미 갱신 중이라면 Queue에 넣고 대기
         return new Promise((resolve, reject) => {
