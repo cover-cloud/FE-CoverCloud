@@ -25,8 +25,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "커버클라우드 | 커버 공유 플랫폼",
-    template: "%s | 커버클라우드",
+    default: "cover-cloud | 커버 공유 플랫폼",
+    template: "%s | cover-cloud",
   },
   description: "노래 커버를 공유하고 감상하는 플랫폼입니다.",
 };
