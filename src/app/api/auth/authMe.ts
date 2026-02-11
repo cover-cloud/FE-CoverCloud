@@ -2,8 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "@/app/store/useAuthStore";
 import axios from "axios";
 
-export const fetchAuthMeWithCookie = async () => {
-  const accessToken = useAuthStore.getState().accessToken;
+export const fetchAuthMeWithCookie = async (accessToken: string) => {
   try {
     const res = await axios.get(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/me`,
@@ -35,7 +34,7 @@ export const useAuthMeQuery = () => {
 
   return useQuery({
     queryKey: ["auth-me-cookie", accessToken], // ✅ 핵심
-    queryFn: fetchAuthMeWithCookie,
+    queryFn: () => fetchAuthMeWithCookie(accessToken),
     retry: false,
   });
 };

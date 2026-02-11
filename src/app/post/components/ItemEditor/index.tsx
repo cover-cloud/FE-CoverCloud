@@ -67,6 +67,7 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
     isLoading: authMeLoading,
     error: authMeError,
   } = useAuthMeQuery();
+  const accessToken = useAuthStore((state) => state.accessToken);
   const { data: postData, isLoading: isPostLoading } = useReadingPost(
     params.id as string,
   );
@@ -147,7 +148,7 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
   };
 
   const onSubmit = async (formData: FormSchema) => {
-    const isAuthenticated = await fetchAuthMeWithCookie();
+    const isAuthenticated = await fetchAuthMeWithCookie(accessToken);
     if (!isAuthenticated.success) {
       openLoginModal();
       useSnackbarStore

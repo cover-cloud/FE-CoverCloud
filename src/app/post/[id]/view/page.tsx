@@ -144,7 +144,7 @@ const PostViewPage = () => {
   }
 
   const navigateToEdit = async () => {
-    const isAuthenticated = await fetchAuthMeWithCookie();
+    const isAuthenticated = await fetchAuthMeWithCookie(accessToken);
 
     if (!isAuthenticated.success) {
       openLoginModal();
@@ -157,7 +157,7 @@ const PostViewPage = () => {
     }
   };
   const reportPostHandler = async () => {
-    const isAuthenticated = await fetchAuthMeWithCookie();
+    const isAuthenticated = await fetchAuthMeWithCookie(accessToken);
     if (!isAuthenticated.success) {
       openLoginModal();
       useSnackbarStore
@@ -182,7 +182,7 @@ const PostViewPage = () => {
     }
   };
   const deletePostHandler = async () => {
-    const isAuthenticated = await fetchAuthMeWithCookie();
+    const isAuthenticated = await fetchAuthMeWithCookie(accessToken);
     if (!isAuthenticated.success) {
       openLoginModal();
       useSnackbarStore

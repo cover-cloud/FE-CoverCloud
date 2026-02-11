@@ -10,7 +10,6 @@ export const useAuthStore = create<AuthStore>((set) => ({
   isLogin: false,
   accessToken: "",
   userId: null,
-
   setIsLogin: (isLogin: boolean) => set({ isLogin }),
   setAccessToken: (accessToken: string) => set({ accessToken }),
 }));

@@ -85,7 +85,7 @@ export default function ActivityClient() {
   };
 
   const handleRecommendClick = async () => {
-    const isAuthenticated = await fetchAuthMeWithCookie();
+    const isAuthenticated = await fetchAuthMeWithCookie(accessToken);
     if (!isAuthenticated.success) {
       openLoginModal();
       useSnackbarStore
