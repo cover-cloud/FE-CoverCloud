@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Avatar, Box, Button, TextField, Typography } from "@mui/material";
 import Image from "next/image";
 import Skeleton from "@mui/material/Skeleton";
 import theme from "@/app/lib/theme";
@@ -111,7 +111,7 @@ const CommentInput = ({
         mb={2}
       >
         <Box className="relative w-[36px] h-[36px] flex-shrink-0 rounded-full overflow-hidden">
-          {(isImageLoading || !imageSrc) && (
+          {/* {(isImageLoading || !imageSrc) && (
             <Skeleton
               variant="rectangular"
               width="100%"
@@ -119,10 +119,10 @@ const CommentInput = ({
               animation="wave"
               sx={{ position: "absolute", inset: 0, zIndex: 1 }}
             />
-          )}
-
+          )} */}
+          <Avatar sx={{ width: 36, height: 36 }} src={imageSrc} />
           {/* Image: 소스가 있을 때만 렌더링 */}
-          {imageSrc && (
+          {/* {imageSrc && (
             <Image
               src={imageSrc}
               alt={`프로필 이미지`}
@@ -139,7 +139,7 @@ const CommentInput = ({
                 setIsImageLoading(false);
               }}
             />
-          )}
+          )} */}
           {/* {isImageLoading || userAvatarImageUrl ? (
             <Skeleton
               variant="rectangular"

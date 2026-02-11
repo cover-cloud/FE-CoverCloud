@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import {
+  Avatar,
   Box,
   Button,
   FormControl,
@@ -193,10 +194,9 @@ const CommentItem = ({
               className="relative flex-shrink-0 rounded-full overflow-hidden"
               width={size}
               height={size}
-              sx={{ bgcolor: "grey.200" }} // 이미지가 없을 때를 대비한 배경색
             >
               {/* 1. 로딩 중일 때만 스켈레톤 표시 */}
-              {isImageLoading && (
+              {/* {isImageLoading && (
                 <Skeleton
                   variant="circular"
                   width="100%"
@@ -204,10 +204,10 @@ const CommentItem = ({
                   animation="wave"
                   sx={{ position: "absolute", inset: 0, zIndex: 1 }}
                 />
-              )}
+              )} */}
 
               {/* 2. imageSrc가 있을 때만 Next.js Image 렌더링 */}
-              {imageSrc && (
+              {/* {imageSrc && (
                 <Image
                   src={imageSrc}
                   alt={`${nickname}의 프로필 이미지`}
@@ -225,7 +225,8 @@ const CommentItem = ({
                     setIsImageLoading(false);
                   }}
                 />
-              )}
+              )} */}
+              <Avatar sx={{ width: size, height: size }} src={imageSrc} />
             </Box>
             <Box sx={{ width: "100%" }}>
               <Box>
