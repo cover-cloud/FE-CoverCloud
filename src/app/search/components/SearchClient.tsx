@@ -52,7 +52,7 @@ export default function SearchClient() {
   ========================= */
   const query = searchParams.get("q") ?? "";
   const page = Math.max(1, Number(searchParams.get("page") ?? 1));
-  const sort = (searchParams.get("sort") as SortType) ?? "LATEST";
+  const sortBy = (searchParams.get("sort") as SortType) ?? "LATEST";
   const searchType = (searchParams.get("searchType") as SearchType) ?? "title";
 
   const selectedTab =
@@ -66,7 +66,7 @@ export default function SearchClient() {
     keyword: query,
     page: page - 1,
     size: 10,
-    sort,
+    sortBy,
   });
 
   /* =========================
@@ -190,7 +190,7 @@ export default function SearchClient() {
                 {value === "LATEST" ? "최신순" : "인기순"}
               </Box>
             )}
-            value={sort}
+            value={sortBy}
             onChange={(e) => handleSortChange(e.target.value as SortType)}
             IconComponent={TuneIcon}
             sx={{

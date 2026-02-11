@@ -1,14 +1,16 @@
 import { api } from "@/app/lib/api";
 import axios from "axios";
-export const changeAccount = (
+import { refreshToken } from "./refresh";
+export const changeAccount = async (
   nickname: string | undefined,
   profileImage: string | null | undefined,
 ) => {
-  const res = api.post(
+  const res = await api.post(
     `/api/user/profile`,
 
     { nickname, profileImage },
   );
+  await refreshToken();
   return res;
 };
 
@@ -24,6 +26,7 @@ export const fetchImageUrl = async (file: File) => {
       "Content-Type": file.type,
     },
   });
+  await refreshToken();
 
   return objectPath;
 };
