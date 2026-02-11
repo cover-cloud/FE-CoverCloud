@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -29,9 +29,10 @@ const Header = () => {
   const openLoginModal = useModalStore((state) => state.openLoginModal);
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const isLogin = useAuthStore((state) => state.isLogin);
+  const userProfileUrl = useAuthStore((state) => state.userProfileUrl);
+
   // const isLogin = useAuthStore((state) => state.isLogin);
 
-  const { data, error } = useAuthMeQuery();
   const [searchQuery, setSearchQuery] = React.useState("");
   const [openAccountModal, setOpenAccountModal] = React.useState(false);
   const [openSearchBar, setOpenSearchBar] = React.useState(false);
@@ -264,7 +265,7 @@ const Header = () => {
                 <Box ml={"50px"} className="flex items-center">
                   <AvatarComponent
                     openAccountModalHandler={openAccountModalHandler}
-                    profileImage={data?.data.profileImage}
+                    profileImage={userProfileUrl}
                   />
                 </Box>
               </Box>

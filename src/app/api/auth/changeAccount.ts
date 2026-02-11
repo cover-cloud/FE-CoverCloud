@@ -1,6 +1,7 @@
 import { api } from "@/app/lib/api";
 import axios from "axios";
-import { refreshToken } from "./refresh";
+import { completeLogin } from "@/app/utils/auth.service";
+import { useAuthStore } from "@/app/store/useAuthStore";
 export const changeAccount = async (
   nickname: string | undefined,
   profileImage: string | null | undefined,
@@ -10,7 +11,9 @@ export const changeAccount = async (
 
     { nickname, profileImage },
   );
-  await refreshToken();
+  const accessToken = useAuthStore.getState().accessToken;
+
+  await completeLogin(accessToken);
   return res;
 };
 
@@ -26,7 +29,8 @@ export const fetchImageUrl = async (file: File) => {
       "Content-Type": file.type,
     },
   });
-  await refreshToken();
+  const accessToken = useAuthStore.getState().accessToken;
+  await completeLogin(accessToken);
 
   return objectPath;
 };
