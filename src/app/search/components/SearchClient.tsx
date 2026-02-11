@@ -24,6 +24,7 @@ import FavoriteBorderSharpIcon from "@mui/icons-material/FavoriteBorderSharp";
 import { fetchAuthMeWithCookie } from "@/app/api/auth/authMe";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
 import { useModalStore } from "@/app/store/useModalStore";
+import { useAuthStore } from "@/app/store/useAuthStore";
 type SearchType = "title" | "tags";
 
 interface SearchTab {
@@ -54,7 +55,7 @@ export default function SearchClient() {
   const page = Math.max(1, Number(searchParams.get("page") ?? 1));
   const sortBy = (searchParams.get("sort") as SortType) ?? "LATEST";
   const searchType = (searchParams.get("searchType") as SearchType) ?? "title";
-
+  const accessToken = useAuthStore((state) => state.accessToken);
   const selectedTab =
     searchTabs.find((t) => t.searchType === searchType) ?? searchTabs[0];
 
@@ -107,7 +108,7 @@ export default function SearchClient() {
   };
   const handleRecommendClick = async () => {
     console.log("실행");
-    const isAuthenticated = await fetchAuthMeWithCookie();
+    const isAuthenticated = await fetchAuthMeWithCookie(accessToken);
 
     if (!isAuthenticated.success) {
       openLoginModal();
