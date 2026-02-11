@@ -94,7 +94,6 @@ const CommentInput = ({
   const userAvatarImageUrl = "";
   const userName = "";
   React.useEffect(() => {
-    console.log("userProfileImage", userProfileImage);
     if (!userProfileImage) {
       // setImageSrc(DEFAULT_IMAGE);
     } else {

@@ -64,7 +64,9 @@ const CommentItem = ({
   const [isImageLoading, setIsImageLoading] = React.useState(true);
   const [isCommentEdit, setIsCommentEdit] = React.useState(false);
   const [editContent, setEditContent] = React.useState(content);
-  const [imageSrc, setImageSrc] = React.useState(profileImageUrl);
+  const [imageSrc, setImageSrc] = React.useState(
+    profileImageUrl || DEFAULT_IMAGE,
+  );
   const size = Math.max(48 - depth * 12, 24);
 
   const openLoginModal = useModalStore((state) => state.openLoginModal);
@@ -163,13 +165,18 @@ const CommentItem = ({
     const result = await reportComment(commentId);
   };
   useEffect(() => {
-    console.log(profileImageUrl);
-    if (!profileImageUrl) {
-      setImageSrc(DEFAULT_IMAGE);
-    } else {
+    if (profileImageUrl) {
       setImageSrc(profileImageUrl);
+      setIsImageLoading(true); // 새 이미지가 오면 로딩 상태 초기화
+    } else {
+      setImageSrc(DEFAULT_IMAGE);
+      setIsImageLoading(false);
     }
   }, [profileImageUrl]);
+  React.useEffect(() => {
+    console.log(imageSrc, "imageSrc");
+  }, [imageSrc]);
+
   return (
     <Box className={`mb-2`} ml={depth * 2}>
       <Box className="flex gap-2 items-start flex-col">
@@ -186,10 +193,12 @@ const CommentItem = ({
               className="relative flex-shrink-0 rounded-full overflow-hidden"
               width={size}
               height={size}
+              sx={{ bgcolor: "grey.200" }} // 이미지가 없을 때를 대비한 배경색
             >
-              {(isImageLoading || !imageSrc) && (
+              {/* 1. 로딩 중일 때만 스켈레톤 표시 */}
+              {isImageLoading && (
                 <Skeleton
-                  variant="rectangular"
+                  variant="circular"
                   width="100%"
                   height="100%"
                   animation="wave"
@@ -197,7 +206,7 @@ const CommentItem = ({
                 />
               )}
 
-              {/* Image: 소스가 있을 때만 렌더링 */}
+              {/* 2. imageSrc가 있을 때만 Next.js Image 렌더링 */}
               {imageSrc && (
                 <Image
                   src={imageSrc}
@@ -205,35 +214,18 @@ const CommentItem = ({
                   fill
                   sizes={`${size}px`}
                   className="object-cover"
+                  // 이미지 로딩 전까지 투명도 0으로 숨김 (스켈레톤을 보여주기 위해)
                   style={{
                     opacity: isImageLoading ? 0 : 1,
-                    transition: "opacity 0.3s ease",
+                    transition: "opacity 0.2s ease",
                   }}
                   onLoad={() => setIsImageLoading(false)}
                   onError={() => {
-                    // setImageSrc(DEFAULT_IMAGE);
+                    setImageSrc(DEFAULT_IMAGE); // 로드 실패 시 기본 이미지로 교체
                     setIsImageLoading(false);
                   }}
                 />
               )}
-              {/* {isImageLoading || !profileImageUrl ? (
-                <Skeleton
-                  variant="circular"
-                  width="100%"
-                  height="100%"
-                  className="absolute inset-0"
-                />
-              ) : (
-                <Image
-                  src={profileImageUrl}
-                  alt={nickname}
-                  fill
-                  sizes={`${size}px`}
-                  style={{ objectFit: "cover", borderRadius: "50%" }}
-                  onLoad={() => setIsImageLoading(false)}
-                  onError={() => setIsImageLoading(false)}
-                />
-              )} */}
             </Box>
             <Box sx={{ width: "100%" }}>
               <Box>
@@ -314,7 +306,7 @@ const CommentItem = ({
         {openCmmentInput && (
           <Box className="mt-2 w-full">
             <CommentInput
-              userProfileImage={userProfileImage || ""}
+              userProfileImage={userProfileImage}
               onSubmit={(data) => onReplySubmit?.(data, commentId)}
               depth={depth + 1}
               id={coverId}
