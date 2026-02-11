@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
       "source.unsplash.com",
       "i.scdn.co",
       "img.youtube.com",
+      "storage.googleapis.com",
     ],
     remotePatterns: [
       {

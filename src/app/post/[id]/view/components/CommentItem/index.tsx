@@ -33,7 +33,9 @@ interface CommentItemProps extends CommentListData {
   openCmmentInput?: boolean;
   openCommentInputHandler?: (id: number) => void;
   currentUserId: number;
+  userProfileImage: string;
 }
+const DEFAULT_IMAGE = "/asset/image/default-image.png";
 
 const CommentItem = ({
   currentUserId,
@@ -52,6 +54,7 @@ const CommentItem = ({
   onReplySubmit,
   openCmmentInput,
   openCommentInputHandler,
+  userProfileImage,
 }: CommentItemProps) => {
   const deleteCommentMutation = useDeleteCommentMutation();
   const updateCommentMutation = useUpdateCommentMutation();
@@ -61,7 +64,7 @@ const CommentItem = ({
   const [isImageLoading, setIsImageLoading] = React.useState(true);
   const [isCommentEdit, setIsCommentEdit] = React.useState(false);
   const [editContent, setEditContent] = React.useState(content);
-
+  const [imageSrc, setImageSrc] = React.useState(profileImageUrl);
   const size = Math.max(48 - depth * 12, 24);
 
   const openLoginModal = useModalStore((state) => state.openLoginModal);
@@ -159,6 +162,14 @@ const CommentItem = ({
     }
     const result = await reportComment(commentId);
   };
+  useEffect(() => {
+    console.log(profileImageUrl);
+    if (!profileImageUrl) {
+      setImageSrc(DEFAULT_IMAGE);
+    } else {
+      setImageSrc(profileImageUrl);
+    }
+  }, [profileImageUrl]);
   return (
     <Box className={`mb-2`} ml={depth * 2}>
       <Box className="flex gap-2 items-start flex-col">
@@ -176,7 +187,36 @@ const CommentItem = ({
               width={size}
               height={size}
             >
-              {isImageLoading || !profileImageUrl ? (
+              {(isImageLoading || !imageSrc) && (
+                <Skeleton
+                  variant="rectangular"
+                  width="100%"
+                  height="100%"
+                  animation="wave"
+                  sx={{ position: "absolute", inset: 0, zIndex: 1 }}
+                />
+              )}
+
+              {/* Image: 소스가 있을 때만 렌더링 */}
+              {imageSrc && (
+                <Image
+                  src={imageSrc}
+                  alt={`${nickname}의 프로필 이미지`}
+                  fill
+                  sizes={`${size}px`}
+                  className="object-cover"
+                  style={{
+                    opacity: isImageLoading ? 0 : 1,
+                    transition: "opacity 0.3s ease",
+                  }}
+                  onLoad={() => setIsImageLoading(false)}
+                  onError={() => {
+                    // setImageSrc(DEFAULT_IMAGE);
+                    setIsImageLoading(false);
+                  }}
+                />
+              )}
+              {/* {isImageLoading || !profileImageUrl ? (
                 <Skeleton
                   variant="circular"
                   width="100%"
@@ -193,7 +233,7 @@ const CommentItem = ({
                   onLoad={() => setIsImageLoading(false)}
                   onError={() => setIsImageLoading(false)}
                 />
-              )}
+              )} */}
             </Box>
             <Box sx={{ width: "100%" }}>
               <Box>
@@ -274,6 +314,7 @@ const CommentItem = ({
         {openCmmentInput && (
           <Box className="mt-2 w-full">
             <CommentInput
+              userProfileImage={userProfileImage || ""}
               onSubmit={(data) => onReplySubmit?.(data, commentId)}
               depth={depth + 1}
               id={coverId}
@@ -289,6 +330,7 @@ const CommentItem = ({
                 {...reply}
                 depth={depth + 1}
                 currentUserId={currentUserId}
+                userProfileImage={userProfileImage}
               />
             </Box>
           ))}

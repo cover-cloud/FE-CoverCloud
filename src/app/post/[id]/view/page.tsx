@@ -53,6 +53,7 @@ const PostViewPage = () => {
   const router = useRouter();
 
   const userInfo = useAuthMeQuery();
+
   const accessToken = useAuthStore((state) => state.accessToken);
   const isLogin = useAuthStore((state) => state.isLogin);
   const openLoginModal = useModalStore((state) => state.openLoginModal);
@@ -407,6 +408,7 @@ const PostViewPage = () => {
             <CommentSection
               id={Number(id)}
               currentUserId={userInfo.data?.data?.userId}
+              userProfileImage={userInfo.data?.data?.profileImage || ""}
             />
           )}
         </Box>
@@ -453,6 +455,7 @@ const PostViewPage = () => {
             <CommentSection
               id={Number(id)}
               currentUserId={userInfo.data?.data?.userId}
+              userProfileImage={userInfo.data?.data?.profileImage || ""}
             />
           </Box>
         </SwipeableDrawer>

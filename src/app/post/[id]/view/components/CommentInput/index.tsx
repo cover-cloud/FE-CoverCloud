@@ -10,12 +10,13 @@ import { useSnackbarStore } from "@/app/store/useSnackbar";
 import { fetchAuthMeWithCookie, useAuthMeQuery } from "@/app/api/auth/authMe";
 import { useModalStore } from "@/app/store/useModalStore";
 import { requireAuth } from "@/app/utils/requireAuth";
-
+const DEFAULT_IMAGE = "/asset/image/default-image.png";
 interface CommentInputProps {
   onSubmit: (data: string) => void;
   depth?: number;
   id: number;
   parentId?: number | null;
+  userProfileImage: string;
 }
 
 const CommentInput = ({
@@ -23,9 +24,14 @@ const CommentInput = ({
   depth = 0,
   id,
   parentId,
+  userProfileImage,
 }: CommentInputProps) => {
-  const [comment, setComment] = React.useState("");
   const accessToken = useAuthStore((state) => state.accessToken);
+
+  const [comment, setComment] = React.useState("");
+  const [isImageLoading, setIsImageLoading] = React.useState(true);
+  const [imageSrc, setImageSrc] = React.useState(userProfileImage);
+
   const isLogin = useAuthStore((state) => state.isLogin);
   const createMutation = useCreateCommentMutation();
 
@@ -84,9 +90,17 @@ const CommentInput = ({
       );
     }
   };
-  const [isImageLoading, setIsImageLoading] = React.useState(true);
+
   const userAvatarImageUrl = "";
   const userName = "";
+  React.useEffect(() => {
+    console.log("userProfileImage", userProfileImage);
+    if (!userProfileImage) {
+      // setImageSrc(DEFAULT_IMAGE);
+    } else {
+      setImageSrc(userProfileImage);
+    }
+  }, [userProfileImage]);
   return (
     <Box>
       <Box
@@ -98,7 +112,36 @@ const CommentInput = ({
         mb={2}
       >
         <Box className="relative w-[36px] h-[36px] flex-shrink-0 rounded-full overflow-hidden">
-          {isImageLoading || userAvatarImageUrl ? (
+          {(isImageLoading || !imageSrc) && (
+            <Skeleton
+              variant="rectangular"
+              width="100%"
+              height="100%"
+              animation="wave"
+              sx={{ position: "absolute", inset: 0, zIndex: 1 }}
+            />
+          )}
+
+          {/* Image: 소스가 있을 때만 렌더링 */}
+          {imageSrc && (
+            <Image
+              src={imageSrc}
+              alt={`프로필 이미지`}
+              fill
+              sizes="(max-width: 768px) 48px, 52px"
+              className="object-cover"
+              style={{
+                opacity: isImageLoading ? 0 : 1,
+                transition: "opacity 0.3s ease",
+              }}
+              onLoad={() => setIsImageLoading(false)}
+              onError={() => {
+                // setImageSrc(DEFAULT_IMAGE);
+                setIsImageLoading(false);
+              }}
+            />
+          )}
+          {/* {isImageLoading || userAvatarImageUrl ? (
             <Skeleton
               variant="rectangular"
               width="100%"
@@ -115,7 +158,7 @@ const CommentInput = ({
               onLoad={() => setIsImageLoading(false)}
               onError={() => setIsImageLoading(false)}
             />
-          )}
+          )} */}
         </Box>
         <TextField
           label="댓글을 입력하세요"

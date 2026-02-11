@@ -13,9 +13,11 @@ interface CommentFormInput {
 const CommentSection = ({
   id,
   currentUserId,
+  userProfileImage,
 }: {
   id: number;
   currentUserId: number;
+  userProfileImage: string;
 }) => {
   const [commentsData, setCommentsData] = React.useState<CommentListData[]>([]);
   const [totalCommentCount, setTotalCommentCount] = React.useState(0);
@@ -59,7 +61,11 @@ const CommentSection = ({
       <Box className="H2">댓글 {totalCommentCount}</Box>
 
       <Box>
-        <CommentInput onSubmit={conmmentSubmitHandler} id={id} />
+        <CommentInput
+          onSubmit={conmmentSubmitHandler}
+          id={id}
+          userProfileImage={userProfileImage}
+        />
         <Box className="mt-2">
           {commentsData.length > 0
             ? commentsData.map((comment: CommentListData) => (
@@ -72,6 +78,7 @@ const CommentSection = ({
                   }
                   openCommentInputHandler={openCommentInputHandler}
                   openCmmentInput={selectedCommentId === comment.commentId}
+                  userProfileImage={userProfileImage}
                 />
               ))
             : null}

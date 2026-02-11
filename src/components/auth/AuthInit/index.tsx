@@ -15,7 +15,6 @@ const AuthInit = ({ children }: { children: React.ReactNode }) => {
 
     useAuthStore.setState({
       accessToken: accessToken.data.accessToken,
-      userProfileUrl: accessToken.data.profileImage || "",
       isLogin: true,
     });
   };

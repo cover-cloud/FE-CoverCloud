@@ -13,7 +13,6 @@ export const completeLogin = async (accessToken: string) => {
     accessToken,
     userId: me.data.userId,
     isLogin: true,
-    userProfileUrl: me.data.profileImage || "",
   });
 
   return me;
