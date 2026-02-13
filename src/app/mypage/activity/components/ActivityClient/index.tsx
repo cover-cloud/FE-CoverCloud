@@ -104,15 +104,8 @@ export default function ActivityClient() {
       type === currentTabType
         ? theme.palette.common.black
         : theme.palette.gray.primary,
-    borderRadius: "10px",
-    minWidth: "60px",
-    minHeight: "32px",
-    padding: "0 12px",
-    fontSize: "16px",
+
     fontWeight: type === currentTabType ? 700 : 400,
-    "&:hover": {
-      backgroundColor: theme.palette.gray.secondary,
-    },
   });
 
   if (authMeData?.success === false) {
@@ -131,9 +124,19 @@ export default function ActivityClient() {
           <Button
             key={tab.type}
             onClick={() => activityTabChangeHandler(tab.type)}
-            sx={activityTabSx(tab.type)}
+            sx={{
+              borderRadius: "10px",
+              minWidth: "60px",
+              minHeight: "32px",
+              padding: "0 12px",
+              "&:hover": {
+                backgroundColor: theme.palette.gray.secondary,
+              },
+            }}
           >
-            {tab.name}
+            <Box className="B1" sx={activityTabSx(tab.type)}>
+              {tab.name}
+            </Box>
           </Button>
         ))}
       </Box>
