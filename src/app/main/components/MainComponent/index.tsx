@@ -55,7 +55,7 @@ const MainComponent = () => {
   ========================= */
   const { data, isLoading } = usePopularCoverListQuery({
     page: page - 1,
-    size: 10,
+    size: 18,
     period,
     genres: selectedGenres.map((g) => g.value),
   });

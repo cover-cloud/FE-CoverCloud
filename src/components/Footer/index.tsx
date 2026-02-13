@@ -12,8 +12,11 @@ const Footer = () => {
       label: "이용약관",
       href: "https://fanatical-maple-fe1.notion.site/2e09f9489f158051a750c6300645ac75",
     },
-    { label: "공지사항", href: "#" },
-    { label: "문의하기", href: "#" },
+    {
+      label: "공지사항",
+      href: "https://fanatical-maple-fe1.notion.site/2e79f9489f1580aea557c44783355b28",
+    },
+    { label: "문의하기", href: "https://forms.gle/z3GM4R86hk1SsB6P8" },
   ];
   return (
     <Box className="max-w-7xl mx-auto py-8 px-4 sx:px-6 md:px-12">

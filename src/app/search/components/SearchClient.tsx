@@ -66,7 +66,7 @@ export default function SearchClient() {
     type: searchType,
     keyword: query,
     page: page - 1,
-    size: 10,
+    size: 18,
     sortBy,
   });
 

@@ -50,7 +50,7 @@ export default function ActivityClient() {
   const { data, isLoading } = useMyCoverListQuery(
     accessToken,
     page - 1, // API가 0-base index라면 page-1 처리
-    10,
+    18,
     currentTabType,
   );
 

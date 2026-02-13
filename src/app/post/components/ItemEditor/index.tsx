@@ -450,8 +450,6 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
                           key={tag}
                           label={tag}
                           onDelete={() => handleDeleteTag(tag)}
-                          color="primary"
-                          variant="outlined"
                         />
                       ))}
                     </Box>

@@ -101,7 +101,29 @@ const Header = () => {
       >
         {!openSearchBar && (
           <Link href="/" style={{ flex: 1 }}>
-            <Box>
+            <Box
+              sx={{
+                display: "block",
+                "@media (min-width:627px)": {
+                  display: "none",
+                },
+              }}
+            >
+              <Image
+                src="/asset/logo/favicon.png"
+                alt="CoverCloud"
+                width={60}
+                height={60}
+              />
+            </Box>
+            <Box
+              sx={{
+                display: "none",
+                "@media (min-width:627px)": {
+                  display: "block",
+                },
+              }}
+            >
               <Image
                 src="/asset/logo/coverLogo.png"
                 alt="CoverCloud"
