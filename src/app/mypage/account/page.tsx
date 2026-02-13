@@ -25,6 +25,7 @@ import { useSnackbarStore } from "@/app/store/useSnackbar";
 
 import Login from "@/components/auth/Login";
 import Loading from "@/app/main/loading";
+import { refresh } from "next/cache";
 
 const AccountPage = () => {
   const router = useRouter();
@@ -73,6 +74,7 @@ const AccountPage = () => {
 
       if (result) {
         const tempAvatarUrl = `https://storage.googleapis.com/covercloud-bucket/${result}`;
+
         setTempAvatar(tempAvatarUrl);
         setAvatar(tempAvatarUrl);
       }
@@ -146,6 +148,7 @@ const AccountPage = () => {
         useSnackbarStore
           .getState()
           .show("프로필 이미지가 변경되었습니다.", "success");
+        await refresh();
       } else {
         throw new Error("change failed");
       }
