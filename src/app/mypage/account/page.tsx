@@ -34,6 +34,7 @@ const AccountPage = () => {
   const [openNickNameModal, setOpenNickNameModal] = React.useState(false);
   const [isDeleteAccountModalOpen, setIsDeleteAccountModalOpen] =
     React.useState(false);
+  const [openImageRemoveModal, setOpenImageRemoveModal] = React.useState(false);
 
   const [openImageConfirmModal, setOpenImageConfirmModal] =
     React.useState(false);
@@ -90,6 +91,7 @@ const AccountPage = () => {
         setAvatar("");
         setPrevAvatar("");
         useSnackbarStore.getState().show("이미지가 삭제되었습니다.", "success");
+        await refresh();
       }
     } catch {
       useSnackbarStore.getState().show("이미지 삭제에 실패했습니다.", "error");
@@ -235,7 +237,7 @@ const AccountPage = () => {
         </Box>
 
         <Button
-          onClick={handleRemoveImage}
+          onClick={() => setOpenImageRemoveModal(true)}
           size="large"
           sx={{
             alignSelf: "center",
@@ -527,6 +529,40 @@ const AccountPage = () => {
                 계정 탈퇴하기
               </PostBasicButton>
             </Box>
+          </Box>
+        </Box>
+      </Modal>
+      <Modal
+        isOpen={openImageRemoveModal}
+        onClose={() => setOpenImageRemoveModal(false)}
+      >
+        <Box className="flex flex-col gap-4 items-center" sx={{ p: 3 }}>
+          <Box className="H1">프로필 이미지 삭제</Box>
+
+          <Avatar
+            src={tempAvatar || undefined}
+            sx={{ width: 160, height: 160 }}
+          />
+
+          <Box className="B1 text-center">이미지를 삭제하시겠습니까?</Box>
+
+          <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+            <Button
+              onClick={handleRemoveImage}
+              variant="contained"
+              disabled={isImageChanging}
+            >
+              {isImageChanging ? "삭제 중..." : "삭제"}
+            </Button>
+
+            <Button
+              onClick={() => {
+                setOpenImageRemoveModal(false);
+              }}
+              variant="outlined"
+            >
+              취소
+            </Button>
           </Box>
         </Box>
       </Modal>
