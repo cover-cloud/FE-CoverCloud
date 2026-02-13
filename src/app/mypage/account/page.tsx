@@ -90,14 +90,13 @@ const AccountPage = () => {
       if (result.data.success) {
         setAvatar("");
         setPrevAvatar("");
+        await refresh();
         useSnackbarStore.getState().show("이미지가 삭제되었습니다.", "success");
       }
     } catch {
       useSnackbarStore.getState().show("이미지 삭제에 실패했습니다.", "error");
-    } finally {
-      setOpenImageRemoveModal(false);
-      refresh();
     }
+    setOpenImageRemoveModal(false);
   };
 
   const changedNickNameHandler = async () => {
@@ -107,16 +106,13 @@ const AccountPage = () => {
       if (result.data.success) {
         setOriginalNickName(newNickName);
         setNewNickName("");
-        setOpenNickNameModal(false);
-
+        await refresh();
         useSnackbarStore.getState().show("닉네임이 변경되었습니다.", "success");
       }
     } catch {
       useSnackbarStore.getState().show("닉네임 변경에 실패했습니다.", "error");
-    } finally {
-      setOpenNickNameModal(false);
-      refresh();
     }
+    setOpenNickNameModal(false);
   };
 
   const openDeleteAccountModalHandler = () => {
@@ -150,7 +146,7 @@ const AccountPage = () => {
         setAvatar(tempAvatar);
         setPrevAvatar(tempAvatar);
         setTempAvatar(null);
-
+        await refresh();
         useSnackbarStore
           .getState()
           .show("프로필 이미지가 변경되었습니다.", "success");
@@ -161,11 +157,10 @@ const AccountPage = () => {
       useSnackbarStore
         .getState()
         .show("프로필 이미지 변경에 실패했습니다.", "error");
-    } finally {
-      setIsImageChanging(false);
-      setOpenImageConfirmModal(false);
-      refresh();
     }
+    setIsImageChanging(false);
+
+    setOpenImageConfirmModal(false);
   };
 
   useEffect(() => {
