@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Box, Tabs, Tab, Button, Grid } from "@mui/material";
+import { Box, Tabs, Tab, Button, Grid, Skeleton } from "@mui/material";
 import PostCard from "@/components/PostCard";
 import { Period, usePopularCoverListQuery } from "@/app/api/cover/list";
 import theme from "@/app/lib/theme";
@@ -85,18 +85,36 @@ const PopularVideos = ({ isViewer }: { isViewer: boolean }) => {
         ))}
       </Box>
       <Grid container spacing={2}>
-        {data?.content.map((post: contentData, idx: number) => (
-          <Grid
-            key={idx}
-            size={
-              isViewer
-                ? { xs: 12 } // 뷰어 모드 → 항상 한 줄
-                : { xs: 12, sm: 6, md: 4 } // 일반 모드
-            }
-          >
-            <PostCard {...post} key={idx} isViewer={isViewer} />
-          </Grid>
-        ))}
+        {isLoading
+          ? // 로딩 중일 때 보여줄 스켈레톤 (10개)
+            Array.from(new Array(10)).map((_, idx) => (
+              <Grid
+                key={`skeleton-${idx}`}
+                size={isViewer ? { xs: 12 } : { xs: 12, sm: 6, md: 4 }}
+              >
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="flex gap-4 mb-4">
+                    <div className="w-32 h-20 bg-gray-200 animate-pulse rounded-lg" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 bg-gray-200 animate-pulse rounded w-full" />
+                      <div className="h-4 bg-gray-200 animate-pulse rounded w-2/3" />
+                    </div>
+                  </div>
+                ))}
+              </Grid>
+            ))
+          : data?.content.map((post: contentData, idx: number) => (
+              <Grid
+                key={idx}
+                size={
+                  isViewer
+                    ? { xs: 12 } // 뷰어 모드 → 항상 한 줄
+                    : { xs: 12, sm: 6, md: 4 } // 일반 모드
+                }
+              >
+                <PostCard {...post} key={idx} isViewer={isViewer} />
+              </Grid>
+            ))}
       </Grid>
     </Box>
   );

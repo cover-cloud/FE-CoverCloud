@@ -34,10 +34,11 @@ export const readingPost = async (coverId: string) => {
     throw error;
   }
 };
-export const useReadingPost = (coverId: string) => {
+export const useReadingPost = (coverId: string, initialData?: any) => {
   return useQuery({
     queryKey: ["readingPost", coverId],
     queryFn: () => readingPost(coverId),
     enabled: !!coverId,
+    initialData,
   });
 };

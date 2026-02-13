@@ -25,6 +25,33 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* globals.css */
+.main-wrapper {
+  display: flex;
+  flex-direction: column; /* 기본은 모바일(세로) */
+  gap: 52px;
+}
+
+.post-content {
+  width: 100%;
+}
+
+.sidebar-content {
+  width: 100%;
+}
+
+/* 627px 이상일 때 (데스크탑) */
+@media (min-width: 900px) {
+  .main-wrapper {
+    flex-direction: row; /* 가로 배치 */
+  }
+  .post-content {
+    width: 66%;
+  }
+  .sidebar-content {
+    width: 33%;
+  }
+}
 .H1 {
   font-size: 24px;
   font-weight: 700;

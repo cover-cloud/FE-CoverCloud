@@ -1,6 +1,9 @@
+// app/page.tsx
 import MainComponent from "./components/MainComponent";
+import { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
-export default function MainPage() {
+
+export default async function MainPage() {
   return <MainComponent />;
 }
