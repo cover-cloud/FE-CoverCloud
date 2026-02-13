@@ -27,5 +27,5 @@ export const refreshToken = async () => {
 };
 export const refreshAccessToken = async () => {
   const res = await refreshToken();
-  useAuthStore.setState({ accessToken: res.accessToken });
+  useAuthStore.setState({ accessToken: res.data.accessToken });
 };
