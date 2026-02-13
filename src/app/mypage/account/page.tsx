@@ -25,12 +25,15 @@ import { useSnackbarStore } from "@/app/store/useSnackbar";
 
 import Login from "@/components/auth/Login";
 import Loading from "@/app/main/loading";
-import { refreshToken } from "@/app/api/auth/refresh";
+import { refreshAccessToken, refreshToken } from "@/app/api/auth/refresh";
+import { useModalStore } from "@/app/store/useModalStore";
 
 const AccountPage = () => {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const isLogin = useAuthStore((state) => state.isLogin);
+  const openLoginModal = useModalStore((state) => state.openLoginModal);
   const [openNickNameModal, setOpenNickNameModal] = React.useState(false);
   const [isDeleteAccountModalOpen, setIsDeleteAccountModalOpen] =
     React.useState(false);
@@ -69,6 +72,13 @@ const AccountPage = () => {
   };
   const hasImage = typeof avatar === "string" && avatar.length > 0;
   const handleImageChange = async (file: File) => {
+    if (!isLogin && !accessToken) {
+      openLoginModal();
+      useSnackbarStore
+        .getState()
+        .show("로그인 후 프로필 이미지를 변경할 수 있습니다.", "error");
+      return;
+    }
     setOpenImageConfirmModal(true);
     try {
       const result = await fetchImageUrl(file);
@@ -84,6 +94,13 @@ const AccountPage = () => {
     }
   };
   const handleRemoveImage = async () => {
+    if (!isLogin && !accessToken) {
+      openLoginModal();
+      useSnackbarStore
+        .getState()
+        .show("로그인 후 프로필 이미지를 삭제할 수 있습니다.", "error");
+      return;
+    }
     try {
       const result = await changeAccount(undefined, "");
 
@@ -96,11 +113,18 @@ const AccountPage = () => {
     } catch {
       useSnackbarStore.getState().show("이미지 삭제에 실패했습니다.", "error");
     }
-    await refreshToken();
+    refreshAccessToken();
     setOpenImageRemoveModal(false);
   };
 
   const changedNickNameHandler = async () => {
+    if (!isLogin && !accessToken) {
+      openLoginModal();
+      useSnackbarStore
+        .getState()
+        .show("로그인 후 닉네임을 변경할 수 있습니다.", "error");
+      return;
+    }
     try {
       const result = await changeAccount(newNickName, undefined);
 
@@ -113,7 +137,7 @@ const AccountPage = () => {
     } catch {
       useSnackbarStore.getState().show("닉네임 변경에 실패했습니다.", "error");
     }
-    await refreshToken();
+    refreshAccessToken();
     setOpenNickNameModal(false);
   };
 
@@ -121,6 +145,13 @@ const AccountPage = () => {
     setIsDeleteAccountModalOpen(true);
   };
   const deleteAccountHandler = () => {
+    if (!isLogin && !accessToken) {
+      openLoginModal();
+      useSnackbarStore
+        .getState()
+        .show("로그인 후 계정을 삭제할 수 있습니다.", "error");
+      return;
+    }
     // TODO: 계정 삭제 API 호출
     setIsDeleteAccountModalOpen(false);
   };
@@ -137,6 +168,13 @@ const AccountPage = () => {
     }
   };
   const changedImageHandler = async () => {
+    if (!isLogin && !accessToken) {
+      openLoginModal();
+      useSnackbarStore
+        .getState()
+        .show("로그인 후 프로필 이미지를 변경할 수 있습니다.", "error");
+      return;
+    }
     if (!tempAvatar) return;
 
     try {
@@ -163,7 +201,7 @@ const AccountPage = () => {
     setIsImageChanging(false);
 
     setOpenImageConfirmModal(false);
-    await refreshToken();
+    refreshAccessToken();
   };
 
   useEffect(() => {

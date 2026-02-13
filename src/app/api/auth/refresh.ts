@@ -1,4 +1,5 @@
 import { api } from "@/app/lib/api";
+import { useAuthStore } from "@/app/store/useAuthStore";
 
 export const refreshToken = async () => {
   try {
@@ -23,4 +24,8 @@ export const refreshToken = async () => {
     // useAuthStore.setState({ accessToken: "" });
     return { success: false };
   }
+};
+export const refreshAccessToken = async () => {
+  const res = await refreshToken();
+  useAuthStore.setState({ accessToken: res.accessToken });
 };

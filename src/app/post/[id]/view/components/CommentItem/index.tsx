@@ -61,7 +61,7 @@ const CommentItem = ({
   const updateCommentMutation = useUpdateCommentMutation();
   const accessToken = useAuthStore((state) => state.accessToken);
   const isLogin = useAuthStore((state) => state.isLogin);
-
+  const openLoginModal = useModalStore((state) => state.openLoginModal);
   const [isImageLoading, setIsImageLoading] = React.useState(true);
   const [isCommentEdit, setIsCommentEdit] = React.useState(false);
   const [editContent, setEditContent] = React.useState(content);
@@ -70,7 +70,6 @@ const CommentItem = ({
   );
   const size = Math.max(48 - depth * 12, 24);
 
-  const openLoginModal = useModalStore((state) => state.openLoginModal);
   const likeComment = useCommentLikeMutation();
   const likeCommentHandler = async () => {
     if (!isLogin && !accessToken) {
