@@ -91,10 +91,12 @@ const AccountPage = () => {
         setAvatar("");
         setPrevAvatar("");
         useSnackbarStore.getState().show("이미지가 삭제되었습니다.", "success");
-        await refresh();
       }
     } catch {
       useSnackbarStore.getState().show("이미지 삭제에 실패했습니다.", "error");
+    } finally {
+      setOpenImageRemoveModal(false);
+      refresh();
     }
   };
 
@@ -111,6 +113,9 @@ const AccountPage = () => {
       }
     } catch {
       useSnackbarStore.getState().show("닉네임 변경에 실패했습니다.", "error");
+    } finally {
+      setOpenNickNameModal(false);
+      refresh();
     }
   };
 
@@ -145,12 +150,10 @@ const AccountPage = () => {
         setAvatar(tempAvatar);
         setPrevAvatar(tempAvatar);
         setTempAvatar(null);
-        setOpenImageConfirmModal(false);
 
         useSnackbarStore
           .getState()
           .show("프로필 이미지가 변경되었습니다.", "success");
-        await refresh();
       } else {
         throw new Error("change failed");
       }
@@ -160,6 +163,8 @@ const AccountPage = () => {
         .show("프로필 이미지 변경에 실패했습니다.", "error");
     } finally {
       setIsImageChanging(false);
+      setOpenImageConfirmModal(false);
+      refresh();
     }
   };
 

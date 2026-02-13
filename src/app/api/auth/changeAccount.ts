@@ -12,7 +12,7 @@ export const changeAccount = async (
 
     { nickname, profileImage },
   );
-  await refreshToken();
+
   return res;
 };
 
