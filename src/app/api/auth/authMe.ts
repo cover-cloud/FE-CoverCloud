@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "@/app/store/useAuthStore";
 import axios from "axios";
 
@@ -31,7 +31,7 @@ export const fetchAuthMeWithCookie = async (accessToken: string) => {
 };
 export const useAuthMeQuery = () => {
   const accessToken = useAuthStore((state) => state.accessToken);
-
+  console.log(accessToken);
   return useQuery({
     queryKey: ["auth-me-cookie", accessToken], // ✅ 핵심
     queryFn: () => fetchAuthMeWithCookie(accessToken),

@@ -32,6 +32,7 @@ const Header = () => {
   // const isLogin = useAuthStore((state) => state.isLogin);
 
   const { data, error } = useAuthMeQuery();
+
   const [searchQuery, setSearchQuery] = React.useState("");
   const [openAccountModal, setOpenAccountModal] = React.useState(false);
   const [openSearchBar, setOpenSearchBar] = React.useState(false);
