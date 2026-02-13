@@ -539,11 +539,6 @@ const AccountPage = () => {
         <Box className="flex flex-col gap-4 items-center" sx={{ p: 3 }}>
           <Box className="H1">프로필 이미지 삭제</Box>
 
-          <Avatar
-            src={tempAvatar || undefined}
-            sx={{ width: 160, height: 160 }}
-          />
-
           <Box className="B1 text-center">이미지를 삭제하시겠습니까?</Box>
 
           <Box sx={{ display: "flex", gap: 2, mt: 2 }}>

@@ -28,6 +28,5 @@ export const fetchImageUrl = async (file: File) => {
       "Content-Type": file.type,
     },
   });
-  await refreshToken();
   return objectPath;
 };
