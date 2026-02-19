@@ -30,6 +30,7 @@ import { useModalStore } from "@/app/store/useModalStore";
 
 const AccountPage = () => {
   const router = useRouter();
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const isLogin = useAuthStore((state) => state.isLogin);
