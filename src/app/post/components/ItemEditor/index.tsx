@@ -17,7 +17,9 @@ import { FormSchema, formSchema, FormField, SongData } from "./type";
 import { useState } from "react";
 import {
   detectAndValidateMediaUrl,
+  fetchTiktokDataWithApi,
   getYoutubeVideoId,
+  MediaUrlResult,
 } from "@/app/utils/youtube";
 import {
   createPost,
@@ -71,6 +73,7 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
   const { data: postData, isLoading: isPostLoading } = useReadingPost(
     params.id as string,
   );
+
   const { control, handleSubmit, watch, setValue, formState } =
     useForm<FormSchema>({
       resolver: zodResolver(formSchema),
@@ -98,13 +101,18 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
   // const [selectedSongData, setSelectedSongData] = useState<SongData | null>(
   //   null
   // );
+  const [videoUrl, setVideoUrl] = useState<MediaUrlResult>({
+    platform: null,
+    id: null,
+    isValid: false,
+    originalUrl: "",
+  });
+  const [isVideoUrlLoading, setIsVideoUrlLoading] = useState(false);
 
   const link = watch("link");
   const songTitle = watch("songTitle");
   const tagInput = watch("tag");
   const selectedSongData = watch("selectedSongData");
-
-  const videoUrl = detectAndValidateMediaUrl(link);
 
   const toggleInputMode = () => {
     setIsManualInput((prev) => !prev);
@@ -233,8 +241,41 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
     setIsSongSearchFocus(false);
   };
   React.useEffect(() => {
-    console.log(authMeError);
-  }, [authMeError]);
+    const validate = async () => {
+      setIsVideoUrlLoading(true);
+      if (!link) {
+        setVideoUrl({
+          platform: null,
+          id: null,
+          isValid: false,
+          originalUrl: "",
+        });
+        return;
+      }
+
+      // 우선 기존 동기 함수로 감지
+      let result = detectAndValidateMediaUrl(link);
+
+      // 틱톡인데 단축 URL인 경우 (embedUrl이 없는 경우) 비동기 처리
+      if (result.platform === "tiktok" && !result.embedUrl) {
+        // 이전에 만든 비동기 API 호출 함수 사용
+        const tiktokData = await fetchTiktokDataWithApi(link);
+        if (tiktokData && tiktokData.realId) {
+          result = {
+            ...result,
+            id: tiktokData.realId,
+            isValid: true,
+            embedUrl: tiktokData.embedUrl,
+          };
+        }
+      }
+
+      setVideoUrl(result);
+      setIsVideoUrlLoading(false);
+    };
+
+    validate();
+  }, [link]);
   React.useEffect(() => {
     if (mode !== "edit") return;
 
@@ -403,6 +444,7 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
                       link={link}
                       youtubeVideoId={videoUrl.embedUrl}
                       videoType={videoUrl.platform}
+                      isVideoUrlLoading={isVideoUrlLoading}
                     />
                   ) : (
                     <TextField

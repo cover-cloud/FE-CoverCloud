@@ -221,3 +221,27 @@ export const getMediaThumbnail = async (media: MediaUrlResult) => {
       return null;
   }
 };
+/**
+ * 틱톡 단축 URL까지 완벽하게 감지하여 최종 결과를 반환하는 비동기 검증 함수
+ */
+export const resolveMediaUrl = async (url: string): Promise<MediaUrlResult> => {
+  // 1. 우선 기존 동기 함수로 기본 검사
+  const result = detectAndValidateMediaUrl(url);
+
+  // 2. 틱톡인데 단축 URL이라서 embedUrl이 없는 경우에만 API 호출
+  if (result.platform === "tiktok" && !result.embedUrl) {
+    const apiData = await fetchTiktokDataWithApi(url);
+
+    if (apiData && apiData.realId) {
+      return {
+        ...result,
+        id: apiData.realId,
+        isValid: true,
+        embedUrl: apiData.embedUrl, // 이제 진짜 ID가 포함된 주소가 들어감
+      };
+    }
+  }
+
+  // 3. 유튜브, 사운드클라우드, 이미 풀 주소인 틱톡은 그대로 반환
+  return result;
+};

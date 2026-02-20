@@ -56,6 +56,18 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "p16-sign-va.tiktokcdn.com",
       },
+      {
+        protocol: "https",
+        hostname: "**.tiktokcdn-us.com", // 미국 서버용
+      },
+      {
+        protocol: "https",
+        hostname: "**.tiktokcdn.com", // 일반 서버용
+      },
+      {
+        protocol: "https",
+        hostname: "**.byteimg.com", // 틱톡 내부 이미지 서버
+      },
     ],
   },
 };

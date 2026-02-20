@@ -13,6 +13,7 @@ const VideoInputField = ({
   link,
   youtubeVideoId,
   videoType,
+  isVideoUrlLoading,
 }: {
   field: FormField;
   controllerField: any;
@@ -20,6 +21,7 @@ const VideoInputField = ({
   link: string;
   youtubeVideoId: string | undefined;
   videoType: MediaPlatform;
+  isVideoUrlLoading: boolean;
 }) => {
   return (
     <React.Fragment>
@@ -29,7 +31,10 @@ const VideoInputField = ({
           sx={{
             backgroundColor:
               fieldState.error ||
-              (field.key === "link" && !!link && !youtubeVideoId)
+              (field.key === "link" &&
+                !!link &&
+                !youtubeVideoId &&
+                !isVideoUrlLoading)
                 ? theme.palette.danger.primary
                 : theme.palette.gray.tertiary,
             height: 379,
@@ -55,11 +60,17 @@ const VideoInputField = ({
             {...controllerField}
             error={
               !!fieldState.error ||
-              (field.key === "link" && !!link && !youtubeVideoId)
+              (field.key === "link" &&
+                !!link &&
+                !youtubeVideoId &&
+                !isVideoUrlLoading)
             }
             helperText={
               fieldState.error?.message ||
-              (field.key === "link" && !!link && !youtubeVideoId
+              (field.key === "link" &&
+              !!link &&
+              !youtubeVideoId &&
+              !isVideoUrlLoading
                 ? "유튜브 / 틱톡 / 사운드클라우드 링크만 첨부 가능합니다."
                 : "")
             }
@@ -69,7 +80,10 @@ const VideoInputField = ({
                   fontSize: "20px",
                   color:
                     fieldState.error ||
-                    (field.key === "link" && !!link && !youtubeVideoId)
+                    (field.key === "link" &&
+                      !!link &&
+                      !youtubeVideoId &&
+                      !isVideoUrlLoading)
                       ? theme.palette.danger.primary
                       : theme.palette.gray.primary,
                   textAlign: "center",
@@ -93,7 +107,10 @@ const VideoInputField = ({
             {...controllerField}
             error={
               !!fieldState.error ||
-              (field.key === "link" && !!link && !youtubeVideoId)
+              (field.key === "link" &&
+                !!link &&
+                !youtubeVideoId &&
+                !isVideoUrlLoading)
             }
           />
           <Box className="mt-3">
