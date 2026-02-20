@@ -117,7 +117,10 @@ const VideoInputField = ({
             <iframe
               width="100%"
               style={{
-                minHeight: "505px",
+                minHeight:
+                  videoType === "youtube" || videoType === "tiktok"
+                    ? "505px"
+                    : "200px",
               }}
               src={youtubeVideoId}
               className="rounded-lg"
