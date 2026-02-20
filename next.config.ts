@@ -52,6 +52,10 @@ const nextConfig: NextConfig = {
         hostname: "storage.googleapis.com",
         pathname: "/covercloud-bucket/**",
       },
+      {
+        protocol: "https",
+        hostname: "p16-sign-va.tiktokcdn.com",
+      },
     ],
   },
 };

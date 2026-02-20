@@ -17,6 +17,7 @@ import {
 import {
   detectAndValidateMediaUrl,
   exampleUsage,
+  fetchTiktokDataWithApi,
   getYoutubeVideoId,
   MediaUrlResult,
 } from "@/app/utils/youtube";
@@ -124,9 +125,25 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
   };
   React.useEffect(() => {
     if (!postData) return;
-    if (videoId && videoId.embedUrl) {
-      setYoutubeVideoId(videoId.embedUrl); // 원본url
-    }
+    const rawLink = postData.data.data.link; // 서버에서 받아온 원본 링크
+    const videoInfo = detectAndValidateMediaUrl(rawLink);
+
+    // 비동기로 ID와 Embed URL을 확정짓는 함수
+    const resolveMedia = async () => {
+      // 1. 틱톡이고, 단축 URL(embedUrl이 없는 상태)인 경우
+      if (videoInfo.platform === "tiktok" && !videoInfo.embedUrl) {
+        const tiktokData = await fetchTiktokDataWithApi(rawLink);
+        if (tiktokData && tiktokData.embedUrl) {
+          setYoutubeVideoId(tiktokData.embedUrl); // 진짜 숫자 ID가 포함된 주소로 세팅
+        }
+      }
+      // 2. 유튜브나 이미 ID가 있는 틱톡, 사운드클라우드인 경우
+      else if (videoInfo.embedUrl) {
+        setYoutubeVideoId(videoInfo.embedUrl);
+      }
+    };
+
+    resolveMedia();
 
     setCoverTitle(postData.data.data.coverTitle);
     setCoverArtist(postData.data.data.coverArtist);

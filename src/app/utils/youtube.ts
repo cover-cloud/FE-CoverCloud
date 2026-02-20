@@ -15,6 +15,7 @@ export interface MediaUrlResult {
  * @param url - 검증할 URL
  * @returns MediaUrlResult 객체
  */
+
 export const detectAndValidateMediaUrl = (url: string): MediaUrlResult => {
   if (!url || typeof url !== "string") {
     return {
@@ -35,11 +36,15 @@ export const detectAndValidateMediaUrl = (url: string): MediaUrlResult => {
 
   // TikTok 패턴
   const tiktokPatterns = [
-    /(?:https?:\/\/)?(?:www\.)?tiktok\.com\/@[\w.-]+\/video\/(\d+)/,
-    /(?:https?:\/\/)?(?:www\.)?tiktok\.com\/.*[?&]v=(\d+)/,
-    /(?:https?:\/\/)?(?:vm|vt)\.tiktok\.com\/([A-Za-z0-9]+)/,
+    {
+      type: "full",
+      regex: /(?:https?:\/\/)?(?:www\.)?tiktok\.com\/@[\w.-]+\/video\/(\d+)/,
+    },
+    {
+      type: "share", // vm.tiktok.com 같은 공유용 단축 URL
+      regex: /(?:https?:\/\/)?(?:vm|vt)\.tiktok\.com\/([A-Za-z0-9]+)/,
+    },
   ];
-
   // SoundCloud 패턴
   const soundcloudPatterns = [
     /(?:https?:\/\/)?(?:www\.)?soundcloud\.com\/([\w-]+)\/([\w-]+)/,
@@ -62,14 +67,19 @@ export const detectAndValidateMediaUrl = (url: string): MediaUrlResult => {
 
   // TikTok 검증
   for (const pattern of tiktokPatterns) {
-    const match = url.match(pattern);
+    const match = url.match(pattern.regex);
     if (match && match[1]) {
       return {
         platform: "tiktok",
+        // full 타입이면 바로 ID로 쓰고, share 타입이면 일단 추출한 코드를 넣음
         id: match[1],
         isValid: true,
         originalUrl: url,
-        embedUrl: `https://www.tiktok.com/player/v1/${match[1]}`,
+        // share URL인 경우 임시 ID이므로 embedUrl을 바로 만들지 않거나 처리 필요
+        embedUrl:
+          pattern.type === "full"
+            ? `https://www.tiktok.com/player/v1/${match[1]}`
+            : undefined,
       };
     }
   }
@@ -151,15 +161,26 @@ export const exampleUsage = () => {
   });
 };
 
-const fetchTiktokThumbnail = async (url: string) => {
+export const fetchTiktokDataWithApi = async (url: string) => {
   try {
     const res = await fetch(
       `https://www.tiktok.com/oembed?url=${encodeURIComponent(url)}`,
     );
     const data = await res.json();
-    return data.thumbnail_url; // 썸네일 URL
+
+    // data.html 안에 "<blockquote ... video/7123456789012345678 ...>" 형태의 ID가 들어있음
+    const idMatch = data.html.match(/video\/(\d+)/);
+    const realId = idMatch ? idMatch[1] : null;
+
+    return {
+      thumbnail: data.thumbnail_url,
+      realId: realId,
+      embedUrl: realId
+        ? `https://www.tiktok.com/player/v1/${realId}`
+        : undefined,
+    };
   } catch (e) {
-    console.error("TikTok 썸네일 가져오기 실패", e);
+    console.error("TikTok 데이터 가져오기 실패", e);
     return null;
   }
 };
@@ -191,7 +212,9 @@ export const getMediaThumbnail = async (media: MediaUrlResult) => {
         ? `https://img.youtube.com/vi/${media.id}/hqdefault.jpg`
         : null;
     case "tiktok":
-      return await fetchTiktokThumbnail(media.originalUrl);
+      return await fetchTiktokDataWithApi(media.originalUrl).then((data) => {
+        return data?.thumbnail || null;
+      });
     case "soundcloud":
       return await fetchSoundCloudThumbnail(media.originalUrl);
     default:
