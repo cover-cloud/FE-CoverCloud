@@ -401,8 +401,9 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
             </Box>
           </Box>
 
-          <Box className="flex B1 mb-2">
-            <Box>{coverArtist}</Box>
+          <Box className="flex B1 mb-2 ">
+            <Box>커버 아티스트： </Box>
+            <Box sx={{ fontWeight: "bold" }}>{coverArtist}</Box>
           </Box>
           <Box className="flex C2 mb-4">
             <Box>{createAt} 작성</Box>

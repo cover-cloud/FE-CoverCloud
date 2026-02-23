@@ -47,10 +47,16 @@ export const detectAndValidateMediaUrl = (url: string): MediaUrlResult => {
   ];
   // SoundCloud 패턴
   const soundcloudPatterns = [
-    /(?:https?:\/\/)?(?:www\.)?soundcloud\.com\/([\w-]+)\/([\w-]+)/,
-    /(?:https?:\/\/)?(?:www\.)?soundcloud\.app\.goo\.gl\/([A-Za-z0-9]+)/,
+    {
+      type: "full",
+      regex: /(?:https?:\/\/)?(?:www\.)?soundcloud\.com\/([\w-]+)\/([\w-]+)/,
+    },
+    {
+      type: "share", // 공유용 단축 URL
+      regex:
+        /(?:https?:\/\/)?(?:soundcloud\.app\.goo\.gl|on\.soundcloud\.com)\/([A-Za-z0-9]+)/,
+    },
   ];
-
   // YouTube 검증
   for (const pattern of youtubePatterns) {
     const match = url.match(pattern);
@@ -85,22 +91,29 @@ export const detectAndValidateMediaUrl = (url: string): MediaUrlResult => {
   }
 
   // SoundCloud 검증
+  // SoundCloud 검증
   for (const pattern of soundcloudPatterns) {
-    const match = url.match(pattern);
+    const match = url.match(pattern.regex);
     if (match) {
-      // SoundCloud는 전체 경로를 ID로 사용
-      const pathMatch = url.match(/soundcloud\.com\/([\w-]+\/[\w-]+)/);
-      const id = pathMatch ? pathMatch[1] : null;
+      if (pattern.type === "full") {
+        const id = `${match[1]}/${match[2]}`;
 
+        return {
+          platform: "soundcloud",
+          id,
+          isValid: true,
+          originalUrl: url,
+          embedUrl: `https://w.soundcloud.com/player/?url=https://soundcloud.com/${id}`,
+        };
+      }
+
+      // 공유 URL인 경우 → 일단 ID 없이 반환
       return {
         platform: "soundcloud",
-        id: id,
+        id: match[1], // 단축코드
         isValid: true,
         originalUrl: url,
-        // SoundCloud embed는 oEmbed API를 통해 생성해야 함
-        embedUrl: id
-          ? `https://w.soundcloud.com/player/?url=https://soundcloud.com/${id}`
-          : undefined,
+        embedUrl: undefined,
       };
     }
   }
@@ -185,19 +198,34 @@ export const fetchTiktokDataWithApi = async (url: string) => {
   }
 };
 
-const fetchSoundCloudThumbnail = async (url: string) => {
+export const fetchSoundCloudDataWithApi = async (url: string) => {
   try {
     const res = await fetch(
       `https://soundcloud.com/oembed?format=json&url=${encodeURIComponent(url)}`,
     );
+
+    if (!res.ok) return null;
     const data = await res.json();
-    return data.thumbnail_url; // 썸네일 URL
+
+    // 🔥 수정된 정규식: / 또는 %2F를 모두 허용
+    // (?:tracks|playlists) : tracks나 playlists를 찾음
+    // (?:/|%2F) : 슬래시(/)나 인코딩된 슬래시(%2F)를 찾음
+    // (\d+) : 최종 숫자 ID를 캡처
+    const idMatch = data.html.match(/(?:tracks|playlists)(?:\/|%2F)(\d+)/);
+    const trackId = idMatch ? idMatch[1] : null;
+
+    return {
+      thumbnail: data.thumbnail_url,
+      realId: trackId,
+      embedUrl: trackId
+        ? `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${trackId}`
+        : undefined,
+    };
   } catch (e) {
-    console.error("SoundCloud 썸네일 가져오기 실패", e);
+    console.error("SoundCloud 데이터 가져오기 실패", e);
     return null;
   }
 };
-
 const getYoutubeThumbnail = (videoId: string) => {
   // 기본 퀄리티
   return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
@@ -216,7 +244,11 @@ export const getMediaThumbnail = async (media: MediaUrlResult) => {
         return data?.thumbnail || null;
       });
     case "soundcloud":
-      return await fetchSoundCloudThumbnail(media.originalUrl);
+      return await fetchSoundCloudDataWithApi(media.originalUrl).then(
+        (data) => {
+          return data?.thumbnail || null;
+        },
+      );
     default:
       return null;
   }
@@ -241,7 +273,17 @@ export const resolveMediaUrl = async (url: string): Promise<MediaUrlResult> => {
       };
     }
   }
+  if (result.platform === "soundcloud" && !result.embedUrl) {
+    const apiData = await fetchSoundCloudDataWithApi(url);
 
+    if (apiData?.realId) {
+      return {
+        ...result,
+        id: apiData.realId,
+        embedUrl: apiData.embedUrl,
+      };
+    }
+  }
   // 3. 유튜브, 사운드클라우드, 이미 풀 주소인 틱톡은 그대로 반환
   return result;
 };

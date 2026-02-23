@@ -17,6 +17,7 @@ import { FormSchema, formSchema, FormField, SongData } from "./type";
 import { useState } from "react";
 import {
   detectAndValidateMediaUrl,
+  fetchSoundCloudDataWithApi,
   fetchTiktokDataWithApi,
   getYoutubeVideoId,
   MediaUrlResult,
@@ -37,6 +38,7 @@ import { fetchAuthMeWithCookie, useAuthMeQuery } from "@/app/api/auth/authMe";
 import Login from "@/components/auth/Login";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
 import { useModalStore } from "@/app/store/useModalStore";
+import { isValid } from "zod/v3";
 
 const fields: FormField[] = [
   { key: "title", label: "제목", placeholder: "게시글의 제목을 입력해주세요." },
@@ -57,6 +59,7 @@ const genres = [
   { title: "K-POP", value: "K_POP" },
   { title: "J-POP", value: "J_POP" },
   { title: "POP", value: "POP" },
+  { title: "기타", value: "OTHER" },
 ];
 const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
   const params = useParams();
@@ -269,7 +272,16 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
           };
         }
       }
-
+      if (result.platform === "soundcloud" && !result.embedUrl) {
+        const soundcloudData = await fetchSoundCloudDataWithApi(link);
+        result = {
+          ...result,
+          id: soundcloudData?.realId,
+          isValid: true,
+          embedUrl: soundcloudData?.embedUrl,
+        };
+      }
+      console.log(result);
       setVideoUrl(result);
       setIsVideoUrlLoading(false);
     };
@@ -295,6 +307,7 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
     }
   }, [mode, postData]);
 
+  if (data?.success === false) return <Login />;
   return (
     <Box
       component="form"

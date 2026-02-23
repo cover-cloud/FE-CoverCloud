@@ -27,6 +27,7 @@ import Login from "@/components/auth/Login";
 import Loading from "@/app/main/loading";
 import { refreshAccessToken, refreshToken } from "@/app/api/auth/refresh";
 import { useModalStore } from "@/app/store/useModalStore";
+import { deletedAccount } from "@/app/api/mypage/deletedAccount";
 
 const AccountPage = () => {
   const router = useRouter();
@@ -37,6 +38,8 @@ const AccountPage = () => {
   const openLoginModal = useModalStore((state) => state.openLoginModal);
   const [openNickNameModal, setOpenNickNameModal] = React.useState(false);
   const [isDeleteAccountModalOpen, setIsDeleteAccountModalOpen] =
+    React.useState(false);
+  const [deleteAccountAgreementModal, setDeleteAccountAgreementModal] =
     React.useState(false);
   const [openImageRemoveModal, setOpenImageRemoveModal] = React.useState(false);
 
@@ -154,6 +157,8 @@ const AccountPage = () => {
       return;
     }
     // TODO: 계정 삭제 API 호출
+    deletedAccount();
+    setDeleteAccountAgreementModal(false);
     setIsDeleteAccountModalOpen(false);
   };
   const logoutHandler = async () => {
@@ -461,7 +466,7 @@ const AccountPage = () => {
         isOpen={isDeleteAccountModalOpen}
         onClose={() => setIsDeleteAccountModalOpen(false)}
       >
-        <Box sx={{ minWidth: "637px", p: 2 }}>
+        <Box sx={{ p: 2 }}>
           <Box
             className="flex flex-col gap-4 items-center"
             sx={{ width: "80%", margin: "auto" }}
@@ -621,7 +626,7 @@ const AccountPage = () => {
             </Box>
             <Box sx={{ mt: 2, display: "flex", gap: 1, mb: "60px" }}>
               <PostBasicButton
-                onClick={deleteAccountHandler}
+                onClick={() => setDeleteAccountAgreementModal(true)}
                 backgroundColor={theme.palette.common.black}
                 color={theme.palette.common.white}
                 hoverBGColor={theme.palette.gray.secondary}
@@ -706,6 +711,35 @@ const AccountPage = () => {
                 if (fileInputRef.current) {
                   fileInputRef.current.value = "";
                 }
+              }}
+              variant="outlined"
+            >
+              취소
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
+      <Modal
+        isOpen={deleteAccountAgreementModal}
+        onClose={() => setDeleteAccountAgreementModal(false)}
+      >
+        <Box className="flex flex-col gap-4 items-center" sx={{ p: 3 }}>
+          <Box className="H1">계정 탈퇴</Box>
+
+          <Box className="B1 text-center">정말 계정을 탈퇴하시겠습니까?</Box>
+
+          <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+            <Button
+              onClick={deleteAccountHandler}
+              variant="contained"
+              disabled={isImageChanging}
+            >
+              {isImageChanging ? "삭제 중..." : "삭제"}
+            </Button>
+
+            <Button
+              onClick={() => {
+                setDeleteAccountAgreementModal(false);
               }}
               variant="outlined"
             >

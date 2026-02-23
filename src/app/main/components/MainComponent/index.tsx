@@ -21,14 +21,15 @@ type PopularTab = {
 const popularTabs: PopularTab[] = [
   { title: "전체", period: "ALL" },
   { title: "월간", period: "MONTHLY" },
-  { title: "일간", period: "DAILY" },
   { title: "주간", period: "WEEKLY" },
+  { title: "일간", period: "DAILY" },
 ];
 
 const genreTabs: Genre[] = [
   { title: "K-POP", value: "K_POP", label: "kpop" },
   { title: "J-POP", value: "J_POP", label: "jpop" },
   { title: "POP", value: "POP", label: "pop" },
+  { title: "기타", value: "OTHER", label: "OTHER" },
 ];
 
 const MainComponent = () => {
