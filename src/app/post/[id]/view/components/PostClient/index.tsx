@@ -17,6 +17,7 @@ import {
 import {
   detectAndValidateMediaUrl,
   exampleUsage,
+  fetchSoundCloudDataWithApi,
   fetchTiktokDataWithApi,
   getYoutubeVideoId,
   MediaUrlResult,
@@ -135,6 +136,12 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
         const tiktokData = await fetchTiktokDataWithApi(rawLink);
         if (tiktokData && tiktokData.embedUrl) {
           setYoutubeVideoId(tiktokData.embedUrl); // 진짜 숫자 ID가 포함된 주소로 세팅
+        }
+      }
+      if (videoInfo.platform === "soundcloud" && !videoInfo.embedUrl) {
+        const soundcloudData = await fetchSoundCloudDataWithApi(rawLink);
+        if (soundcloudData && soundcloudData.embedUrl) {
+          setYoutubeVideoId(soundcloudData.embedUrl); // 진짜 숫자 ID가 포함된 주소로 세팅
         }
       }
       // 2. 유튜브나 이미 ID가 있는 틱톡, 사운드클라우드인 경우
