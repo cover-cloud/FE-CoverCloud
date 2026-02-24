@@ -416,8 +416,8 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
             <Box>{createAt} 작성</Box>
           </Box>
           <Box
-            className="flex gap-2 items-center overflow-hidden min-w-0 "
-            sx={{ marginBottom: "20px" }}
+            className="flex gap-2 items-center min-w-0"
+            sx={{ marginBottom: "20px", flexWrap: "wrap" }}
           >
             <Box className="flex-shrink-0">{coverGenre}</Box>
 
@@ -430,10 +430,11 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
                 fontSize: "16px",
                 fontWeight: "bold",
                 color: theme.palette.purple.primary,
+                flexWrap: "wrap",
               }}
             >
               {tags?.map((t) => (
-                <Box key={t} className="mr-2 ">
+                <Box key={t} className="mr-2">
                   #{t}
                 </Box>
               ))}
