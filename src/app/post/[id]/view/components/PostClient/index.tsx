@@ -87,6 +87,8 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
   const [originalTitle, setOriginalTitle] = React.useState<string>(
     initialData?.data?.originalTitle || "",
   );
+  const [originalCoverImageUrl, setOriginalCoverImageUrl] =
+    React.useState<string>(initialData?.data?.originalCoverImageUrl || "");
   const [videoOwner, setVideoOwner] = React.useState<number | null>(null);
   const [likeCount, setLikeCount] = React.useState<number>(
     initialData?.data?.likeCount || 0,
@@ -156,6 +158,7 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
     setCoverArtist(postData.data.data.coverArtist);
     setOriginalTitle(postData.data.data.originalTitle);
     setOriginalArtist(postData.data.data.originalArtist);
+    setOriginalCoverImageUrl(postData.data.data.originalCoverImageUrl);
     setCreateAt(formetCreatedAt);
     setCoverGenre(postData.data.data.coverGenre);
     setTags(postData.data.data.tags);
@@ -419,7 +422,9 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
             className="flex gap-2 items-center min-w-0"
             sx={{ marginBottom: "20px", flexWrap: "wrap" }}
           >
-            <Box className="flex-shrink-0">{coverGenre}</Box>
+            <Box className="flex-shrink-0">
+              {coverGenre === "OTHER" ? "기타" : coverGenre}
+            </Box>
 
             <Box className="w-[1px] h-4 bg-black flex-shrink-0" />
 
@@ -441,9 +446,9 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
             </Box>
           </Box>
           <ArtistInfo
-            coverArtist={originalArtist || ""}
-            songTitle={originalTitle || ""}
-            coverUrl=""
+            coverArtist={originalArtist || "정보없음"}
+            songTitle={originalTitle || "정보없음"}
+            coverUrl={originalCoverImageUrl || ""}
             isMobile={isMobile}
           />
           {!isPostLoading && isMobile && (

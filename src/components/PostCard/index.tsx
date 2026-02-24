@@ -125,7 +125,9 @@ const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
           </Box>
 
           <Box className="flex gap-2 items-center overflow-hidden min-w-0">
-            <Box className="flex-shrink-0 S4">{coverGenre}</Box>
+            <Box className="flex-shrink-0 S4">
+              {coverGenre === "OTHER" ? "기타" : coverGenre}
+            </Box>
 
             <Box className="w-[1px] h-4 bg-black flex-shrink-0" />
 
