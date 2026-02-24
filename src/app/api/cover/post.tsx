@@ -5,6 +5,7 @@ export type PostData = {
   videoUrl?: string;
   originalTitle?: string;
   originalArtist?: string;
+  originalCoverImageUrl?: string;
   coverArtist?: string;
   title?: string;
   genre?: string;
