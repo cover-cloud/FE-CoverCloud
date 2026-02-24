@@ -32,8 +32,8 @@ const Footer = () => {
           ))}
         </Box>
         <Box className="C3" sx={{ color: "#828282" }}>
-          <Box>문의 : Email@gmail.com</Box>
-          <Box>© 2026 CoverCloud. All rights reserved.</Box>
+          <Box>문의 : covercloudofficial@gmail.com</Box>
+          <Box>Copyright 2026 covercloud. All rights reserved.</Box>
         </Box>
       </Box>
     </Box>
