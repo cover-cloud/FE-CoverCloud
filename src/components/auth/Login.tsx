@@ -117,7 +117,7 @@ const Login = () => {
           />
           네이버 로그인
         </Button>
-        <Button
+        {/* <Button
           variant="contained"
           sx={{
             position: "relative",
@@ -136,7 +136,7 @@ const Login = () => {
           onClick={() => handleLogin("admin")}
         >
           관리자 로그인
-        </Button>
+        </Button> */}
         <Box className="B1 text-center" sx={{ padding: "40px 12px" }}>
           소셜 로그인으로 가입 할 시 이용약관,
           <br />
