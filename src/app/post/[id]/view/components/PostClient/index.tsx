@@ -243,9 +243,10 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
     try {
       const deleteResult = await deletePost(id as string | string[]);
       if (deleteResult.success) {
+        useSnackbarStore.getState().show("삭제가 완료되었습니다.", "success");
         router.push("/");
       } else {
-        alert("삭제 실패");
+        useSnackbarStore.getState().show("삭제 실패", "error");
       }
       setIsDeleteModalOpen(false);
     } catch (error) {
@@ -439,7 +440,16 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
               }}
             >
               {tags?.map((t) => (
-                <Box key={t} className="mr-2">
+                <Box
+                  key={t}
+                  className="mr-2"
+                  sx={{ cursor: "pointer", "&:hover": { opacity: 0.7 } }}
+                  onClick={() =>
+                    router.push(
+                      `/search?q=${encodeURIComponent(t)}&searchType=tags`,
+                    )
+                  }
+                >
                   #{t}
                 </Box>
               ))}

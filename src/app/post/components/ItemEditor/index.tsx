@@ -9,8 +9,10 @@ import {
   Chip,
   MenuItem,
   CircularProgress,
+  Typography,
   useMediaQuery,
 } from "@mui/material";
+import Modal from "@/components/modal/Modal";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormSchema, formSchema, FormField, SongData } from "./type";
@@ -99,6 +101,10 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
   const [isManualInput, setIsManualInput] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
   const [tagError, setTagError] = useState<string>("");
+  const [isEditConfirmOpen, setIsEditConfirmOpen] = useState(false);
+  const [pendingFormData, setPendingFormData] = useState<FormSchema | null>(
+    null,
+  );
 
   const [isSongSearchFocus, setIsSongSearchFocus] = useState(false);
   // const [selectedSongData, setSelectedSongData] = useState<SongData | null>(
@@ -159,6 +165,16 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
   };
 
   const onSubmit = async (formData: FormSchema) => {
+    if (mode === "edit") {
+      setPendingFormData(formData);
+      setIsEditConfirmOpen(true);
+      return;
+    }
+
+    await executeSubmit(formData);
+  };
+
+  const executeSubmit = async (formData: FormSchema) => {
     const isAuthenticated = await fetchAuthMeWithCookie(accessToken);
     if (!isAuthenticated.success) {
       openLoginModal();
@@ -168,20 +184,20 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
       return;
     }
 
+    const sendData: PostData = {
+      videoUrl: formData.link,
+      originalTitle: formData.selectedSongData.songTitle,
+      originalArtist: formData.selectedSongData?.artist,
+      originalCoverImageUrl: formData.selectedSongData?.coverUrl,
+      coverArtist: formData.coverArtist,
+      title: formData.title,
+      genre: formData.genre,
+      tags: tags,
+    };
+
     if (mode === "create") {
-      const sendData: PostData = {
-        videoUrl: formData.link,
-        originalTitle: formData.selectedSongData.songTitle,
-        originalArtist: formData.selectedSongData?.artist,
-        originalCoverImageUrl: formData.selectedSongData?.coverUrl,
-        coverArtist: formData.coverArtist,
-        title: formData.title,
-        genre: formData.genre,
-        tags: tags,
-      };
       try {
         const createResult = await createPost(sendData);
-
         if (createResult.success) {
           router.push("/main");
         }
@@ -189,25 +205,21 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
         console.log(error);
       }
     } else {
-      const sendData: PostData = {
-        videoUrl: formData.link,
-        originalTitle: formData.selectedSongData.songTitle,
-        originalArtist: formData.selectedSongData?.artist,
-        originalCoverImageUrl: formData.selectedSongData?.coverUrl,
-        coverArtist: formData.coverArtist,
-        title: formData.title,
-        genre: formData.genre,
-        tags: tags,
-      };
-
       const updateResult = await updatePost(params.id as string, sendData);
       if (updateResult.success) {
-        router.push("/main");
+        router.push(`/post/${params.id}/view`);
       }
     }
 
     setTagError("");
-    // router.push("/main");
+  };
+
+  const handleEditConfirm = async () => {
+    setIsEditConfirmOpen(false);
+    if (pendingFormData) {
+      await executeSubmit(pendingFormData);
+      setPendingFormData(null);
+    }
   };
 
   const selectSongHandler = (
@@ -532,11 +544,56 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
                 },
               }}
             >
-              커버곡 추천하기
+              {mode === "create" ? "커버곡 추천하기" : "수정하기"}
             </Button>
           </Box>
         </React.Fragment>
       )}
+      <Modal
+        isOpen={isEditConfirmOpen}
+        onClose={() => {
+          setIsEditConfirmOpen(false);
+          setPendingFormData(null);
+        }}
+      >
+        <Box
+          className="flex flex-col items-center"
+          sx={{
+            width: "100%",
+            bgcolor: "#fff",
+            borderRadius: "12px",
+            p: "40px",
+          }}
+        >
+          <Typography variant="h6" sx={{ fontWeight: 700, mb: "8px" }}>
+            게시글 수정
+          </Typography>
+          <Typography sx={{ fontSize: "20px", color: "#666", mb: "24px" }}>
+            게시글을 수정하시겠습니까?
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "16px",
+              width: "100%",
+            }}
+          >
+            <Button
+              variant="outlined"
+              onClick={() => {
+                setIsEditConfirmOpen(false);
+                setPendingFormData(null);
+              }}
+            >
+              취소
+            </Button>
+            <Button variant="contained" onClick={handleEditConfirm}>
+              수정
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
     </Box>
   );
 };
