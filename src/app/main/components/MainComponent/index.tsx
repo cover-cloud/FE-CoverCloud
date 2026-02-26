@@ -54,13 +54,15 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
   /* =========================
      API 호출 (0부터)
   ========================= */
-  const { data, isLoading } = usePopularCoverListQuery({
+  const { data: queryData, isLoading } = usePopularCoverListQuery({
     page: page - 1,
     size: 18,
     period,
     genres: selectedGenres.map((g) => g.value),
     initialData,
   });
+
+  const data = queryData ?? initialData;
 
   /* =========================
      URL 변경 헬퍼
