@@ -41,12 +41,40 @@ const fetchPopularCoverList = async ({
   return res.data.data;
 };
 
+export const fetchPopularCoverListServer = async ({
+  page,
+  size = 18,
+  period,
+  genres,
+}: FetchPopularCoverParams) => {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const body: any = { page, size };
+
+  if (period && period !== "ALL") {
+    body.period = period;
+  }
+  if (genres?.length) {
+    body.genres = genres.map((g) => GENRE_MAP[g]).filter(Boolean);
+  }
+
+  const res = await fetch(`${baseUrl}/api/cover/list`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    cache: "no-store",
+  });
+
+  const json = await res.json();
+  return json.data;
+};
+
 export const usePopularCoverListQuery = ({
   page,
   size,
   period,
   genres,
-}: FetchPopularCoverParams) => {
+  initialData,
+}: FetchPopularCoverParams & { initialData?: any }) => {
   return useQuery({
     queryKey: ["cover-trending", page, size, period, genres],
     queryFn: () =>
@@ -56,6 +84,6 @@ export const usePopularCoverListQuery = ({
         period,
         genres,
       }),
-    // staleTime: 1000 * 60,
+    ...(initialData ? { initialData } : {}),
   });
 };

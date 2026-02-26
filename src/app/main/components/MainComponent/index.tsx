@@ -32,7 +32,7 @@ const genreTabs: Genre[] = [
   { title: "기타", value: "OTHER", label: "OTHER" },
 ];
 
-const MainComponent = () => {
+const MainComponent = ({ initialData }: { initialData?: any }) => {
   const theme = useTheme();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -59,6 +59,7 @@ const MainComponent = () => {
     size: 18,
     period,
     genres: selectedGenres.map((g) => g.value),
+    initialData,
   });
 
   /* =========================
