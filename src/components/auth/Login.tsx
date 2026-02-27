@@ -25,11 +25,9 @@ const Login = () => {
 
   const handleLogin = (loginType: "kakao" | "naver" | "admin") => {
     if (loginType === "kakao") {
-      window.location.href =
-        "https://www.covercloud.kr/oauth2/authorization/kakao";
+      window.location.href = "/oauth2/authorization/kakao";
     } else if (loginType === "naver") {
-      window.location.href =
-        "https://www.covercloud.kr/oauth2/authorization/naver";
+      window.location.href = "/oauth2/authorization/naver";
     } else if (loginType === "admin") {
       setOpenAdminModal(true);
     }
