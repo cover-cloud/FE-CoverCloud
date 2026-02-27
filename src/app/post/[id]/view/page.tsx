@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const tagString = post.tags?.map((t: string) => `#${t}`).join(" ");
 
   return {
-    title: `${post.coverTitle} (${post.coverArtist} 커버) | cover-cloud`,
+    title: `${post.coverTitle} (${post.coverArtist} 커버) | covercloud`,
     description: `${post.originalArtist} - ${post.originalTitle} 커버 영상. ${tagString}`,
     openGraph: {
       title: post.coverTitle,
