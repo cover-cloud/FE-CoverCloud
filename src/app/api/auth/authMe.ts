@@ -32,8 +32,9 @@ export const fetchAuthMeWithCookie = async (accessToken: string) => {
 export const useAuthMeQuery = () => {
   const accessToken = useAuthStore((state) => state.accessToken);
   return useQuery({
-    queryKey: ["auth-me-cookie", accessToken], // ✅ 핵심
+    queryKey: ["auth-me-cookie", accessToken],
     queryFn: () => fetchAuthMeWithCookie(accessToken),
+    enabled: !!accessToken,
     retry: false,
   });
 };
