@@ -12,7 +12,13 @@ type PopularTab = {
   value: number;
   period: Period;
 };
-const PopularVideos = ({ isViewer }: { isViewer: boolean }) => {
+const PopularVideos = ({
+  isViewer,
+  currentCoverId,
+}: {
+  isViewer: boolean;
+  currentCoverId?: number;
+}) => {
   const popularTabs: PopularTab[] = [
     { title: "최신", value: 0, period: "ALL" },
     { title: "일간", value: 1, period: "DAILY" },
@@ -103,18 +109,20 @@ const PopularVideos = ({ isViewer }: { isViewer: boolean }) => {
                 ))}
               </Grid>
             ))
-          : data?.content.map((post: contentData, idx: number) => (
-              <Grid
-                key={idx}
-                size={
-                  isViewer
-                    ? { xs: 12 } // 뷰어 모드 → 항상 한 줄
-                    : { xs: 12, sm: 6, md: 4 } // 일반 모드
-                }
-              >
-                <PostCard {...post} key={idx} isViewer={isViewer} />
-              </Grid>
-            ))}
+          : data?.content
+              .filter((post: contentData) => post.coverId !== currentCoverId)
+              .map((post: contentData, idx: number) => (
+                <Grid
+                  key={idx}
+                  size={
+                    isViewer
+                      ? { xs: 12 } // 뷰어 모드 → 항상 한 줄
+                      : { xs: 12, sm: 6, md: 4 } // 일반 모드
+                  }
+                >
+                  <PostCard {...post} key={idx} isViewer={isViewer} />
+                </Grid>
+              ))}
       </Grid>
     </Box>
   );

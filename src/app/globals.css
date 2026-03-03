@@ -46,10 +46,10 @@ body {
     flex-direction: row; /* 가로 배치 */
   }
   .post-content {
-    width: 66%;
+    width: 60%;
   }
   .sidebar-content {
-    width: 33%;
+    width: 35%;
   }
 }
 .H1 {

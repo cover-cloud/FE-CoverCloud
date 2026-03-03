@@ -490,7 +490,7 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
         </Box>
       </Box>
       <Box className="sidebar-content">
-        <PopularVideos isViewer={!isMobile} />
+        <PopularVideos isViewer={!isMobile} currentCoverId={Number(id)} />
       </Box>
       {isMobile && (
         <SwipeableDrawer

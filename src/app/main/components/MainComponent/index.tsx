@@ -38,8 +38,8 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
   const searchParams = useSearchParams();
 
   /* =========================
-     URL → 상태 (UI 기준)
-  ========================= */
+      URL → 상태 (UI 기준)
+    ========================= */
   const page = Math.max(1, Number(searchParams.get("page") ?? 1));
   const period = (searchParams.get("period") as Period) ?? "ALL";
   const genreValues = searchParams.get("genres")
@@ -52,8 +52,8 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
   const selectedGenres = genreTabs.filter((g) => genreValues.includes(g.value));
 
   /* =========================
-     API 호출 (0부터)
-  ========================= */
+      API 호출 (0부터)
+    ========================= */
   const { data: queryData, isLoading } = usePopularCoverListQuery({
     page: page - 1,
     size: 18,
@@ -65,8 +65,8 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
   const data = queryData ?? initialData;
 
   /* =========================
-     URL 변경 헬퍼
-  ========================= */
+      URL 변경 헬퍼
+    ========================= */
   const updateParams = (next: Record<string, string>) => {
     const params = new URLSearchParams(searchParams.toString());
 
@@ -78,8 +78,8 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
   };
 
   /* =========================
-     핸들러
-  ========================= */
+      핸들러
+    ========================= */
   const handlePageChange = (_: any, value: number) => {
     updateParams({ page: String(value) });
   };
@@ -105,8 +105,8 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
   };
 
   /* =========================
-     스타일
-  ========================= */
+      스타일
+    ========================= */
   const popularTabSx = (active: boolean) => ({
     color: active ? theme.palette.common.black : theme.palette.gray.primary,
     borderRadius: "10px",
@@ -135,8 +135,8 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
   });
 
   /* =========================
-     렌더링
-  ========================= */
+      렌더링
+    ========================= */
   return (
     <div>
       {/* 인기 탭 */}

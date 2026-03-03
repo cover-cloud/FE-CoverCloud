@@ -229,9 +229,13 @@ const CommentItem = ({
             </Box>
             <Box sx={{ width: "100%" }}>
               <Box>
-                <Box className="flex">
+                <Box className="flex items-center gap-2">
                   <Box fontWeight="bold">{nickname || "익명"}</Box>
-                  <Box>{useFormatCreatedAt(createdAt)}</Box>
+                  <Box
+                    sx={{ fontSize: "12px", color: theme.palette.gray.primary }}
+                  >
+                    {useFormatCreatedAt(createdAt)}
+                  </Box>
                 </Box>
                 <Box>
                   {isCommentEdit ? (
