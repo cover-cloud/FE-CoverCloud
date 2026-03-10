@@ -326,8 +326,7 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
     <Box
       component="form"
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col gap-4 mt-4"
-      sx={{ width: isMobile ? "100%" : "70%", mx: "auto" }}
+      className="flex flex-col gap-4 mt-4 sm:px-8 lg:px-60"
     >
       {authMeLoading ? (
         <Box

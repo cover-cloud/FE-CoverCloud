@@ -151,6 +151,7 @@ const VideoInputField = ({
           className="S4"
           sx={{
             color: theme.palette.gray.primary,
+            textAlign: "center",
           }}
         >
           {isMobile ? (
