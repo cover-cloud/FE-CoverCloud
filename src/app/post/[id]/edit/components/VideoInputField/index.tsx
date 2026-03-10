@@ -153,8 +153,14 @@ const VideoInputField = ({
             color: theme.palette.gray.primary,
           }}
         >
-          저작권에 위배되는 영상은 사전 고지 없이 삭제될 수 있으니 주의
-          바랍니다.
+          {isMobile ? (
+            <>
+              저작권에 위배되는 영상은 <br />
+              사전 고지 없이 삭제될 수 있으니 주의 바랍니다.
+            </>
+          ) : (
+            "저작권에 위배되는 영상은 사전 고지 없이 삭제될 수 있으니 주의 바랍니다."
+          )}
         </Box>
       </Box>
     </React.Fragment>
