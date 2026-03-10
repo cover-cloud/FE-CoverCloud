@@ -109,6 +109,7 @@ const ArtistListField = ({
                   coverArtist={song.artist}
                   songTitle={song.title}
                   coverUrl={song.coverUrl}
+                  isSearch
                 />
               </Box>
             );

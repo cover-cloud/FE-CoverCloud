@@ -24,6 +24,10 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "is1-ssl.mzstatic.com",
+      },
+      {
+        protocol: "https",
         hostname: "i1.sndcdn.com",
         port: "",
         pathname: "/**",

@@ -9,19 +9,14 @@ const ArtistProfile = ({
   coverArtist,
   songTitle,
   coverUrl,
+  isSearch,
 }: ArtistProfileProps) => {
   const [isImageLoading, setIsImageLoading] = React.useState(false);
 
   return (
-    <Box className="flex gap-4" sx={{ padding: "16px" }}>
+    <Box className="flex gap-4" sx={{ padding: isSearch ? "0" : "16px" }}>
       <Box className="relative w-12 h-12 flex-shrink-0">
         {isImageLoading || !coverUrl ? (
-          // <Skeleton
-          //   variant="rectangular"
-          //   width="100%"
-          //   height="100%"
-          //   className="absolute inset-0"
-          // />
           <img
             src={"/asset/image/defaultProfile.png"}
             alt="Default Profile"

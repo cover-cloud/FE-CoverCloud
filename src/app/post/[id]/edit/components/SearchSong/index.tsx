@@ -18,7 +18,7 @@ const SearchSong = ({
 }: {
   selectedSongData: SongData;
   selectSongHandler: (
-    songData: SongData & { title: string; spotifyTrackId: string }
+    songData: SongData & { title: string; spotifyTrackId: string },
   ) => void;
   songTitle: string;
   isSongSearchFocus: boolean;
@@ -56,12 +56,13 @@ const SearchSong = ({
               coverArtist={selectedSongData.artist}
               songTitle={selectedSongData.songTitle}
               coverUrl={selectedSongData.coverUrl}
+              isSearch
             />
           </Box>
         )}
       <Box
         tabIndex={-1}
-        className="absolute top-[80px] bg-white w-full z-10 max-h-[260px]"
+        className="absolute top-[70px] bg-white w-full z-10 max-h-[260px]"
         sx={{
           backgroundColor: theme.palette.gray.tertiary,
           borderRadius: "15px",
