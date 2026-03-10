@@ -2,7 +2,7 @@ import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/app/lib/api";
 const search = async (keyword: string) => {
-  const searchResult = await api.post(`/api/music/spotify/search`, { keyword });
+  const searchResult = await api.post(`/api/music/search`, { keyword });
   return searchResult.data;
 };
 
