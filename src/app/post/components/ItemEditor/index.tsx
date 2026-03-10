@@ -472,6 +472,7 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
                       youtubeVideoId={videoUrl.embedUrl}
                       videoType={videoUrl.platform}
                       isVideoUrlLoading={isVideoUrlLoading}
+                      isMobile={isMobile}
                     />
                   ) : (
                     <TextField

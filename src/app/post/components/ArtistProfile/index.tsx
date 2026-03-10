@@ -13,7 +13,7 @@ const ArtistProfile = ({
   const [isImageLoading, setIsImageLoading] = React.useState(false);
 
   return (
-    <Box className="flex gap-4">
+    <Box className="flex gap-4" sx={{ padding: "16px" }}>
       <Box className="relative w-12 h-12 flex-shrink-0">
         {isImageLoading || !coverUrl ? (
           // <Skeleton

@@ -14,6 +14,7 @@ const VideoInputField = ({
   youtubeVideoId,
   videoType,
   isVideoUrlLoading,
+  isMobile,
 }: {
   field: FormField;
   controllerField: any;
@@ -22,6 +23,7 @@ const VideoInputField = ({
   youtubeVideoId: string | undefined;
   videoType: MediaPlatform;
   isVideoUrlLoading: boolean;
+  isMobile: boolean;
 }) => {
   return (
     <React.Fragment>
@@ -41,10 +43,25 @@ const VideoInputField = ({
             borderRadius: "15px",
           }}
         >
-          <Box className="flex items-center gap-2">
-            <CgAdd />
-            <Box sx={{ fontSize: "20px" }}>
-              추천하고 싶은 커버곡 영상 링크를 아래에 입력해주세요.
+          <Box
+            className="flex items-center justify-center gap-2"
+            sx={{
+              width: "70%",
+            }}
+          >
+            <Box>
+              <CgAdd size={30} />
+            </Box>
+            <Box className="S4">
+              {isMobile ? (
+                <>
+                  추천하고 싶은 커버곡 영상
+                  <br />
+                  링크를 아래에 입력해주세요.
+                </>
+              ) : (
+                "추천하고 싶은 커버곡 영상 링크를 아래에 입력해주세요."
+              )}
             </Box>
           </Box>
           <TextField
@@ -130,10 +147,15 @@ const VideoInputField = ({
         </Box>
       )}
       <Box className="flex justify-center mt-4">
-        <Typography>
+        <Box
+          className="S4"
+          sx={{
+            color: theme.palette.gray.primary,
+          }}
+        >
           저작권에 위배되는 영상은 사전 고지 없이 삭제될 수 있으니 주의
           바랍니다.
-        </Typography>
+        </Box>
       </Box>
     </React.Fragment>
   );

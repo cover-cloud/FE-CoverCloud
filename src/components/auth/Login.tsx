@@ -138,9 +138,8 @@ const Login = () => {
           관리자 로그인
         </Button> */}
         <Box className="B1 text-center" sx={{ padding: "40px 12px" }}>
-          소셜 로그인으로 가입 할 시 이용약관,
-          <br />
-          개인정보처리방침에 동의한 것으로 간주합니다.
+          소셜 계정으로 가입하면 <br /> 이용약관 및 개인정보처리방침에 동의하게
+          됩니다.
         </Box>
       </Box>
       <Modal

@@ -466,7 +466,7 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
               onClick={() => setIsCommentOpen(true)}
               sx={{
                 p: 2,
-                my: 2,
+
                 bgcolor: theme.palette.gray.secondary,
                 borderRadius: "8px",
                 cursor: "pointer",

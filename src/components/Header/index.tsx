@@ -84,7 +84,7 @@ const Header = () => {
   const buttonSx = {
     all: "unset",
     position: "absolute",
-    top: 0,
+
     color: "black",
     cursor: "pointer",
     width: "48px",
@@ -184,137 +184,143 @@ const Header = () => {
           </Button>
         </Box>
 
-        <Box
-          className="relative flex justify-end"
-          sx={{
-            flex: 1,
-            display: {
-              xs: "flex",
-            },
-            "@media (min-width:767px)": {
-              display: "none",
-            },
-          }}
-        >
+        <Box className="flex justify-end" sx={{ flex: 1, gap: 1 }}>
           <Box
-            className="relative"
+            className={`${openSearchBar ? "absolute" : "relative"} flex justify-end `}
             sx={{
-              flex: openSearchBar ? 1 : "0 0 48px",
-              transition: "flex 0.3s ease",
+              flex: 1,
+              display: {
+                xs: "flex",
+              },
+              top: openSearchBar ? "36px" : "auto",
+              backgroundColor: openSearchBar ? "white" : "transparent",
+              left: 0,
+              width: "100%",
+              padding: openSearchBar ? "0 16px" : "0",
+              zIndex: 1000,
+
+              "@media (min-width:767px)": {
+                display: "none",
+              },
             }}
           >
-            <TextField
-              className="H1"
-              placeholder="검색어를 입력해주세요."
-              value={searchQuery}
-              fullWidth
-              onChange={(e) => setSearchQuery(e.target.value)}
+            <Box
+              className="relative"
               sx={{
-                "& .MuiInputBase-root": {
-                  height: "48px",
-                  transition: "width 0.3s ease, flex 0.3s ease",
-                  width: "100%",
-                  borderRadius: "50px",
-                  padding: "0 12px",
-                  paddingLeft: openSearchBar ? "48px" : "12px",
-                },
-                "& .MuiInputBase-input": {
-                  padding: "12px",
-                },
+                display: "flex",
+                alignItems: "center",
+                flex: openSearchBar ? 1 : "0 0 48px",
+                transition: "flex 0.3s ease",
               }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleSearch();
-              }}
-            />
-
-            <Button
-              disableRipple
-              disableFocusRipple
-              sx={{ ...buttonSx, left: 0 }}
-              onClick={() => searchBarHandler(openSearchBar)}
             >
-              <SearchIcon />
-            </Button>
-            {openSearchBar && (
+              <TextField
+                className="H1"
+                placeholder="검색어를 입력해주세요."
+                value={searchQuery}
+                fullWidth
+                onChange={(e) => setSearchQuery(e.target.value)}
+                sx={{
+                  "& .MuiInputBase-root": {
+                    height: "48px",
+                    transition: "width 0.3s ease, flex 0.3s ease",
+                    width: "100%",
+                    borderRadius: "50px",
+                    padding: "0 12px",
+                    paddingLeft: openSearchBar ? "48px" : "12px",
+                  },
+                  "& .MuiInputBase-input": {
+                    padding: "12px",
+                  },
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSearch();
+                }}
+              />
+
               <Button
                 disableRipple
                 disableFocusRipple
-                sx={{
-                  ...buttonSx,
-                  right: 0,
-                }}
-                onClick={() => setOpenSearchBar(false)}
+                sx={{ ...buttonSx, left: 0 }}
+                onClick={() => searchBarHandler(openSearchBar)}
               >
-                <IoClose />
+                <SearchIcon />
               </Button>
-            )}
+              {openSearchBar && (
+                <Button
+                  disableRipple
+                  disableFocusRipple
+                  sx={{
+                    ...buttonSx,
+                    right: 0,
+                  }}
+                  onClick={() => setOpenSearchBar(false)}
+                >
+                  <IoClose />
+                </Button>
+              )}
+            </Box>
           </Box>
-        </Box>
+          {isLogin ? (
+            <Box className="flex" sx={{ gap: 1 }}>
+              <Link href="/post/create">
+                {isMobile ? (
+                  <Box sx={{}}>
+                    <IoIosAddCircle
+                      size={58}
+                      color={theme.palette.orange.primary}
+                    />
+                  </Box>
+                ) : (
+                  <Button
+                    variant="outlined"
+                    sx={{
+                      width: "160px",
+                      height: "48px",
+                      backgroundColor: theme.palette.orange.primary,
+                      color: theme.palette.common.white,
+                      border: "none",
+                      borderRadius: "50px",
+                      "&:hover": {
+                        backgroundColor: theme.palette.orange.secondary,
+                        color: theme.palette.common.black,
+                      },
+                    }}
+                  >
+                    <Box className="H3">곡 추천하기</Box>
+                  </Button>
+                )}
+              </Link>
 
-        {!openSearchBar && (
-          <Box className="flex justify-end" sx={{ flex: 1 }}>
-            {isLogin ? (
-              <Box className="flex">
-                <Link href="/post/create">
-                  {isMobile ? (
-                    <Box sx={{}}>
-                      <IoIosAddCircle
-                        size={58}
-                        color={theme.palette.orange.primary}
-                      />
-                    </Box>
-                  ) : (
-                    <Button
-                      variant="outlined"
-                      sx={{
-                        width: "160px",
-                        height: "48px",
-                        backgroundColor: theme.palette.orange.primary,
-                        color: theme.palette.common.white,
-                        border: "none",
-                        borderRadius: "50px",
-                        "&:hover": {
-                          backgroundColor: theme.palette.orange.secondary,
-                          color: theme.palette.common.black,
-                        },
-                      }}
-                    >
-                      <Box className="H3">곡 추천하기</Box>
-                    </Button>
-                  )}
-                </Link>
-
-                <Box ml={"50px"} className="flex items-center">
-                  <AvatarComponent
-                    openAccountModalHandler={openAccountModalHandler}
-                    profileImage={data?.data.profileImage}
-                  />
-                </Box>
+              <Box className="flex items-center">
+                <AvatarComponent
+                  openAccountModalHandler={openAccountModalHandler}
+                  profileImage={data?.data.profileImage}
+                />
               </Box>
-            ) : (
-              <Button
-                variant="contained"
-                onClick={handleLogin}
-                sx={{
-                  width: "126px",
-                  height: "48px",
-                  borderRadius: "50px",
-                  backgroundColor: theme.palette.orange.primary,
-                  "&:hover": {
-                    backgroundColor: theme.palette.orange.secondary,
-                    color: theme.palette.common.black,
-                  },
-                }}
-              >
-                <Box className="H3">로그인하기</Box>
-              </Button>
-            )}
+            </Box>
+          ) : (
+            <Button
+              variant="contained"
+              onClick={handleLogin}
+              sx={{
+                width: "126px",
+                height: "48px",
+                borderRadius: "50px",
+                backgroundColor: theme.palette.orange.primary,
+                "&:hover": {
+                  backgroundColor: theme.palette.orange.secondary,
+                  color: theme.palette.common.black,
+                },
+              }}
+            >
+              <Box className="H3">로그인하기</Box>
+            </Button>
+          )}
 
-            {openAccountModal && (
-              <AccountModal openAccountModalHandler={openAccountModalHandler} />
-            )}
-          </Box>
-        )}
+          {openAccountModal && (
+            <AccountModal openAccountModalHandler={openAccountModalHandler} />
+          )}
+        </Box>
       </Box>
     </header>
   );

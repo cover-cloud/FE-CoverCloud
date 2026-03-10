@@ -5,6 +5,7 @@ import {
   alpha,
   TextField,
   CircularProgress,
+  useMediaQuery,
 } from "@mui/material";
 import React, { useRef, useEffect } from "react";
 import { SongData } from "../../../../components/ItemEditor/type";
@@ -14,6 +15,7 @@ import theme from "@/app/lib/theme";
 import PostBasicButton from "@/components/PostBasicButton";
 import { useSearchQuery } from "@/app/api/spotify/search";
 import { useAuthStore } from "@/app/store/useAuthStore";
+import { is } from "zod/v4/locales";
 
 const ArtistListField = ({
   searchsongTitle,
@@ -58,7 +60,7 @@ const ArtistListField = ({
 
   const [songTitle, setsongTitle] = React.useState("");
   const [artist, setArtist] = React.useState("");
-
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   React.useEffect(() => {
     songTitleManualChangeHandler(songTitle, artist);
   }, [songTitle, artist]);
@@ -177,7 +179,7 @@ const ArtistListField = ({
             position: "absolute",
             left: 0,
             right: 0,
-            bottom: "40px",
+            bottom: "50px",
             height: "30px",
             display: "flex",
             background: `linear-gradient(
@@ -192,18 +194,35 @@ const ArtistListField = ({
             pointerEvents: "none",
           }}
         />
-        <Box className="flex justify-between ">
+        <Box className="flex justify-between " sx={{ height: 50 }}>
           <Box className="flex items-center flex-1 justify-center">
-            <Typography
+            <Box
+              className="C2"
               sx={{
                 color: theme.palette.gray.primary,
                 textAlign: "center",
               }}
             >
-              {isManualInput
-                ? "원곡을 검색하고 싶다면 돌아가기를 눌러주세요."
-                : "원곡 정보를 찾지 못했다면 직접 입력해주세요."}
-            </Typography>
+              {isManualInput ? (
+                isMobile ? (
+                  <>
+                    원곡을 검색하고 싶다면
+                    <br />
+                    돌아가기를 눌러주세요.
+                  </>
+                ) : (
+                  "원곡을 검색하고 싶다면 돌아가기를 눌러주세요."
+                )
+              ) : isMobile ? (
+                <>
+                  원곡 정보를 찾지 못했다면
+                  <br />
+                  직접 입력해주세요.
+                </>
+              ) : (
+                "원곡 정보를 찾지 못했다면 직접 입력해주세요."
+              )}
+            </Box>
           </Box>
           <Box sx={{ mb: 1, mr: 1 }}>
             <PostBasicButton

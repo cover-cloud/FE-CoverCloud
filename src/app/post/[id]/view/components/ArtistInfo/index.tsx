@@ -42,10 +42,10 @@ const ArtistInfo = ({
                   ? "max-h-[500px] opacity-100"
                   : "max-h-0 opacity-0"
               }
+
        
             `}
             sx={{
-              padding: "16px",
               backgroundColor: theme.palette.gray.tertiary,
               borderRadius: "20px",
             }}
