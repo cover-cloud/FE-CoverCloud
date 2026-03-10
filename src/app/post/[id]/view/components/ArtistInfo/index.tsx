@@ -62,6 +62,7 @@ const ArtistInfo = ({
           coverArtist={coverArtist}
           songTitle={songTitle}
           coverUrl={coverUrl}
+          isSearch
         />
       )}
     </section>
