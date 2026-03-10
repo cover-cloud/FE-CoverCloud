@@ -29,7 +29,7 @@ const ArtistListField = ({
   searchsongTitle: string;
   selectedSongData: SongData;
   setSelectedSongData: (
-    songData: SongData & { title: string; spotifyTrackId: string },
+    songData: SongData & { title: string; itunesTrackId: string },
   ) => void;
   isSongSearchFocus: boolean;
   isManualInput: boolean;
@@ -101,7 +101,7 @@ const ArtistListField = ({
             return (
               <Box
                 // ref={isLast ? lastSongRef : null}
-                key={`${song.spotifyTrackId}-${index}`}
+                key={`${song.itunesTrackId}-${index}`}
                 onClick={() => setSelectedSongData(song)}
                 className="cursor-pointer"
               >

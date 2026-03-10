@@ -223,10 +223,10 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
   };
 
   const selectSongHandler = (
-    songData: SongData & { title: string; spotifyTrackId: string },
+    songData: SongData & { title: string; itunesTrackId: string },
   ) => {
     setValue("selectedSongData", {
-      key: songData?.spotifyTrackId,
+      key: songData?.itunesTrackId,
       artist: songData?.artist,
       songTitle: songData?.title,
       coverUrl: songData?.coverUrl,
@@ -313,7 +313,7 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
       setValue("selectedSongData", {
         artist: postData.data.data.originalArtist,
         songTitle: postData.data.data.originalTitle,
-        key: postData.data.data.spotifyTrackId ?? "",
+        key: postData.data.data.itunesTrackId ?? "",
         coverUrl: postData.data.data.coverUrl ?? "",
       });
 

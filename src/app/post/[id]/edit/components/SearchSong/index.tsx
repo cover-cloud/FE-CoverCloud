@@ -18,7 +18,7 @@ const SearchSong = ({
 }: {
   selectedSongData: SongData;
   selectSongHandler: (
-    songData: SongData & { title: string; spotifyTrackId: string },
+    songData: SongData & { title: string; itunesTrackId: string },
   ) => void;
   songTitle: string;
   isSongSearchFocus: boolean;
