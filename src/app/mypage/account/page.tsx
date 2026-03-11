@@ -163,6 +163,10 @@ const AccountPage = () => {
   };
   const logoutHandler = async () => {
     // TODO: 로그아웃 API 호출
+    if (!isLogin && !accessToken) {
+      useSnackbarStore.getState().show("이미 로그아웃 되었습니다.", "error");
+      return;
+    }
     const result = await logout(accessToken);
     if (result.success) {
       useAuthStore.setState({ accessToken: "" });
@@ -217,6 +221,7 @@ const AccountPage = () => {
     setPrevAvatar(avatar);
     setOriginalNickName(data.data.nickname);
     setAccessedSNS(data.data.provider);
+    setEmail(data.data.email);
   }, [data]);
   if (isLoading) return <Loading />;
   if (data?.success === false) return <Login />;
@@ -339,7 +344,6 @@ const AccountPage = () => {
           </Typography>
           <TextField
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
             placeholder="이메일"
             fullWidth
             disabled
