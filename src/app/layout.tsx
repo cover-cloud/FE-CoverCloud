@@ -52,7 +52,7 @@ export default function RootLayout({
               </ClientOnlyWrapper>
 
               <Box className="font-sans min-h-screen">
-                <main className="max-w-7xl mx-auto py-8 px-4 sx:px-6 md:px-12">
+                <main className="max-w-7xl mx-auto md:py-8 px-4 sx:px-6 md:px-12">
                   {children}
 
                   <ClientModalRender />

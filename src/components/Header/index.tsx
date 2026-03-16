@@ -97,7 +97,7 @@ const Header = () => {
     <header>
       <Box
         className="flex items-center justify-between gap-4 max-w-7xl mx-auto px-6"
-        sx={{ height: "120px", top: 0, left: 0 }}
+        sx={{ height: isMobile ? "100px" : "120px", top: 0, left: 0 }}
       >
         {!openSearchBar && (
           <Link href="/" style={{ flex: 1 }}>
