@@ -13,14 +13,14 @@ export default function CallbackClient() {
   useEffect(() => {
     const refreshTokenHandler = async () => {
       const accessToken = await refreshToken();
-      useAuthStore.setState({
-        accessToken: accessToken.data.accessToken,
-        isLogin: true,
-      });
       if (!accessToken.data.accessToken) {
         useSnackbarStore.getState().show("로그인에 실패했습니다.", "error");
         return;
       }
+      useAuthStore.setState({
+        accessToken: accessToken.data.accessToken,
+        isLogin: true,
+      });
 
       (async () => {
         try {
