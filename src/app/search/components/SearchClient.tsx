@@ -17,7 +17,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import PostCard from "@/components/PostCard";
 import InfoMessage from "@/components/InfoMessage";
 import { contentData } from "@/app/main/type";
-import { useSearchQuery } from "@/app/api/search/saerch";
+import { useSearchQuery } from "@/app/api/search/search";
 import TuneIcon from "@mui/icons-material/Tune";
 import AccessTimeSharpIcon from "@mui/icons-material/AccessTimeSharp";
 import FavoriteBorderSharpIcon from "@mui/icons-material/FavoriteBorderSharp";
