@@ -72,6 +72,8 @@ const VideoInputField = ({
                 backgroundColor: theme.palette.gray.secondary,
                 borderRadius: "15px",
                 border: "none",
+                fontSize: "20px",
+                fontWeight: 400,
               },
             }}
             {...controllerField}
@@ -148,7 +150,7 @@ const VideoInputField = ({
       )}
       <Box className="flex justify-center mt-4">
         <Box
-          className="S4"
+          className="B1"
           sx={{
             color: theme.palette.gray.primary,
             textAlign: "center",

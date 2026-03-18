@@ -103,33 +103,44 @@ const Header = () => {
           <Link href="/" style={{ flex: 1 }}>
             <Box
               sx={{
-                display: "block",
-                "@media (min-width:627px)": {
-                  display: "none",
+                cursor: "pointer",
+                "& *": {
+                  cursor: "pointer",
                 },
+                WebkitUserSelect: "none",
+                userSelect: "none",
               }}
             >
-              <Image
-                src="/asset/logo/favicon.png"
-                alt="CoverCloud"
-                width={60}
-                height={60}
-              />
-            </Box>
-            <Box
-              sx={{
-                display: "none",
-                "@media (min-width:627px)": {
+              <Box
+                sx={{
                   display: "block",
-                },
-              }}
-            >
-              <Image
-                src="/asset/logo/coverLogo.png"
-                alt="CoverCloud"
-                width={180}
-                height={32}
-              />
+                  "@media (min-width:627px)": {
+                    display: "none",
+                  },
+                }}
+              >
+                <Image
+                  src="/asset/logo/favicon.png"
+                  alt="CoverCloud"
+                  width={60}
+                  height={60}
+                />
+              </Box>
+              <Box
+                sx={{
+                  display: "none",
+                  "@media (min-width:627px)": {
+                    display: "block",
+                  },
+                }}
+              >
+                <Image
+                  src="/asset/logo/coverLogo.png"
+                  alt="CoverCloud"
+                  width={180}
+                  height={32}
+                />
+              </Box>
             </Box>
           </Link>
         )}

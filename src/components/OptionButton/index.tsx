@@ -9,6 +9,7 @@ interface OptionButtonProps {
   openReportModal: () => void;
   navigateToEdit: () => void;
   colIcon?: boolean;
+  isCenter?: boolean;
 }
 
 const OptionButton = ({
@@ -17,6 +18,7 @@ const OptionButton = ({
   openReportModal,
   navigateToEdit,
   colIcon = false,
+  isCenter = false,
 }: OptionButtonProps) => {
   const [isOptionOpen, setIsOptionOpen] = React.useState(false);
 
@@ -43,7 +45,10 @@ const OptionButton = ({
   }, [isOptionOpen]);
 
   return (
-    <Box ref={wrapperRef} className="flex items-start justify-center relative">
+    <Box
+      ref={wrapperRef}
+      className={`flex ${isCenter ? "items-center" : "items-start"} justify-center relative`}
+    >
       {/* 버튼 클릭 */}
       <Box
         onClick={(e) => {

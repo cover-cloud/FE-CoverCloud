@@ -25,6 +25,7 @@ const ArtistListField = ({
   isManualInput,
   toggleInputMode,
   songTitleManualChangeHandler,
+  onComplete,
 }: {
   searchsongTitle: string;
   selectedSongData: SongData;
@@ -35,6 +36,7 @@ const ArtistListField = ({
   isManualInput: boolean;
   toggleInputMode: () => void;
   songTitleManualChangeHandler: (songTitle: string, artist: string) => void;
+  onComplete: () => void;
 }) => {
   // const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
   //   useSpotifySearchQuery(searchsongTitle);
@@ -80,19 +82,21 @@ const ArtistListField = ({
       border: "none",
       "& .MuiInputBase-input": {
         padding: "10px",
+        fontSize: "20px",
+        fontWeight: 400,
       },
     },
   };
 
   return (
-    <Box>
+    <Box sx={{ backgroundColor: "#F2F2F2", borderRadius: "15px" }}>
       <Box
         sx={{
           position: "relative",
-          maxHeight: "210px",
+          maxHeight: "320px",
           overflowY: "auto",
         }}
-        className="flex flex-col gap-2 rounded p-2"
+        className="flex flex-col gap-2  p-2"
       >
         {!isManualInput || data?.length > 0 ? (
           data?.map((song: any, index: any) => {
@@ -115,22 +119,28 @@ const ArtistListField = ({
             );
           })
         ) : (
-          <Box className="flex flex-col justify-center w-[80%] m-auto h-[210px]">
+          <Box className="flex flex-col justify-center w-[95%] m-auto h-[230px] gap-5">
             <Box className="w-full mb-2">
-              <Typography fontWeight={"bold"}>원곡 제목</Typography>
+              <Typography fontSize={16} fontWeight={"bold"}>
+                원곡 제목
+              </Typography>
               <TextField
                 placeholder="원곡 제목"
                 variant="outlined"
+                slotProps={{ htmlInput: { className: "B1" } }}
                 sx={manualStyle}
                 value={songTitle}
                 onChange={(e) => setsongTitle(e.target.value)}
               />
             </Box>
             <Box className="w-full mb-2">
-              <Typography fontWeight={"bold"}>원곡 가수</Typography>
+              <Typography fontSize={16} fontWeight={"bold"}>
+                원곡 가수
+              </Typography>
               <TextField
                 placeholder="원곡 가수"
                 variant="outlined"
+                slotProps={{ htmlInput: { className: "B1" } }}
                 sx={manualStyle}
                 value={artist}
                 onChange={(e) => setArtist(e.target.value)}
@@ -141,9 +151,9 @@ const ArtistListField = ({
 
         {!isManualInput && (
           <Box
-            className="flex items-center justify-center"
+            className="flex items-center justify-center B1"
             sx={{
-              height: "210px",
+              height: "310px",
               borderRadius: "15px",
               border: "none",
             }}
@@ -180,7 +190,7 @@ const ArtistListField = ({
             position: "absolute",
             left: 0,
             right: 0,
-            bottom: "50px",
+            bottom: "-70px",
             height: "30px",
             display: "flex",
             background: `linear-gradient(
@@ -195,10 +205,33 @@ const ArtistListField = ({
             pointerEvents: "none",
           }}
         />
-        <Box className="flex justify-between " sx={{ height: 50 }}>
+        {isManualInput && (
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              paddingRight: 1,
+              marginBottom: "26px",
+            }}
+          >
+            <PostBasicButton
+              backgroundColor={theme.palette.gray.primary}
+              color={theme.palette.common.white}
+              hoverBGColor={theme.palette.gray.fourth}
+              hoverColor={theme.palette.common.white}
+              onClick={onComplete}
+              postClass="H3"
+              postRadius="40px"
+            >
+              원곡정보 입력완료
+            </PostBasicButton>
+          </Box>
+        )}
+        <Box className="flex justify-between " sx={{ height: 70 }}>
           <Box className="flex items-center flex-1 justify-center">
             <Box
-              className="C2"
+              className="B1"
               sx={{
                 color: theme.palette.gray.primary,
                 textAlign: "center",
@@ -225,13 +258,17 @@ const ArtistListField = ({
               )}
             </Box>
           </Box>
-          <Box sx={{ mb: 1, mr: 1 }}>
+
+          <Box
+            sx={{ mb: 1, mr: 1, display: "flex", alignItems: "center", gap: 1 }}
+          >
             <PostBasicButton
               backgroundColor={theme.palette.common.black}
               color={theme.palette.common.white}
               hoverBGColor={theme.palette.gray.secondary}
               hoverColor={theme.palette.common.black}
               onClick={toggleInputHandler}
+              postClass="B1"
             >
               {isManualInput ? "돌아가기" : "직접입력"}
             </PostBasicButton>

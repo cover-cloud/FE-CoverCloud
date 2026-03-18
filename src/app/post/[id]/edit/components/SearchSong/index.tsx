@@ -76,6 +76,7 @@ const SearchSong = ({
           toggleInputMode={toggleInputMode}
           isManualInput={isManualInput}
           songTitleManualChangeHandler={songTitleManualChangeHandler}
+          onComplete={onClickOutside}
         />
       </Box>
     </Box>

@@ -14,7 +14,12 @@ import { useTheme } from "@mui/material/styles";
 import { detectAndValidateMediaUrl } from "../../app/utils/youtube";
 
 const DEFAULT_IMAGE = "/asset/image/default-image.png";
-
+const genres = [
+  { title: "K-POP", value: "K_POP" },
+  { title: "J-POP", value: "J_POP" },
+  { title: "POP", value: "POP" },
+  { title: "기타", value: "OTHER" },
+];
 const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
   coverArtist,
   coverGenre,
@@ -126,7 +131,7 @@ const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
 
           <Box className="flex gap-2 items-center overflow-hidden min-w-0">
             <Box className="flex-shrink-0 S4">
-              {coverGenre === "OTHER" ? "기타" : coverGenre}
+              {genres.find((g) => g.value === coverGenre)?.title || "기타"}
             </Box>
 
             <Box className="w-[1px] h-4 bg-black flex-shrink-0" />

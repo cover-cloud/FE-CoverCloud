@@ -357,20 +357,27 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
               render={({ field: controllerField, fieldState }) => (
                 <Box className="mb-4 relative">
                   {/* 레이블과 에러 */}
-                  <Box className="flex items-center justify-between mb-1">
-                    {fieldState.error && (
-                      <ErrorMessageComponent>입력필수</ErrorMessageComponent>
-                    )}
-
-                    {/* 노래 검색 전용 에러 */}
-                    {field.key === "songTitle" &&
-                      formState.isSubmitted &&
-                      (!selectedSongData.artist ||
-                        !selectedSongData.songTitle) && (
+                  {field.key !== "tag" && (
+                    <Box className="flex items-center justify-between mb-1">
+                      <Typography fontWeight="bold">{field.label}</Typography>
+                      {fieldState.error && (
                         <ErrorMessageComponent>입력필수</ErrorMessageComponent>
                       )}
 
-                    {field.key === "tag" && (
+                      {/* 노래 검색 전용 에러 */}
+                      {field.key === "songTitle" &&
+                        formState.isSubmitted &&
+                        (!selectedSongData.artist ||
+                          !selectedSongData.songTitle) && (
+                          <ErrorMessageComponent>
+                            입력필수
+                          </ErrorMessageComponent>
+                        )}
+                    </Box>
+                  )}
+                  {field.key === "tag" && (
+                    <Box className="flex items-center justify-between mb-1">
+                      <Typography fontWeight="bold">태그</Typography>
                       <Button
                         type="button"
                         onClick={handleAddTag}
@@ -378,8 +385,8 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
                       >
                         추가
                       </Button>
-                    )}
-                  </Box>
+                    </Box>
+                  )}
                   {field.key === "songTitle" ? (
                     <Box
                       ref={songSearchWrapperRef}
@@ -412,6 +419,8 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
                             backgroundColor: theme.palette.gray.secondary,
                             borderRadius: "15px",
                             border: "none",
+                            fontSize: "20px",
+                            fontWeight: 400,
                           },
                         }}
                       />
@@ -440,6 +449,8 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
                           backgroundColor: theme.palette.gray.secondary,
                           borderRadius: "15px",
                           border: "none",
+                          fontSize: "20px",
+                          fontWeight: 400,
                         },
                       }}
                       {...controllerField}
@@ -487,6 +498,8 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
                           backgroundColor: theme.palette.gray.secondary,
                           borderRadius: "15px",
                           border: "none",
+                          fontSize: "20px",
+                          fontWeight: 400,
                         },
                       }}
                       {...controllerField}
@@ -517,7 +530,11 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
                       {tags.map((tag) => (
                         <Chip
                           key={tag}
-                          label={tag}
+                          label={`#${tag}`}
+                          sx={{
+                            color: "#8385EF",
+                            fontWeight: "bold",
+                          }}
                           onDelete={() => handleDeleteTag(tag)}
                         />
                       ))}
@@ -533,6 +550,7 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
             <Button
               type="submit"
               sx={{
+                marginTop: "30px",
                 width: "196px",
                 fontSize: "20px",
                 backgroundColor: theme.palette.orange.primary,

@@ -51,6 +51,12 @@ import { formatViewCount } from "@/app/utils/viewCount";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
 import { requireAuth } from "@/app/utils/requireAuth";
 import { reportPost } from "@/app/api/cover/reportPost";
+const genres = [
+  { title: "K-POP", value: "K_POP" },
+  { title: "J-POP", value: "J_POP" },
+  { title: "POP", value: "POP" },
+  { title: "기타", value: "OTHER" },
+];
 const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
   const router = useRouter();
 
@@ -407,6 +413,7 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
                   openDeleteModal={() => setIsDeleteModalOpen(true)}
                   navigateToEdit={navigateToEdit}
                   openReportModal={() => setIsReportModalOpen(true)}
+                  isCenter
                 />
               )}
             </Box>
@@ -423,8 +430,8 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
             className="flex gap-2 items-center min-w-0"
             sx={{ marginBottom: "20px", flexWrap: "wrap" }}
           >
-            <Box className="flex-shrink-0">
-              {coverGenre === "OTHER" ? "기타" : coverGenre}
+            <Box className="flex-shrink-0 S3">
+              {genres.find((g) => g.value === coverGenre)?.title || "기타"}
             </Box>
 
             <Box className="w-[1px] h-4 bg-black flex-shrink-0" />
