@@ -31,12 +31,10 @@ import {
 } from "@/app/api/cover/like";
 import { useMyCommentList } from "@/app/api/cover/comment";
 
-import { FaPlay } from "react-icons/fa";
-import { FaHeart } from "react-icons/fa";
-import { FaRegHeart } from "react-icons/fa";
 import { IoIosArrowBack } from "react-icons/io";
 import { IoCloseSharp } from "react-icons/io5";
 
+import PlayLikeCount from "../PlayLikeCount";
 import ArtistInfo from "../ArtistInfo";
 import CommentSection from "../CommentSection";
 import PopularVideos from "../PopularVideos";
@@ -47,7 +45,6 @@ import { useFormatCreatedAt } from "@/app/utils/formetCreatedAt";
 import OptionButton from "@/components/OptionButton";
 import { fetchAuthMeWithCookie, useAuthMeQuery } from "@/app/api/auth/authMe";
 import { useModalStore } from "@/app/store/useModalStore";
-import { formatViewCount } from "@/app/utils/viewCount";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
 import { requireAuth } from "@/app/utils/requireAuth";
 import { reportPost } from "@/app/api/cover/reportPost";
@@ -363,60 +360,27 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
         <Box>
           <Box className="flex justify-between items-center">
             <h1 className="H1 mb-1">{coverTitle}</h1>
-            <Box className="flex gap-4">
-              <Box className="flex gap-2 items-center">
-                <FaPlay />
-                <Box sx={{ fontSize: "20px" }}>
-                  {formatViewCount(postData?.data.data.viewCount)}
-                </Box>
-              </Box>
-              <Button
-                className="flex gap-2 items-center"
-                onClick={likeToggleHandler}
-                disabled={isLoading}
-                disableRipple
-                sx={{
-                  minWidth: "auto",
-                  padding: 0,
-                  marginRight: "15px",
-                  backgroundColor: "transparent",
-                  color: "#000",
-                  "&:hover": {
-                    backgroundColor: "transparent",
-                  },
-                  "&:active": {
-                    backgroundColor: "transparent",
-                  },
-                  "&.Mui-disabled": {
-                    color: "#000",
-                    opacity: 0.5,
-                  },
-                }}
-              >
-                {!toggleLikeButton ? (
-                  <FaRegHeart size={20} />
-                ) : (
-                  <FaHeart size={20} />
-                )}
-                <Box
-                  sx={{
-                    fontSize: "20px",
-                  }}
-                >
-                  {likeCount}
-                </Box>
-              </Button>
-
-              {!isMobile && (
-                <OptionButton
-                  isLogin={userInfo.data?.data?.userId === videoOwner}
-                  openDeleteModal={() => setIsDeleteModalOpen(true)}
-                  navigateToEdit={navigateToEdit}
-                  openReportModal={() => setIsReportModalOpen(true)}
-                  isCenter
+            {!isMobile && (
+              <Box className="flex gap-4">
+                <PlayLikeCount
+                  viewCount={postData?.data.data.viewCount}
+                  likeCount={likeCount}
+                  isLiked={toggleLikeButton}
+                  isLoading={isLoading}
+                  onLikeToggle={likeToggleHandler}
                 />
-              )}
-            </Box>
+
+                {!isMobile && (
+                  <OptionButton
+                    isLogin={userInfo.data?.data?.userId === videoOwner}
+                    openDeleteModal={() => setIsDeleteModalOpen(true)}
+                    navigateToEdit={navigateToEdit}
+                    openReportModal={() => setIsReportModalOpen(true)}
+                    isCenter
+                  />
+                )}
+              </Box>
+            )}
           </Box>
 
           <Box className="flex B1 mb-2 ">
@@ -462,6 +426,17 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
               ))}
             </Box>
           </Box>
+          {isMobile && (
+            <Box className="mb-5">
+              <PlayLikeCount
+                viewCount={postData?.data.data.viewCount}
+                likeCount={likeCount}
+                isLiked={toggleLikeButton}
+                isLoading={isLoading}
+                onLikeToggle={likeToggleHandler}
+              />
+            </Box>
+          )}
           <ArtistInfo
             coverArtist={originalArtist || "정보없음"}
             songTitle={originalTitle || "정보없음"}
