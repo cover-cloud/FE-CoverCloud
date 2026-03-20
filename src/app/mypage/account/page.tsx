@@ -679,8 +679,9 @@ const AccountPage = () => {
       <Modal
         isOpen={openImageConfirmModal}
         onClose={() => {
-          setOpenImageConfirmModal(false);
+          setAvatar(prevAvatar);
           setTempAvatar(null);
+          setOpenImageConfirmModal(false);
           if (fileInputRef.current) {
             fileInputRef.current.value = "";
           }
