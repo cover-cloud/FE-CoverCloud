@@ -394,7 +394,14 @@ const AccountPage = () => {
           </PostBasicButton>
           <Box className="flex items-center gap-2 B1">
             <Box className="B1">
-              회원 탈퇴가 필요하다면 ‘계정 삭제’를 눌러주세요.
+              {isMobile ? (
+                <>
+                  회원 탈퇴가 필요하다면 <br />
+                  ‘계정 삭제’를 눌러주세요.
+                </>
+              ) : (
+                <>회원 탈퇴가 필요하다면 ‘계정 삭제’를 눌러주세요.</>
+              )}
             </Box>
             <Button
               onClick={openDeleteAccountModalHandler}
