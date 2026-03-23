@@ -10,6 +10,7 @@ import {
   Pagination,
   Select,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -25,6 +26,7 @@ import { fetchAuthMeWithCookie } from "@/app/api/auth/authMe";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
 import { useModalStore } from "@/app/store/useModalStore";
 import { useAuthStore } from "@/app/store/useAuthStore";
+
 type SearchType = "title" | "tags";
 
 interface SearchTab {
@@ -47,6 +49,7 @@ export default function SearchClient() {
   const theme = useTheme();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { openLoginModal } = useModalStore();
   /* =========================
      URL → 상태 파싱
@@ -170,14 +173,14 @@ export default function SearchClient() {
         ))}
       </Box>
       <Box
-        className="flex items-center justify-between"
+        className={`flex items-center justify-between ${isMobile ? "flex-col gap-2" : ""}`}
         sx={{ mb: "44px", pl: "8px" }}
       >
         <Typography variant="h5">
           <strong style={{ marginRight: "8px" }}>{`“${query}”`}</strong>
           {searchType === "title" ? "제목" : "태그"} 검색 결과.
         </Typography>
-        <Box sx={{ minWidth: 120 }}>
+        <Box className="flex justify-end w-full" sx={{ minWidth: 120 }}>
           <Select
             size="small"
             renderValue={(value) => (

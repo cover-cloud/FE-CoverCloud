@@ -421,6 +421,10 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
                             border: "none",
                             fontSize: "20px",
                             fontWeight: 400,
+                            height: isMobile ? "40px" : "48px",
+                            "& input::placeholder": {
+                              fontSize: "16px",
+                            },
                           },
                         }}
                       />
@@ -449,8 +453,12 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
                           backgroundColor: theme.palette.gray.secondary,
                           borderRadius: "15px",
                           border: "none",
-                          fontSize: "20px",
+                          fontSize: isMobile ? "16px" : "20px",
                           fontWeight: 400,
+                          height: isMobile ? "40px" : "48px",
+                          "& input::placeholder": {
+                            fontSize: "16px",
+                          },
                         },
                       }}
                       {...controllerField}
@@ -500,6 +508,10 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
                           border: "none",
                           fontSize: "20px",
                           fontWeight: 400,
+                          height: isMobile ? "40px" : "48px",
+                          "& input::placeholder": {
+                            fontSize: "16px",
+                          },
                         },
                       }}
                       {...controllerField}

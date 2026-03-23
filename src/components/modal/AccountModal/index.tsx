@@ -66,7 +66,13 @@ const AccountModal = ({
               }}
             >
               <FiSettings size={24} strokeWidth={isAccount ? 2.5 : 1} />
-              <Box className={isAccount ? "S1" : "B1"}>내 계정 설정</Box>
+              <Box
+                sx={{
+                  fontWeight: isAccount ? 700 : 400,
+                }}
+              >
+                내 계정 설정
+              </Box>
             </Box>
           </Link>
 
@@ -84,7 +90,13 @@ const AccountModal = ({
               }}
             >
               <CiFolderOn size={24} strokeWidth={isActivity ? 1.5 : 1} />
-              <Box className={isActivity ? "S1" : "B1"}>내 활동 내역</Box>
+              <Box
+                sx={{
+                  fontWeight: isActivity ? 700 : 400,
+                }}
+              >
+                내 활동 내역
+              </Box>
             </Box>
           </Link>
         </Box>

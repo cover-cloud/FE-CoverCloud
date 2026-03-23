@@ -230,7 +230,11 @@ const AccountPage = () => {
       className="flex flex-col gap-4"
       sx={{ width: isMobile ? "100%" : "70%", mx: "auto" }}
     >
-      <Box sx={{ fontSize: 24, fontWeight: "bold", mb: 4 }}>내 계정 설정</Box>
+      <Box
+        sx={{ fontSize: 24, fontWeight: "bold", mb: 4, textAlign: "center" }}
+      >
+        내 계정 설정
+      </Box>
 
       <Box className="flex flex-col gap-1 items-center justify-center">
         {/* Avatar 영역 */}
@@ -383,13 +387,15 @@ const AccountPage = () => {
             onClick={logoutHandler}
             sxStyle={{
               marginBottom: "24px",
+              fontSize: 20,
             }}
-            postClass="B1"
           >
             계정 로그아웃
           </PostBasicButton>
           <Box className="flex items-center gap-2 B1">
-            <Box>회원 탈퇴가 필요하다면 ‘계정 삭제’를 눌러주세요.</Box>
+            <Box className="B1">
+              회원 탈퇴가 필요하다면 ‘계정 삭제’를 눌러주세요.
+            </Box>
             <Button
               onClick={openDeleteAccountModalHandler}
               sx={{
@@ -401,9 +407,7 @@ const AccountPage = () => {
                 },
               }}
             >
-              <Box className="B1" sx={{ flex: "1 0 auto" }}>
-                계정삭제
-              </Box>
+              <Box sx={{ flex: "1 0 auto", fontSize: 20 }}>계정삭제</Box>
             </Button>
           </Box>
         </Box>

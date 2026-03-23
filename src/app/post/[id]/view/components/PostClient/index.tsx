@@ -367,6 +367,7 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
                   likeCount={likeCount}
                   isLiked={toggleLikeButton}
                   isLoading={isLoading}
+                  isMobile={isMobile}
                   onLikeToggle={likeToggleHandler}
                 />
 
@@ -433,6 +434,7 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
                 likeCount={likeCount}
                 isLiked={toggleLikeButton}
                 isLoading={isLoading}
+                isMobile={isMobile}
                 onLikeToggle={likeToggleHandler}
               />
             </Box>
@@ -456,7 +458,7 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
                 justifyContent: "space-between",
               }}
             >
-              <Typography className="B1">댓글 보기</Typography>
+              <Box className="B1">댓글 보기</Box>
               <Typography
                 sx={{ color: theme.palette.gray.primary }}
               ></Typography>

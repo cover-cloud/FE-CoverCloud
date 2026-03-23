@@ -74,6 +74,10 @@ const VideoInputField = ({
                 border: "none",
                 fontSize: "20px",
                 fontWeight: 400,
+                height: isMobile ? "40px" : "48px",
+              },
+              "& input::placeholder": {
+                fontSize: "16px",
               },
             }}
             {...controllerField}

@@ -84,6 +84,17 @@ body {
   font-size: 20px;
   font-weight: 400;
 }
+@media (max-width: 767px) {
+  .B1 {
+    font-size: 14px;
+  }
+  .H2 {
+    font-size: 16px;
+  }
+  /* .S1 {
+    font-size: 14px;
+  } */
+}
 .B2 {
   font-size: 16px;
   font-weight: 500;

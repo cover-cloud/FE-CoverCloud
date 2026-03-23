@@ -203,7 +203,7 @@ const Header = () => {
               display: {
                 xs: "flex",
               },
-              top: openSearchBar ? "36px" : "auto",
+              top: openSearchBar ? "26px" : "auto",
               backgroundColor: openSearchBar ? "white" : "transparent",
               left: 0,
               width: "100%",

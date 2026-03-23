@@ -12,6 +12,7 @@ interface PlayLikeCountProps {
   isLiked: boolean;
   isLoading: boolean;
   onLikeToggle: () => void;
+  isMobile: boolean;
 }
 
 const PlayLikeCount = ({
@@ -20,12 +21,15 @@ const PlayLikeCount = ({
   isLiked,
   isLoading,
   onLikeToggle,
+  isMobile,
 }: PlayLikeCountProps) => {
   return (
     <Box className="flex gap-4">
       <Box className="flex gap-2 items-center">
         <FaPlay />
-        <Box sx={{ fontSize: "20px" }}>{formatViewCount(viewCount)}</Box>
+        <Box sx={{ fontSize: isMobile ? "16px" : "20px" }}>
+          {formatViewCount(viewCount)}
+        </Box>
       </Box>
       <Button
         className="flex gap-2 items-center"

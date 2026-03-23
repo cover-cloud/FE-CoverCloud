@@ -23,7 +23,14 @@ const Footer = () => {
       <Box>
         <Box
           className="flex"
-          sx={{ gap: "30px", mb: "16px", fontSize: "15px", fontWeight: "bold" }}
+          sx={{
+            columnGap: "30px",
+            rowGap: "10px",
+            mb: "16px",
+            fontSize: "15px",
+            fontWeight: "bold",
+            flexWrap: "wrap",
+          }}
         >
           {footerLink.map((link) => (
             <Link key={link.label} href={link.href} target="_blank">
