@@ -83,6 +83,13 @@ export default function ActivityClient() {
       page: String(value),
     });
   };
+  const linkHandler = (type: string) => {
+    if (type === "recommend") {
+      handleRecommendClick();
+    } else {
+      router.push("/main");
+    }
+  };
 
   const handleRecommendClick = async () => {
     const isAuthenticated = await fetchAuthMeWithCookie(accessToken);
@@ -175,9 +182,19 @@ export default function ActivityClient() {
         </>
       ) : (
         <InfoMessage
-          message={`아직 ${activityTabs[selectedTabIndex].name}한 곡이 없습니다.\n새로운 곡을 추천하시겠어요?`}
-          buttonText="곡 추천하기"
-          onClick={handleRecommendClick}
+          message={
+            activityTabs[selectedTabIndex].type === "comment"
+              ? `아직 ${activityTabs[selectedTabIndex].name}을 단 곡이 없습니다.\n새로운 곡을 찾아볼까요?`
+              : activityTabs[selectedTabIndex].type === "like"
+                ? `아직 ${activityTabs[selectedTabIndex].name}를 누른 곡이 없습니다.\n새로운 곡을 찾아볼까요?`
+                : `아직 ${activityTabs[selectedTabIndex].name}한 곡이 없습니다.\n새로운 곡을 추천하시겠어요?`
+          }
+          buttonText={
+            activityTabs[selectedTabIndex].type === "recommend"
+              ? "곡 추천하기"
+              : "최신글 보러가기"
+          }
+          onClick={() => linkHandler(activityTabs[selectedTabIndex].type)}
         />
       )}
     </Box>
