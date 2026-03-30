@@ -512,6 +512,11 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
                           "& input::placeholder": {
                             fontSize: "16px",
                           },
+                          "& input:-webkit-autofill": {
+                            WebkitBackgroundClip: "text !important",
+                            WebkitTextFillColor: "inherit !important",
+                            transition: "background-color 9999s ease-in-out 0s",
+                          },
                         },
                       }}
                       {...controllerField}
