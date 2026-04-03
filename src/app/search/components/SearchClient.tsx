@@ -173,12 +173,29 @@ export default function SearchClient() {
         ))}
       </Box>
       <Box
-        className={`flex items-center justify-between ${isMobile ? "flex-col gap-2" : ""}`}
+        className={`flex justify-between ${isMobile ? "flex-col gap-2" : ""}`}
         sx={{ mb: "44px", pl: "8px" }}
       >
-        <Typography variant="h5">
-          <strong style={{ marginRight: "8px" }}>{`“${query}”`}</strong>
-          {searchType === "title" ? "제목" : "태그"} 검색 결과
+        <Typography
+          variant="h5"
+          sx={{ display: "flex", flexWrap: "wrap", alignItems: "baseline" }}
+        >
+          <span
+            style={{ display: "flex", maxWidth: "100%", marginRight: "8px" }}
+          >
+            <span>{'"'}</span>
+            <strong
+              style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {query}
+            </strong>
+            <span>{'"'}</span>
+          </span>
+          <span>{searchType === "title" ? "제목" : "태그"} 검색 결과</span>
         </Typography>
         <Box className="flex justify-end xs:w-full" sx={{ minWidth: 120 }}>
           <Select
@@ -256,7 +273,7 @@ export default function SearchClient() {
       </Box>
       {!data?.data.content.length ? (
         <InfoMessage
-          subMessage={query ? `“${query}”` : ""}
+          subMessage={query ? `"${query}"` : ""}
           message="검색 결과가 없습니다.\n새로운 곡을 추천하시겠어요?"
           buttonText="곡 추천하기"
           onClick={handleRecommendClick}
