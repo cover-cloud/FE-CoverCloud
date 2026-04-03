@@ -178,9 +178,9 @@ export default function SearchClient() {
       >
         <Typography variant="h5">
           <strong style={{ marginRight: "8px" }}>{`“${query}”`}</strong>
-          {searchType === "title" ? "제목" : "태그"} 검색 결과.
+          {searchType === "title" ? "제목" : "태그"} 검색 결과
         </Typography>
-        <Box className="flex justify-end w-full" sx={{ minWidth: 120 }}>
+        <Box className="flex justify-end xs:w-full" sx={{ minWidth: 120 }}>
           <Select
             size="small"
             renderValue={(value) => (
