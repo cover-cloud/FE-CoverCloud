@@ -12,6 +12,7 @@ import GlobalSnackbar from "@/components/GlobalSnackbar";
 import ClientOnlyWrapper from "@/components/ClientOnlyWrapper";
 import ScrollToTop from "@/app/utils/scrollToTop";
 import Script from "next/script";
+import MaintenanceModal from "@/components/modal/MaintenanceModal";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -54,7 +55,7 @@ export default function RootLayout({
               <Box className="font-sans min-h-screen">
                 <main className="max-w-7xl mx-auto md:py-8 px-4 sx:px-6 md:px-12">
                   {children}
-
+                  <MaintenanceModal />
                   <ClientModalRender />
                 </main>
                 <Footer />
