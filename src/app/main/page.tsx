@@ -13,17 +13,12 @@ export default async function MainPage({
   const period = (params.period as Period) ?? "ALL";
   const genres = params.genres ? params.genres.split(",") : [];
 
-  let initialData = null;
-  try {
-    initialData = await fetchPopularCoverListServer({
-      page: page - 1,
-      size: 18,
-      period,
-      genres,
-    });
-  } catch (e) {
-    console.error("SSR fetch error:", e);
-  }
+  const initialData = await fetchPopularCoverListServer({
+    page: page - 1,
+    size: 18,
+    period,
+    genres,
+  });
 
   return <MainComponent initialData={initialData} />;
 }
