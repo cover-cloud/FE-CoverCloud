@@ -55,7 +55,7 @@ export default function RootLayout({
               <Box className="font-sans min-h-screen">
                 <main className="max-w-7xl mx-auto md:py-8 px-4 sx:px-6 md:px-12">
                   {children}
-                  <MaintenanceModal />
+                  {/* <MaintenanceModal /> */}
                   <ClientModalRender />
                 </main>
                 <Footer />
