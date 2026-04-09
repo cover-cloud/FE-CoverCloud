@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "../components/Header";
@@ -13,6 +13,7 @@ import ClientOnlyWrapper from "@/components/ClientOnlyWrapper";
 import ScrollToTop from "@/app/utils/scrollToTop";
 import Script from "next/script";
 import MaintenanceModal from "@/components/modal/MaintenanceModal";
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,6 +31,22 @@ export const metadata: Metadata = {
     template: "%s | covercloud",
   },
   description: "노래 커버를 공유하고 감상하는 플랫폼입니다.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "covercloud",
+  },
+  icons: {
+    apple: "/icons/icon-192x192.png",
+  },
+};
+export const viewport: Viewport = {
+  themeColor: "#000000",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 export default function RootLayout({
   children,
@@ -41,6 +58,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <ServiceWorkerRegister />
         <Script
           src="https://developers.kakao.com/sdk/js/kakao.js"
           strategy="beforeInteractive"
