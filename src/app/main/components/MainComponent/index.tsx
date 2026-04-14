@@ -184,6 +184,7 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
               onChange={handlePageChange}
               hidePrevButton={page === 1}
               hideNextButton={page === data.totalPages}
+              sx={{ "& .MuiPagination-ul": { flexWrap: "nowrap" } }}
             />
           </Box>
         </>

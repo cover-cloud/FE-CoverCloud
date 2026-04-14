@@ -298,6 +298,7 @@ export default function SearchClient() {
               onChange={handlePageChange}
               hidePrevButton={page === 1}
               hideNextButton={page === data.data.totalPages}
+              sx={{ "& .MuiPagination-ul": { flexWrap: "nowrap" } }}
             />
           </Box>
         </React.Fragment>

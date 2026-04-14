@@ -178,6 +178,7 @@ export default function ActivityClient() {
               count={data.data.totalPages || 1}
               page={page}
               onChange={pageChangeHandler}
+              sx={{ "& .MuiPagination-ul": { flexWrap: "nowrap" } }}
             />
           </Box>
         </>
