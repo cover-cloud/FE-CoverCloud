@@ -27,10 +27,26 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "covercloud | 커버 공유 플랫폼",
+    default: "커버클라우드 | covercloud - 노래 커버 공유 플랫폼",
     template: "%s | covercloud",
   },
-  description: "노래 커버를 공유하고 감상하는 플랫폼입니다.",
+  description:
+    "커버클라우드 - 노래 커버를 공유하고 감상하는 플랫폼입니다. 나만의 커버를 올리고 다른 사람들의 커버를 감상해보세요.",
+  keywords: [
+    "커버클라우드",
+    "covercloud",
+    "노래 커버",
+    "커버 공유",
+    "음악 커버",
+  ],
+  openGraph: {
+    title: "커버클라우드 | covercloud",
+    description: "노래 커버를 공유하고 감상하는 플랫폼",
+    url: "https://covercloud.kr",
+    siteName: "커버클라우드",
+    locale: "ko_KR",
+    type: "website",
+  },
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
