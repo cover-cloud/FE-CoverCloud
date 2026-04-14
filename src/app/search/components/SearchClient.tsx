@@ -102,6 +102,7 @@ export default function SearchClient() {
     updateParams({
       page: String(value),
     });
+    window.scrollTo({ top: 0, behavior: "instant" });
   };
   const handleSortChange = (value: SortType) => {
     updateParams({

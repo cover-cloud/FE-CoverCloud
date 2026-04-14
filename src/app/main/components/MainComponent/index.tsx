@@ -82,6 +82,7 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
     ========================= */
   const handlePageChange = (_: any, value: number) => {
     updateParams({ page: String(value) });
+    window.scrollTo({ top: 0, behavior: "instant" });
   };
 
   const popularTabChangeHandler = (tab: PopularTab) => {
