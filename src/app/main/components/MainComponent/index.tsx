@@ -165,6 +165,7 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
           width: "100%",
           marginBottom: "32px",
           padding: "0 10px",
+          cursor: isMobile ? "initial" : "pointer",
         }}
         onClick={() => bannerClickHandler("desktop")}
       >
