@@ -132,6 +132,7 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
     minHeight: "32px",
     padding: "0 12px",
     fontSize: "14px",
+
     "@media (hover: hover)": {
       "&:hover": {
         backgroundColor: theme.palette.genre.secondary,
@@ -215,6 +216,11 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
             key={tab.period}
             onClick={() => popularTabChangeHandler(tab)}
             sx={popularTabSx(tab.period === period)}
+            disableRipple
+            disableTouchRipple
+            onTouchEnd={(e) => {
+              (e.currentTarget as HTMLElement).blur();
+            }}
           >
             <Box className="S1">{tab.title}</Box>
           </Button>
@@ -228,6 +234,11 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
             key={tab.value}
             onClick={() => genreTabChangeHandler(tab)}
             sx={genreTabSx(genreValues.includes(tab.value))}
+            disableRipple
+            disableTouchRipple
+            onTouchEnd={(e) => {
+              (e.currentTarget as HTMLElement).blur();
+            }}
           >
             <Box className="S3">{tab.title}</Box>
           </Button>
