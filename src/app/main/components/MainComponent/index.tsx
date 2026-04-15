@@ -146,7 +146,8 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
     },
     "@media (hover: hover)": {
       "&:hover": {
-        backgroundColor: theme.palette.gray.secondary,
+        backgroundColor: theme.palette.genre.secondary,
+        color: theme.palette.common.black,
       },
     },
   });
