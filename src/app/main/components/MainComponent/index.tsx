@@ -192,7 +192,15 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
               </PostBasicButton>
             </Box>
           </Box>
-          <Box className="absolute" sx={{ bottom: 25, right: 0, zIndex: 0 }}>
+          <Box
+            className="absolute"
+            sx={{
+              bottom: 25,
+              right: 0,
+              zIndex: 0,
+              scale: isMobile ? 0.8 : 1,
+            }}
+          >
             <img src={"/asset/image/banner.png"} alt="banner" />
           </Box>
         </Box>
