@@ -115,10 +115,11 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
     minWidth: "60px",
     minHeight: "32px",
     fontSize: "20px",
-    "@media (hover: none)": {
-      "&:hover": {
-        backgroundColor: "transparent",
-      },
+    "&:focus": {
+      backgroundColor: "transparent",
+    },
+    "&:focus-visible": {
+      backgroundColor: "transparent",
     },
     "@media (hover: hover)": {
       "&:hover": {
@@ -137,10 +138,11 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
     minHeight: "32px",
     padding: "0 12px",
     fontSize: "14px",
-    "@media (hover: none)": {
-      "&:hover": {
-        backgroundColor: "transparent",
-      },
+    "&:focus": {
+      backgroundColor: "transparent",
+    },
+    "&:focus-visible": {
+      backgroundColor: "transparent",
     },
     "@media (hover: hover)": {
       "&:hover": {
