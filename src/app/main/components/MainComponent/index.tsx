@@ -228,8 +228,10 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
           <Button
             key={tab.period}
             onClick={() => popularTabChangeHandler(tab)}
-            sx={popularTabSx(tab.period === period)}
-            disabled={isDisabled}
+            sx={{
+              ...popularTabSx(tab.period === period),
+              ...(isDisabled && { pointerEvents: "none" }),
+            }}
           >
             <Box className="S1">{tab.title}</Box>
           </Button>
@@ -242,8 +244,10 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
           <Button
             key={tab.value}
             onClick={() => genreTabChangeHandler(tab)}
-            sx={genreTabSx(genreValues.includes(tab.value))}
-            disabled={isDisabled}
+            sx={{
+              ...genreTabSx(genreValues.includes(tab.value)),
+              ...(isDisabled && { pointerEvents: "none" }),
+            }}
           >
             <Box className="S3">{tab.title}</Box>
           </Button>
