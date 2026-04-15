@@ -115,6 +115,11 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
     minWidth: "60px",
     minHeight: "32px",
     fontSize: "20px",
+    "@media (hover: none)": {
+      "&:hover": {
+        backgroundColor: "transparent",
+      },
+    },
     "@media (hover: hover)": {
       "&:hover": {
         backgroundColor: theme.palette.gray.secondary,
@@ -132,10 +137,14 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
     minHeight: "32px",
     padding: "0 12px",
     fontSize: "14px",
+    "@media (hover: none)": {
+      "&:hover": {
+        backgroundColor: "transparent",
+      },
+    },
     "@media (hover: hover)": {
       "&:hover": {
-        backgroundColor: theme.palette.genre.secondary,
-        color: theme.palette.common.black,
+        backgroundColor: theme.palette.gray.secondary,
       },
     },
   });
