@@ -295,7 +295,7 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
           embedUrl: soundcloudData?.embedUrl,
         };
       }
-      console.log(result);
+
       setVideoUrl(result);
       setIsVideoUrlLoading(false);
     };
@@ -314,7 +314,7 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
         artist: postData.data.data.originalArtist,
         songTitle: postData.data.data.originalTitle,
         key: postData.data.data.itunesTrackId ?? "",
-        coverUrl: postData.data.data.coverUrl ?? "",
+        coverUrl: postData.data.data.originalCoverImageUrl ?? "",
       });
 
       setTags(postData.data.data.tags ?? []);
@@ -603,7 +603,13 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
           <Typography variant="h6" sx={{ fontWeight: 700, mb: "8px" }}>
             게시글 수정
           </Typography>
-          <Typography sx={{ fontSize: "20px", color: "#666", mb: "24px" }}>
+          <Typography
+            sx={{
+              fontSize: isMobile ? "14px" : "20px",
+              color: "#666",
+              mb: "24px",
+            }}
+          >
             게시글을 수정하시겠습니까?
           </Typography>
           <Box

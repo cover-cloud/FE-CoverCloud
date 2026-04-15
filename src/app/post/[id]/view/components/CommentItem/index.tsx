@@ -173,9 +173,6 @@ const CommentItem = ({
       setIsImageLoading(false);
     }
   }, [profileImageUrl]);
-  React.useEffect(() => {
-    console.log(imageSrc, "imageSrc");
-  }, [imageSrc]);
 
   return (
     <Box className={`mb-2`} ml={depth * 2}>

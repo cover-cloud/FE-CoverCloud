@@ -84,6 +84,14 @@ body {
   font-size: 20px;
   font-weight: 400;
 }
+.banner {
+  font-size: 32px;
+  font-weight: 700;
+}
+.bannerSub {
+  font-size: 20px;
+  font-weight: 400;
+}
 @media (max-width: 767px) {
   .B1 {
     font-size: 14px;
@@ -91,9 +99,18 @@ body {
   .H2 {
     font-size: 16px;
   }
+
   /* .S1 {
     font-size: 14px;
   } */
+}
+@media (max-width: 600px) {
+  .banner {
+    font-size: 24px;
+  }
+  .bannerSub {
+    font-size: 14px;
+  }
 }
 .B2 {
   font-size: 16px;

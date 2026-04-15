@@ -111,7 +111,6 @@ export default function SearchClient() {
     });
   };
   const handleRecommendClick = async () => {
-    console.log("실행");
     const isAuthenticated = await fetchAuthMeWithCookie(accessToken);
 
     if (!isAuthenticated.success) {
