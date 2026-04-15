@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid";
 import PostCard from "../../../../components/PostCard";
 import Box from "@mui/material/Box";
@@ -55,7 +55,11 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
   /* =========================
       API 호출 (0부터)
     ========================= */
-  const { data: queryData, isLoading } = usePopularCoverListQuery({
+  const {
+    data: queryData,
+    isLoading,
+    isFetching,
+  } = usePopularCoverListQuery({
     page: page - 1,
     size: 18,
     period,
@@ -65,10 +69,19 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
 
   const data = queryData ?? initialData;
 
+  const [isTabChanging, setIsTabChanging] = useState(false);
+
+  useEffect(() => {
+    if (!isFetching) setIsTabChanging(false);
+  }, [isFetching]);
+
+  const isDisabled = isTabChanging || isFetching;
+
   /* =========================
       URL 변경 헬퍼
     ========================= */
   const updateParams = (next: Record<string, string>) => {
+    setIsTabChanging(true);
     const params = new URLSearchParams(searchParams.toString());
 
     Object.entries(next).forEach(([key, value]) => {
@@ -216,7 +229,7 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
             key={tab.period}
             onClick={() => popularTabChangeHandler(tab)}
             sx={popularTabSx(tab.period === period)}
-            disabled={isLoading}
+            disabled={isDisabled}
           >
             <Box className="S1">{tab.title}</Box>
           </Button>
@@ -230,7 +243,7 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
             key={tab.value}
             onClick={() => genreTabChangeHandler(tab)}
             sx={genreTabSx(genreValues.includes(tab.value))}
-            disabled={isLoading}
+            disabled={isDisabled}
           >
             <Box className="S3">{tab.title}</Box>
           </Button>
