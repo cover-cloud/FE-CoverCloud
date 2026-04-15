@@ -216,6 +216,7 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
             key={tab.period}
             onClick={() => popularTabChangeHandler(tab)}
             sx={popularTabSx(tab.period === period)}
+            disabled={isLoading}
           >
             <Box className="S1">{tab.title}</Box>
           </Button>
@@ -229,6 +230,7 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
             key={tab.value}
             onClick={() => genreTabChangeHandler(tab)}
             sx={genreTabSx(genreValues.includes(tab.value))}
+            disabled={isLoading}
           >
             <Box className="S3">{tab.title}</Box>
           </Button>
