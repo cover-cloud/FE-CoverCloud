@@ -115,6 +115,11 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
     minWidth: "60px",
     minHeight: "32px",
     fontSize: "20px",
+    // 모바일: hover 효과 없음
+    "&:hover": {
+      backgroundColor: "transparent",
+    },
+    // 데스크톱: hover 효과 적용
     "@media (hover: hover)": {
       "&:hover": {
         backgroundColor: theme.palette.gray.secondary,
@@ -132,7 +137,14 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
     minHeight: "32px",
     padding: "0 12px",
     fontSize: "14px",
-
+    // 모바일: hover 시 원래 상태 유지
+    "&:hover": {
+      backgroundColor: selected
+        ? theme.palette.genre.primary
+        : theme.palette.gray.secondary,
+      color: selected ? theme.palette.common.white : theme.palette.common.black,
+    },
+    // 데스크톱: hover 효과 적용
     "@media (hover: hover)": {
       "&:hover": {
         backgroundColor: theme.palette.genre.secondary,
@@ -216,11 +228,6 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
             key={tab.period}
             onClick={() => popularTabChangeHandler(tab)}
             sx={popularTabSx(tab.period === period)}
-            disableRipple
-            disableTouchRipple
-            onTouchEnd={(e) => {
-              (e.currentTarget as HTMLElement).blur();
-            }}
           >
             <Box className="S1">{tab.title}</Box>
           </Button>
@@ -234,11 +241,6 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
             key={tab.value}
             onClick={() => genreTabChangeHandler(tab)}
             sx={genreTabSx(genreValues.includes(tab.value))}
-            disableRipple
-            disableTouchRipple
-            onTouchEnd={(e) => {
-              (e.currentTarget as HTMLElement).blur();
-            }}
           >
             <Box className="S3">{tab.title}</Box>
           </Button>
