@@ -115,12 +115,8 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
     minWidth: "60px",
     minHeight: "32px",
     fontSize: "20px",
-    // 모바일: hover 효과 없음
-    "&:hover": {
-      backgroundColor: "transparent",
-    },
-    // 데스크톱: hover 효과 적용
-    "@media (hover: hover)": {
+
+    "@media (hover: hover) and (pointer: fine)": {
       "&:hover": {
         backgroundColor: theme.palette.gray.secondary,
       },
@@ -137,18 +133,10 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
     minHeight: "32px",
     padding: "0 12px",
     fontSize: "14px",
-    // 모바일: hover 시 원래 상태 유지
-    "&:hover": {
-      backgroundColor: selected
-        ? theme.palette.genre.primary
-        : theme.palette.gray.secondary,
-      color: selected ? theme.palette.common.white : theme.palette.common.black,
-    },
-    // 데스크톱: hover 효과 적용
-    "@media (hover: hover)": {
+
+    "@media (hover: hover) and (pointer: fine)": {
       "&:hover": {
         backgroundColor: theme.palette.genre.secondary,
-        color: theme.palette.common.black,
       },
     },
   });

@@ -98,11 +98,7 @@ const theme = createTheme({
           borderRadius: "10px",
           padding: "6px 14px",
           boxShadow: "none",
-          "@media (hover: none)": {
-            "&:hover": {
-              backgroundColor: "inherit !important",
-            },
-          },
+
           "&:hover": {
             boxShadow: "none",
           },

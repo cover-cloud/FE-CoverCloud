@@ -136,10 +136,3 @@ body {
   font-size: 12px;
   font-weight: 700;
 }
-
-@media (hover: none) {
-  .MuiButton-root:hover,
-  .MuiButtonBase-root:hover {
-    background-color: inherit !important;
-  }
-}
