@@ -115,6 +115,9 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
     minWidth: "60px",
     minHeight: "32px",
     fontSize: "20px",
+    "&:focus, &:active, &:focus-visible": {
+      backgroundColor: "transparent",
+    },
     "@media (hover: hover)": {
       "&:hover": {
         backgroundColor: theme.palette.gray.secondary,
@@ -133,6 +136,12 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
     padding: "0 12px",
     fontSize: "14px",
 
+    "&:hover, &:focus, &:active, &:focus-visible": {
+      backgroundColor: selected
+        ? theme.palette.genre.primary
+        : theme.palette.gray.secondary,
+      color: selected ? theme.palette.common.white : theme.palette.common.black,
+    },
     "@media (hover: hover)": {
       "&:hover": {
         backgroundColor: theme.palette.genre.secondary,
