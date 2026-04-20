@@ -2,7 +2,11 @@ import MainComponent from "./components/MainComponent";
 import { fetchPopularCoverListServer, Period } from "../api/cover/list";
 
 export const dynamic = "force-dynamic";
-
+export const metadata = {
+  alternates: {
+    canonical: "https://covercloud.kr/main",
+  },
+};
 export default async function MainPage({
   searchParams,
 }: {
