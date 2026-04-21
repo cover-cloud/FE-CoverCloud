@@ -9,10 +9,10 @@ const myCoverList = async (page: number, size: number) => {
       return res.data;
     } else {
       // 로그아웃 로직
-      useAuthStore.setState({ accessToken: "" });
+      useAuthStore.setState({ accessToken: "", isLogin: false });
     }
   } catch (error) {
-    useAuthStore.setState({ accessToken: "" });
+    useAuthStore.setState({ accessToken: "", isLogin: false });
     return {
       success: false,
       message: "로그인 정보를 확인할 수 없습니다.",

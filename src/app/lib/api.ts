@@ -79,7 +79,7 @@ api.interceptors.response.use(
       } catch (refreshError) {
         // 갱신 실패 시 대기 중인 모든 요청도 거절
         processQueue(refreshError, null);
-        useAuthStore.setState({ accessToken: "" });
+        useAuthStore.setState({ accessToken: "", isLogin: false });
         // 로그인 페이지로 리다이렉트 시키는 로직 추가 권장
         return Promise.reject(refreshError);
       } finally {

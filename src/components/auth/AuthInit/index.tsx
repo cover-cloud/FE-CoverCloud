@@ -11,7 +11,10 @@ const AuthInit = ({ children }: { children: React.ReactNode }) => {
   const refreshTokenHandler = async () => {
     const accessToken = await refreshToken();
 
-    if (!accessToken.success) return;
+    if (!accessToken.success) {
+      useAuthStore.setState({ isLogin: false });
+      return;
+    }
 
     useAuthStore.setState({
       accessToken: accessToken.data.accessToken,
@@ -21,6 +24,9 @@ const AuthInit = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (pathname.startsWith("/auth/callback")) return;
+
+    const { isLogin } = useAuthStore.getState();
+    if (!isLogin) return;
 
     refreshTokenHandler();
   }, []);

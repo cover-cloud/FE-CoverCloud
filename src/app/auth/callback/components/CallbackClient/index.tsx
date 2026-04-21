@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { completeLogin } from "@/app/utils/auth.service";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
 import { refreshToken } from "@/app/api/auth/refresh";
@@ -14,6 +14,7 @@ export default function CallbackClient() {
     const refreshTokenHandler = async () => {
       const accessToken = await refreshToken();
       if (!accessToken.data.accessToken) {
+        useAuthStore.setState({ isLogin: false });
         useSnackbarStore.getState().show("로그인에 실패했습니다.", "error");
         return;
       }
@@ -28,6 +29,7 @@ export default function CallbackClient() {
           useSnackbarStore.getState().show("로그인되었습니다.", "success");
           router.replace("/main");
         } catch {
+          useAuthStore.setState({ isLogin: false });
           useSnackbarStore.getState().show("로그인에 실패했습니다.", "error");
         }
       })();

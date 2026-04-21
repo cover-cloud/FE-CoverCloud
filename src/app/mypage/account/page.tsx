@@ -148,7 +148,7 @@ const AccountPage = () => {
   const openDeleteAccountModalHandler = () => {
     setIsDeleteAccountModalOpen(true);
   };
-  const deleteAccountHandler = () => {
+  const deleteAccountHandler = async () => {
     if (!isLogin && !accessToken) {
       openLoginModal();
       useSnackbarStore
@@ -156,10 +156,10 @@ const AccountPage = () => {
         .show("로그인 후 계정을 삭제할 수 있습니다.", "error");
       return;
     }
-    // TODO: 계정 삭제 API 호출
-    deletedAccount();
+    await deletedAccount();
     setDeleteAccountAgreementModal(false);
     setIsDeleteAccountModalOpen(false);
+    router.push("/");
   };
   const logoutHandler = async () => {
     // TODO: 로그아웃 API 호출
@@ -167,15 +167,9 @@ const AccountPage = () => {
       useSnackbarStore.getState().show("이미 로그아웃 되었습니다.", "error");
       return;
     }
-    const result = await logout(accessToken);
-    if (result.success) {
-      useAuthStore.setState({ accessToken: "" });
-      useAuthStore.setState({ isLogin: false });
-      useSnackbarStore.getState().show("로그아웃되었습니다.", "success");
-      router.push("/");
-    } else {
-      useSnackbarStore.getState().show("로그아웃에 실패했습니다.", "error");
-    }
+    await logout(accessToken);
+    useSnackbarStore.getState().show("로그아웃되었습니다.", "success");
+    router.push("/");
   };
   const changedImageHandler = async () => {
     if (!isLogin && !accessToken) {

@@ -112,10 +112,10 @@ const myCommentList = () => {
       return res;
     } else {
       // 로그아웃 로직
-      useAuthStore.setState({ accessToken: "" });
+      useAuthStore.setState({ accessToken: "", isLogin: false });
     }
   } catch (error) {
-    useAuthStore.setState({ accessToken: "" });
+    useAuthStore.setState({ accessToken: "", isLogin: false });
   }
 };
 export const useMyCommentList = () => {
