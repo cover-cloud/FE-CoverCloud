@@ -1,7 +1,7 @@
 const CACHE_NAME = "my-app-v1";
 
 // 앱 셸에 필요한 핵심 파일들을 캐시합니다
-const PRECACHE_URLS = ["/", "/offline"];
+const PRECACHE_URLS = ["/"];
 
 // 설치 시 핵심 파일 캐시
 self.addEventListener("install", (event) => {
