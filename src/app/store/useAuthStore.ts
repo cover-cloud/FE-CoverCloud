@@ -13,7 +13,7 @@ export const useAuthStore = create<AuthStore>()(
   persist(
     (set) => ({
       isLogin: false,
-      accessToken: process.env.NEXT_PUBLIC_DEV_TOKEN ?? "",
+      accessToken: "",
       userId: null,
       setIsLogin: (isLogin: boolean) => set({ isLogin }),
       setAccessToken: (accessToken: string) => set({ accessToken }),
