@@ -5,7 +5,6 @@ import Image from "next/image";
 import Skeleton from "@mui/material/Skeleton";
 import "./PostCard.module.css";
 import Box from "@mui/material/Box";
-import router from "next/router";
 import Link from "next/link";
 import { FaRegHeart } from "react-icons/fa";
 import { contentData } from "../../app/main/type";
@@ -45,7 +44,7 @@ const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
 
       try {
         const thumbnail = await getMediaThumbnail(videoId);
-        setImageSrc(thumbnail);
+        setImageSrc(thumbnail ?? DEFAULT_IMAGE);
       } catch (error) {
         console.error("Thumbnail fetch failed:", error);
         setImageSrc(DEFAULT_IMAGE);
