@@ -20,16 +20,11 @@ import {
   fetchSoundCloudDataWithApi,
   fetchTiktokDataWithApi,
   getYoutubeVideoId,
+  MediaPlatform,
   MediaUrlResult,
 } from "@/app/utils/youtube";
 import { deletePost, useReadingPost } from "@/app/api/cover/post";
-import {
-  fetchLike,
-  fetchUnlike,
-  useLikeMutation,
-  useUnlikeMutation,
-} from "@/app/api/cover/like";
-import { useMyCommentList } from "@/app/api/cover/comment";
+import { fetchLike, fetchUnlike } from "@/app/api/cover/like";
 
 import { IoIosArrowBack } from "react-icons/io";
 import { IoCloseSharp } from "react-icons/io5";
@@ -48,6 +43,7 @@ import { useModalStore } from "@/app/store/useModalStore";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
 import { requireAuth } from "@/app/utils/requireAuth";
 import { reportPost } from "@/app/api/cover/reportPost";
+import VideoPlayer from "../../../edit/components/VideoPlayer";
 const genres = [
   { title: "K-POP", value: "K_POP" },
   { title: "J-POP", value: "J_POP" },
@@ -112,9 +108,9 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
   const videoId: MediaUrlResult = postData
     ? detectAndValidateMediaUrl(postData.data.data.link)
     : { platform: null, id: null, isValid: false, originalUrl: "" };
-  const formetCreatedAt = postData
-    ? useFormatCreatedAt(postData.data.data.createdAt)
-    : "";
+  const formetCreatedAt = useFormatCreatedAt(
+    postData?.data?.data?.createdAt ?? "",
+  );
   const getAspectRatio = (videoId: MediaUrlResult | null) => {
     if (!videoId || !videoId.platform) return "16 / 9"; // 기본값
 
@@ -332,16 +328,25 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
         )}
         <Box sx={{ marginBottom: "12px" }}>
           {youtubeVideoId ? (
-            <iframe
-              src={youtubeVideoId}
-              width="100%"
-              height={videoId?.platform === "soundcloud" ? "200px" : "auto"}
-              style={{
-                aspectRatio: getAspectRatio(videoId),
-                borderRadius: "12px",
-                border: "none",
+            // <iframe
+            //   src={youtubeVideoId}
+            //   width="100%"
+            //   height={videoId?.platform === "soundcloud" ? "200px" : "auto"}
+            //   style={{
+            //     aspectRatio: getAspectRatio(videoId),
+            //     borderRadius: "12px",
+            //     border: "none",
+            //   }}
+            //   allowFullScreen
+            // />
+            <VideoPlayer
+              videoId={youtubeVideoId}
+              videoType={videoId?.platform as MediaPlatform}
+              videoData={videoId}
+              onVideoEnded={() => {
+                // TODO: 다음 비디오로 이동
               }}
-              allowFullScreen
+              getAspectRatio={getAspectRatio}
             />
           ) : (
             /* 동영상이 준비되기 전 보여줄 스켈레톤 */

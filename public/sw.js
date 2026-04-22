@@ -29,6 +29,8 @@ self.addEventListener("activate", (event) => {
 
 // 네트워크 우선, 실패 시 캐시 사용
 self.addEventListener("fetch", (event) => {
+  // http/https 요청만 처리 (chrome-extension 등 제외)
+  if (!event.request.url.startsWith("http")) return;
   // API 요청은 캐시하지 않음
   if (event.request.url.includes("/api/")) return;
 
@@ -47,7 +49,7 @@ self.addEventListener("fetch", (event) => {
       .catch(() => {
         // 오프라인일 때 캐시에서 반환
         return caches.match(event.request).then((cachedResponse) => {
-          return cachedResponse || caches.match("/offline");
+          return cachedResponse || caches.match("/");
         });
       }),
   );
