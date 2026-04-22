@@ -29,7 +29,7 @@ self.addEventListener("activate", (event) => {
 
 // 네트워크 우선, 실패 시 캐시 사용
 self.addEventListener("fetch", (event) => {
-  // http/https 요청만 처리 (chrome-extension 등 제외)
+  // http/https 요청만 캐시 (chrome-extension 등 제외)
   if (!event.request.url.startsWith("http")) return;
   // API 요청은 캐시하지 않음
   if (event.request.url.includes("/api/")) return;
