@@ -1,11 +1,10 @@
 "use client";
 import React from "react";
-import { Box, Tabs, Tab, Button, Grid, Skeleton } from "@mui/material";
+import { Box, Button, Grid } from "@mui/material";
 import PostCard from "@/components/PostCard";
 import { Period, usePopularCoverListQuery } from "@/app/api/cover/list";
 import theme from "@/app/lib/theme";
 import { contentData } from "@/app/main/type";
-import { is } from "zod/v4/locales";
 
 type PopularTab = {
   title: string;
@@ -31,14 +30,14 @@ const PopularVideos = ({
     period: "ALL",
   });
 
-  const { data, isLoading, error } = usePopularCoverListQuery({
+  const { data, isLoading } = usePopularCoverListQuery({
     page: 0,
     size: 10,
     period: selectedTab.period,
   });
 
   const popularTabChangeHandler = (
-    event: React.ChangeEvent<unknown>,
+    _event: React.ChangeEvent<unknown>,
     value: PopularTab,
   ) => {
     setSelectedTab(value);
