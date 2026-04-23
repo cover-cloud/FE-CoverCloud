@@ -136,3 +136,25 @@ body {
   font-size: 12px;
   font-weight: 700;
 }
+
+/* swiper banner */
+.swiper-pagination-bullet {
+  background: rgba(255, 255, 255, 0.7);
+  opacity: 1;
+}
+
+.swiper-pagination-bullet-active {
+  background: #fff;
+}
+
+.main-banner-pagination .swiper-pagination-bullet {
+  width: 9px;
+  height: 9px;
+  margin: 0 4px !important;
+  background: #999;
+  opacity: 1;
+}
+
+.main-banner-pagination .swiper-pagination-bullet-active {
+  background: #333;
+}
