@@ -1,21 +1,16 @@
 import { api } from "@/app/lib/api";
 import { useAuthStore } from "@/app/store/useAuthStore";
+import axios from "axios";
 
 export const refreshToken = async () => {
   try {
-    const response = await api.post(
-      `/api/auth/refresh`,
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/refresh`,
       {},
-      {
-        withCredentials: true,
-      },
+      { withCredentials: true },
     );
     return response.data;
   } catch (error) {
-    if (error instanceof Error) {
-      return { success: false };
-    }
-
     return { success: false };
   }
 };

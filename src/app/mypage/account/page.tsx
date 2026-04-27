@@ -25,7 +25,7 @@ import { useSnackbarStore } from "@/app/store/useSnackbar";
 
 import Login from "@/components/auth/Login";
 import Loading from "@/app/main/loading";
-import { refreshAccessToken, refreshToken } from "@/app/api/auth/refresh";
+import { refreshAccessToken } from "@/app/api/auth/refresh";
 import { useModalStore } from "@/app/store/useModalStore";
 import { deletedAccount } from "@/app/api/mypage/deletedAccount";
 
@@ -117,7 +117,7 @@ const AccountPage = () => {
     } catch {
       useSnackbarStore.getState().show("이미지 삭제에 실패했습니다.", "error");
     }
-    refreshAccessToken();
+    // refreshAccessToken();
     setOpenImageRemoveModal(false);
   };
 
@@ -141,7 +141,7 @@ const AccountPage = () => {
     } catch {
       useSnackbarStore.getState().show("닉네임 변경에 실패했습니다.", "error");
     }
-    refreshAccessToken();
+    // refreshAccessToken();
     setOpenNickNameModal(false);
   };
 
@@ -205,7 +205,7 @@ const AccountPage = () => {
     setIsImageChanging(false);
 
     setOpenImageConfirmModal(false);
-    refreshAccessToken();
+    // refreshAccessToken();
   };
 
   useEffect(() => {
