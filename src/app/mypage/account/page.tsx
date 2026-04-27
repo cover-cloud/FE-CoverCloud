@@ -59,7 +59,11 @@ const AccountPage = () => {
 
   const accessToken = useAuthStore((state) => state.accessToken);
   const { data, isLoading } = useAuthMeQuery();
+  const [isHydrated, setIsHydrated] = React.useState(false);
 
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
   const accountSx = {
     "& .MuiInputBase-input": {
       padding: "12px 20px",
@@ -218,7 +222,7 @@ const AccountPage = () => {
     setEmail(data.data.email);
   }, [data]);
 
-  if (isLoading) return <Loading />;
+  if (!isHydrated || isLoading) return <Loading />;
   if (data?.success === false || !isLogin) return <Login />;
   return (
     <Box

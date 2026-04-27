@@ -13,6 +13,7 @@ import Login from "@/components/auth/Login";
 import { fetchAuthMeWithCookie, useAuthMeQuery } from "@/app/api/auth/authMe";
 import { useModalStore } from "@/app/store/useModalStore";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
+import Loading from "@/app/main/loading";
 
 export const dynamic = "force-dynamic";
 
@@ -54,6 +55,12 @@ export default function ActivityClient() {
     18,
     currentTabType,
   );
+
+  const [isHydrated, setIsHydrated] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   /* =========================
      URL 변경 헬퍼 (updateParams)
@@ -116,7 +123,7 @@ export default function ActivityClient() {
 
     fontWeight: type === currentTabType ? 700 : 400,
   });
-
+  if (!isHydrated || isLoading) return <Loading />;
   if (authMeData?.success === false || !isLogin) {
     return <Login />;
   }
