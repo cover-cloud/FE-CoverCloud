@@ -31,6 +31,7 @@ const theme = createTheme({
     },
     purple: {
       primary: "#8385EF",
+      secondary: "#A6A8F5",
     },
   },
 
