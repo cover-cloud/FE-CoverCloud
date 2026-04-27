@@ -165,7 +165,18 @@ export default function MainBanner() {
                       fontSize: "16px",
                     }}
                   >
-                    {isMobile ? banner.mobileButtonText : banner.buttonText}
+                    <Box
+                      component="span"
+                      sx={{ display: { xs: "none", md: "inline" } }}
+                    >
+                      {banner.buttonText}
+                    </Box>
+                    <Box
+                      component="span"
+                      sx={{ display: { xs: "inline", md: "none" } }}
+                    >
+                      {banner.mobileButtonText}
+                    </Box>
                   </PostBasicButton>
                 </Link>
               </Box>

@@ -12,7 +12,7 @@ const PostBasicButton = ({
   postRadius = "15px",
   postClass = "",
 }: {
-  children: string;
+  children: string | React.ReactNode;
   onClick: () => void;
   color?: string;
   backgroundColor?: string;
