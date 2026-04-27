@@ -26,6 +26,9 @@ const banners = [
     backgroundColor: "#D4D5F5",
     buttonColor: theme.palette.purple.primary,
     buttonHoverColor: theme.palette.purple.secondary,
+
+    mobileScale: 0.55,
+    mobileRight: "-45px",
   },
   {
     title: "커버클라우드, 어떠셨나요?",
@@ -38,6 +41,8 @@ const banners = [
     backgroundColor: "#FEE9E7",
     buttonColor: theme.palette.orange.primary,
     buttonHoverColor: theme.palette.orange.secondary,
+    mobileScale: 0.8,
+    mobileRight: "-10px",
   },
 ];
 
@@ -48,7 +53,7 @@ export default function MainBanner() {
   return (
     <Box sx={{ width: "100%", overflow: "hidden", position: "relative" }}>
       <Swiper
-        modules={[Autoplay, Pagination]}
+        modules={[Pagination]}
         loop
         onSwiper={(swiper) => {
           swiperRef.current = swiper;
@@ -72,7 +77,7 @@ export default function MainBanner() {
                 minWidth: "896px",
 
                 "@media (max-width: 1176px)": {
-                  padding: "20px 0 20px 48px",
+                  padding: "10px 0 10px 30px",
                   height: "170px",
                   gap: "12px",
                   alignItems: "flex-start",
@@ -94,8 +99,8 @@ export default function MainBanner() {
                     transform: "scale(1)",
                   },
                   "@media (max-width: 534px)": {
-                    transform: "scale(0.6)",
-                    right: "-20px",
+                    transform: `scale(${banner.mobileScale})`,
+                    right: banner.mobileRight,
                   },
                 }}
               >
@@ -118,7 +123,7 @@ export default function MainBanner() {
                     fontSize: banner.titleFontSize,
 
                     "@media (max-width: 768px)": {
-                      fontSize: "24px",
+                      fontSize: "23px",
                     },
                   }}
                 >
@@ -130,6 +135,9 @@ export default function MainBanner() {
                       whiteSpace: "normal",
                       "@media (max-width: 1176px)": {
                         whiteSpace: "pre-line",
+                      },
+                      "@media (max-width: 768px)": {
+                        fontSize: "14px",
                       },
                     }}
                   >
