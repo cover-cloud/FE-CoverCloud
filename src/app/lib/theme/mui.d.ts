@@ -27,6 +27,7 @@ declare module "@mui/material/styles" {
     };
     purple: {
       primary: string;
+      secondary: string;
     };
   }
 
@@ -56,6 +57,7 @@ declare module "@mui/material/styles" {
     };
     purple?: {
       primary: string;
+      secondary: string;
     };
   }
 }
