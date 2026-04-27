@@ -41,6 +41,7 @@ import Login from "@/components/auth/Login";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
 import { useModalStore } from "@/app/store/useModalStore";
 import { isValid } from "zod/v3";
+import Loading from "@/app/main/loading";
 
 const fields: FormField[] = [
   { key: "title", label: "제목", placeholder: "게시글의 제목을 입력해주세요." },
@@ -68,12 +69,14 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
   const router = useRouter();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const { openLoginModal } = useModalStore();
+
   const songSearchWrapperRef = React.useRef<HTMLDivElement | null>(null);
   const {
     data,
     isLoading: authMeLoading,
     error: authMeError,
   } = useAuthMeQuery();
+  const isLogin = useAuthStore((state) => state.isLogin);
   const accessToken = useAuthStore((state) => state.accessToken);
   const { data: postData, isLoading: isPostLoading } = useReadingPost(
     params.id as string,
@@ -117,7 +120,11 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
     originalUrl: "",
   });
   const [isVideoUrlLoading, setIsVideoUrlLoading] = useState(false);
+  const [isHydrated, setIsHydrated] = React.useState(false);
 
+  React.useEffect(() => {
+    setIsHydrated(true);
+  }, []);
   const link = watch("link");
   const songTitle = watch("songTitle");
   const tagInput = watch("tag");
@@ -320,8 +327,8 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
       setTags(postData.data.data.tags ?? []);
     }
   }, [mode, postData]);
-
-  if (data?.success === false) return <Login />;
+  if (!isHydrated || isPostLoading) return <Loading />;
+  if (data?.success === false || !isLogin) return <Login />;
   return (
     <Box
       component="form"
