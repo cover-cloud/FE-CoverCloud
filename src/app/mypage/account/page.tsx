@@ -217,8 +217,9 @@ const AccountPage = () => {
     setAccessedSNS(data.data.provider);
     setEmail(data.data.email);
   }, [data]);
+
   if (isLoading) return <Loading />;
-  if (data?.success === false) return <Login />;
+  if (data?.success === false || !isLogin) return <Login />;
   return (
     <Box
       className="flex flex-col gap-4"

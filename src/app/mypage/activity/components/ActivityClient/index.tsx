@@ -28,6 +28,7 @@ export default function ActivityClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { openLoginModal } = useModalStore();
+  const isLogin = useAuthStore((state) => state.isLogin);
   const accessToken = useAuthStore((state) => state.accessToken);
 
   /* =========================
@@ -103,7 +104,7 @@ export default function ActivityClient() {
     }
     router.push("/post/create");
   };
-
+  console.log(authMeData);
   /* =========================
      조건부 렌더링
   ========================= */
@@ -116,7 +117,7 @@ export default function ActivityClient() {
     fontWeight: type === currentTabType ? 700 : 400,
   });
 
-  if (authMeData?.success === false) {
+  if (authMeData?.success === false || !isLogin) {
     return <Login />;
   }
 
