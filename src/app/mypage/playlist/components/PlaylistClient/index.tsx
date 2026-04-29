@@ -10,10 +10,13 @@ import CreatePlaylistButton, {
 import PlaylistListPanel from "../PlaylistListPanel";
 import PlaylistDetailPanel from "../PlaylistDetailPanel";
 import { getMovedIndex } from "../playlistUtils";
-import { MoveDirection, Playlist } from "../playlistTypes";
+import { MoveDirection, Playlist, PlaylistItem } from "../playlistTypes";
 
 const PlaylistClient = () => {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [playlistItemsById, setPlaylistItemsById] = useState<
+    Record<number, PlaylistItem[]>
+  >({});
   const [selectedPlaylistId, setSelectedPlaylistId] = useState<number | null>(
     null,
   );
@@ -21,6 +24,9 @@ const PlaylistClient = () => {
   const selectedPlaylist = playlists.find(
     (playlist) => playlist.id === selectedPlaylistId,
   );
+  const selectedPlaylistItems = selectedPlaylistId
+    ? (playlistItemsById[selectedPlaylistId] ?? [])
+    : [];
 
   const createPlaylist = async (payload: CreatePlaylistPayload) => {
     const now = Date.now();
@@ -29,7 +35,12 @@ const PlaylistClient = () => {
       id: now,
       title: payload.title,
       description: payload.description,
-      items: [
+    };
+
+    setPlaylists((prev) => [newPlaylist, ...prev]);
+    setPlaylistItemsById((prev) => ({
+      ...prev,
+      [newPlaylist.id]: [
         {
           id: now + 1,
           title: "테스트 곡 1",
@@ -41,9 +52,7 @@ const PlaylistClient = () => {
           artist: "아티스트 2",
         },
       ],
-    };
-
-    setPlaylists((prev) => [newPlaylist, ...prev]);
+    }));
     setSelectedPlaylistId(newPlaylist.id);
   };
 
@@ -51,7 +60,11 @@ const PlaylistClient = () => {
     setPlaylists((prev) =>
       prev.filter((playlist) => playlist.id !== playlistId),
     );
-
+    setPlaylistItemsById((prev) => {
+      const next = { ...prev };
+      delete next[playlistId];
+      return next;
+    });
     if (selectedPlaylistId === playlistId) {
       setSelectedPlaylistId(null);
     }
@@ -82,51 +95,38 @@ const PlaylistClient = () => {
   const deletePlaylistItem = (itemId: number) => {
     if (!selectedPlaylistId) return;
 
-    setPlaylists((prev) =>
-      prev.map((playlist) => {
-        if (playlist.id !== selectedPlaylistId) return playlist;
-
-        return {
-          ...playlist,
-          items: playlist.items.filter((item) => item.id !== itemId),
-        };
-      }),
-    );
+    setPlaylistItemsById((prev) => ({
+      ...prev,
+      [selectedPlaylistId]: (prev[selectedPlaylistId] ?? []).filter(
+        (item) => item.id !== itemId,
+      ),
+    }));
   };
 
   const movePlaylistItem = (itemId: number, direction: MoveDirection) => {
     if (!selectedPlaylistId) return;
 
-    setPlaylists((prev) =>
-      prev.map((playlist) => {
-        if (playlist.id !== selectedPlaylistId) return playlist;
+    setPlaylistItemsById((prev) => {
+      const items = prev[selectedPlaylistId] ?? [];
+      const currentIndex = items.findIndex((item) => item.id === itemId);
 
-        const currentIndex = playlist.items.findIndex(
-          (item) => item.id === itemId,
-        );
+      if (currentIndex === -1) return prev;
 
-        if (currentIndex === -1) return playlist;
+      const targetIndex = getMovedIndex(items, currentIndex, direction);
 
-        const targetIndex = getMovedIndex(
-          playlist.items,
-          currentIndex,
-          direction,
-        );
+      if (
+        targetIndex < 0 ||
+        targetIndex >= items.length ||
+        targetIndex === currentIndex
+      ) {
+        return prev;
+      }
 
-        if (
-          targetIndex < 0 ||
-          targetIndex >= playlist.items.length ||
-          targetIndex === currentIndex
-        ) {
-          return playlist;
-        }
-
-        return {
-          ...playlist,
-          items: arrayMove(playlist.items, currentIndex, targetIndex),
-        };
-      }),
-    );
+      return {
+        ...prev,
+        [selectedPlaylistId]: arrayMove(items, currentIndex, targetIndex),
+      };
+    });
   };
 
   const handlePlaylistDragEnd = (event: DragEndEvent) => {
@@ -149,25 +149,18 @@ const PlaylistClient = () => {
 
     if (!over || active.id === over.id || !selectedPlaylistId) return;
 
-    setPlaylists((prev) =>
-      prev.map((playlist) => {
-        if (playlist.id !== selectedPlaylistId) return playlist;
+    setPlaylistItemsById((prev) => {
+      const items = prev[selectedPlaylistId] ?? [];
+      const oldIndex = items.findIndex((item) => item.id === active.id);
+      const newIndex = items.findIndex((item) => item.id === over.id);
 
-        const oldIndex = playlist.items.findIndex(
-          (item) => item.id === active.id,
-        );
-        const newIndex = playlist.items.findIndex(
-          (item) => item.id === over.id,
-        );
+      if (oldIndex === -1 || newIndex === -1) return prev;
 
-        if (oldIndex === -1 || newIndex === -1) return playlist;
-
-        return {
-          ...playlist,
-          items: arrayMove(playlist.items, oldIndex, newIndex),
-        };
-      }),
-    );
+      return {
+        ...prev,
+        [selectedPlaylistId]: arrayMove(items, oldIndex, newIndex),
+      };
+    });
   };
 
   return (
@@ -178,6 +171,7 @@ const PlaylistClient = () => {
         <PlaylistListPanel
           playlists={playlists}
           selectedPlaylistId={selectedPlaylistId}
+          playlistItemsById={playlistItemsById}
           onSelect={setSelectedPlaylistId}
           onDelete={deletePlaylist}
           onMove={movePlaylist}
@@ -186,6 +180,7 @@ const PlaylistClient = () => {
 
         <PlaylistDetailPanel
           selectedPlaylist={selectedPlaylist}
+          selectedPlaylistItems={selectedPlaylistItems}
           onDeleteItem={deletePlaylistItem}
           onMoveItem={movePlaylistItem}
           onDragEnd={handlePlaylistItemDragEnd}

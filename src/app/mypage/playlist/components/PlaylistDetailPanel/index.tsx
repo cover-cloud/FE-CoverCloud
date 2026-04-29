@@ -14,10 +14,11 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import SortablePlaylistItemCard from "../SortablePlaylistItemCard";
-import { MoveDirection, Playlist } from "../playlistTypes";
+import { MoveDirection, Playlist, PlaylistItem } from "../playlistTypes";
 
 type PlaylistDetailPanelProps = {
   selectedPlaylist?: Playlist;
+  selectedPlaylistItems: PlaylistItem[];
   onDeleteItem: (itemId: number) => void;
   onMoveItem: (itemId: number, direction: MoveDirection) => void;
   onDragEnd: (event: DragEndEvent) => void;
@@ -25,6 +26,7 @@ type PlaylistDetailPanelProps = {
 
 const PlaylistDetailPanel = ({
   selectedPlaylist,
+  selectedPlaylistItems,
   onDeleteItem,
   onMoveItem,
   onDragEnd,
@@ -60,7 +62,7 @@ const PlaylistDetailPanel = ({
           </Box>
 
           <Box className="max-h-[60vh] overflow-y-auto pr-1 md:max-h-[520px]">
-            {selectedPlaylist.items.length === 0 ? (
+            {selectedPlaylistItems.length === 0 ? (
               <Typography className="text-sm text-gray-500">
                 이 재생리스트에 담긴 곡이 없습니다.
               </Typography>
@@ -71,11 +73,11 @@ const PlaylistDetailPanel = ({
                 onDragEnd={onDragEnd}
               >
                 <SortableContext
-                  items={selectedPlaylist.items.map((item) => item.id)}
+                  items={selectedPlaylistItems.map((item) => item.id)}
                   strategy={verticalListSortingStrategy}
                 >
                   <Box className="flex flex-col gap-3">
-                    {selectedPlaylist.items.map((item) => (
+                    {selectedPlaylistItems.map((item) => (
                       <SortablePlaylistItemCard
                         key={item.id}
                         item={item}

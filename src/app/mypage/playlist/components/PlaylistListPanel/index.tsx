@@ -14,11 +14,12 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import SortablePlaylistCard from "../SortablePlaylistCard";
-import { MoveDirection, Playlist } from "../playlistTypes";
+import { MoveDirection, Playlist, PlaylistItem } from "../playlistTypes";
 
 type PlaylistListPanelProps = {
   playlists: Playlist[];
   selectedPlaylistId: number | null;
+  playlistItemsById: Record<number, PlaylistItem[]>;
   onSelect: (playlistId: number) => void;
   onDelete: (playlistId: number) => void;
   onMove: (playlistId: number, direction: MoveDirection) => void;
@@ -28,6 +29,7 @@ type PlaylistListPanelProps = {
 const PlaylistListPanel = ({
   playlists,
   selectedPlaylistId,
+  playlistItemsById,
   onSelect,
   onDelete,
   onMove,
@@ -65,6 +67,7 @@ const PlaylistListPanel = ({
                   <SortablePlaylistCard
                     key={playlist.id}
                     playlist={playlist}
+                    itemCount={playlistItemsById[playlist.id]?.length ?? 0}
                     isSelected={playlist.id === selectedPlaylistId}
                     onClick={() => onSelect(playlist.id)}
                     onDelete={() => onDelete(playlist.id)}

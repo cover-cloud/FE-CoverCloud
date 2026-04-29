@@ -52,7 +52,7 @@ const SortablePlaylistItemCard = ({
         ≡
       </Button>
 
-      <Box className="min-w-0 flex-1">
+      {/* <Box className="min-w-0 flex-1">
         <Typography className="truncate font-medium">{item.title}</Typography>
 
         {item.artist && (
@@ -60,7 +60,7 @@ const SortablePlaylistItemCard = ({
             {item.artist}
           </Typography>
         )}
-      </Box>
+      </Box> */}
 
       <PlaylistMoveButtons onMove={onMove} onDelete={onDelete} />
     </Box>

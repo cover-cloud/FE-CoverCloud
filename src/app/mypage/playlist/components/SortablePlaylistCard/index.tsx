@@ -9,6 +9,7 @@ import { MoveDirection, Playlist } from "../playlistTypes";
 
 type SortablePlaylistCardProps = {
   playlist: Playlist;
+  itemCount: number;
   isSelected: boolean;
   onClick: () => void;
   onDelete: () => void;
@@ -17,6 +18,7 @@ type SortablePlaylistCardProps = {
 
 const SortablePlaylistCard = ({
   playlist,
+  itemCount,
   isSelected,
   onClick,
   onDelete,
@@ -72,11 +74,11 @@ const SortablePlaylistCard = ({
         )}
 
         <Typography className="mt-1 text-xs text-gray-400">
-          {playlist.items.length}곡
+          {itemCount}곡
         </Typography>
       </Box>
-
-      <PlaylistMoveButtons onMove={onMove} onDelete={onDelete} />
+      {/* 
+      <PlaylistMoveButtons onMove={onMove} onDelete={onDelete} /> */}
     </Box>
   );
 };
