@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Box } from "@mui/material";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import { DragEndEvent } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import CreatePlaylistButton, {
@@ -10,104 +10,192 @@ import CreatePlaylistButton, {
 import PlaylistListPanel from "../PlaylistListPanel";
 import PlaylistDetailPanel from "../PlaylistDetailPanel";
 import { getMovedIndex } from "../playlistUtils";
-import { MoveDirection, Playlist, PlaylistItem } from "../playlistTypes";
+import { MoveDirection, PlaylistItem } from "../playlistTypes";
+import {
+  useCreatePlaylistMutation,
+  useMyPlaylistQuery,
+  useDeletePlaylistMutation,
+  usePatchPlaylistMutation,
+  usePlaylistDetailQuery,
+} from "@/app/api/mypage/playlist/playlist";
+import { useCreatePlaylistItemMutation } from "@/app/api/mypage/playlist/playlistItem";
+import { useAuthStore } from "@/app/store/useAuthStore";
+import { useSnackbarStore } from "@/app/store/useSnackbar";
+import { useModalStore } from "@/app/store/useModalStore";
+import Modal from "@/components/modal/Modal";
+import PlaylistOptionButton from "@/components/PlaylistOptionButton";
+import { is } from "zod/v4/locales";
 
 const PlaylistClient = () => {
-  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const createPlaylistMutation = useCreatePlaylistMutation();
+  const deletePlaylistMutation = useDeletePlaylistMutation();
+  const patchPlaylistMutation = usePatchPlaylistMutation();
+
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const isLogin = useAuthStore((state) => state.isLogin);
+  const openLoginModal = useModalStore((state) => state.openLoginModal);
+
   const [playlistItemsById, setPlaylistItemsById] = useState<
     Record<number, PlaylistItem[]>
   >({});
-  const [selectedPlaylistId, setSelectedPlaylistId] = useState<number | null>(
-    null,
-  );
 
-  const selectedPlaylist = playlists.find(
-    (playlist) => playlist.id === selectedPlaylistId,
-  );
-  const selectedPlaylistItems = selectedPlaylistId
-    ? (playlistItemsById[selectedPlaylistId] ?? [])
-    : [];
+  const [selectedPlaylist, setSelectedPlaylist] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
 
-  const createPlaylist = async (payload: CreatePlaylistPayload) => {
-    const now = Date.now();
+  const [editPlaylistName, setEditPlaylistName] = useState("");
 
-    const newPlaylist: Playlist = {
-      id: now,
-      title: payload.title,
-      description: payload.description,
-    };
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-    setPlaylists((prev) => [newPlaylist, ...prev]);
-    setPlaylistItemsById((prev) => ({
-      ...prev,
-      [newPlaylist.id]: [
-        {
-          id: now + 1,
-          title: "테스트 곡 1",
-          artist: "아티스트 1",
-        },
-        {
-          id: now + 2,
-          title: "테스트 곡 2",
-          artist: "아티스트 2",
-        },
-      ],
-    }));
-    setSelectedPlaylistId(newPlaylist.id);
+  const { data, isLoading, isError } = useMyPlaylistQuery();
+  const {
+    data: playlistDetailData,
+    isLoading: isPlaylistDetailLoading,
+    error: playlistDetailError,
+  } = usePlaylistDetailQuery(selectedPlaylist?.id ?? null);
+  //이름 변경이 같은지 확인
+  const trimmedEditPlaylistName = editPlaylistName.trim();
+
+  const isSamePlaylistName =
+    selectedPlaylist?.name.trim() === trimmedEditPlaylistName;
+
+  const isEditDisabled =
+    !selectedPlaylist || !trimmedEditPlaylistName || isSamePlaylistName;
+
+  const selectedPlaylistHandler = (
+    playlistId: number,
+    playlistName: string,
+  ) => {
+    setSelectedPlaylist({
+      id: playlistId,
+      name: playlistName,
+    });
+
+    setEditPlaylistName(playlistName);
   };
 
-  const deletePlaylist = (playlistId: number) => {
-    setPlaylists((prev) =>
-      prev.filter((playlist) => playlist.id !== playlistId),
-    );
-    setPlaylistItemsById((prev) => {
-      const next = { ...prev };
-      delete next[playlistId];
-      return next;
-    });
-    if (selectedPlaylistId === playlistId) {
-      setSelectedPlaylistId(null);
+  const createNewPlaylistHandler = async (name: string) => {
+    if (!isLogin && !accessToken) {
+      openLoginModal();
+
+      useSnackbarStore
+        .getState()
+        .show("로그인 후 플레이리스트를 생성할 수 있습니다.", "error");
+
+      return;
+    }
+    const result = await createPlaylistMutation.mutateAsync(name);
+
+    if (result.success) {
+      useSnackbarStore
+        .getState()
+        .show("플레이리스트가 성공적으로 생성되었습니다.", "success");
+    } else {
+      useSnackbarStore
+        .getState()
+        .show("플레이리스트 생성에 실패했습니다.", "error");
     }
   };
 
-  const movePlaylist = (playlistId: number, direction: MoveDirection) => {
-    setPlaylists((prev) => {
-      const currentIndex = prev.findIndex(
-        (playlist) => playlist.id === playlistId,
-      );
+  const handleDeleteSelectedPlaylist = () => {
+    if (!selectedPlaylist) return;
 
-      if (currentIndex === -1) return prev;
+    deletePlaylist(selectedPlaylist.id);
+  };
 
-      const targetIndex = getMovedIndex(prev, currentIndex, direction);
+  const deletePlaylist = async (playlistId: number) => {
+    if (!isLogin && !accessToken) {
+      openLoginModal();
 
-      if (
-        targetIndex < 0 ||
-        targetIndex >= prev.length ||
-        targetIndex === currentIndex
-      ) {
-        return prev;
-      }
+      useSnackbarStore
+        .getState()
+        .show("로그인 후 플레이리스트를 삭제할 수 있습니다.", "error");
 
-      return arrayMove(prev, currentIndex, targetIndex);
+      return;
+    }
+
+    const result = await deletePlaylistMutation.mutateAsync(playlistId);
+
+    if (result.success) {
+      useSnackbarStore
+        .getState()
+        .show("플레이리스트가 성공적으로 삭제되었습니다.", "success");
+
+      setSelectedPlaylist(null);
+      setEditPlaylistName("");
+      setIsDeleteModalOpen(false);
+    } else {
+      useSnackbarStore
+        .getState()
+        .show("플레이리스트 삭제에 실패했습니다.", "error");
+
+      setIsDeleteModalOpen(false);
+    }
+  };
+
+  const handleEditSelectedPlaylist = async () => {
+    if (!selectedPlaylist) return;
+
+    const nextName = editPlaylistName.trim();
+
+    if (!nextName) return;
+
+    if (selectedPlaylist.name.trim() === nextName) return;
+
+    if (!isLogin && !accessToken) {
+      openLoginModal();
+
+      useSnackbarStore
+        .getState()
+        .show("로그인 후 플레이리스트를 수정할 수 있습니다.", "error");
+
+      return;
+    }
+
+    const result = await patchPlaylistMutation.mutateAsync({
+      playlistId: selectedPlaylist.id,
+      name: nextName,
     });
+
+    if (result.success) {
+      useSnackbarStore
+        .getState()
+        .show("플레이리스트가 성공적으로 수정되었습니다.", "success");
+
+      setSelectedPlaylist({
+        id: selectedPlaylist.id,
+        name: nextName,
+      });
+
+      setEditPlaylistName(nextName);
+      setIsEditModalOpen(false);
+    } else {
+      useSnackbarStore
+        .getState()
+        .show("플레이리스트 수정에 실패했습니다.", "error");
+
+      setIsEditModalOpen(false);
+    }
   };
 
   const deletePlaylistItem = (itemId: number) => {
-    if (!selectedPlaylistId) return;
+    if (!selectedPlaylist) return;
 
     setPlaylistItemsById((prev) => ({
       ...prev,
-      [selectedPlaylistId]: (prev[selectedPlaylistId] ?? []).filter(
+      [selectedPlaylist.id]: (prev[selectedPlaylist.id] ?? []).filter(
         (item) => item.id !== itemId,
       ),
     }));
   };
 
   const movePlaylistItem = (itemId: number, direction: MoveDirection) => {
-    if (!selectedPlaylistId) return;
+    if (!selectedPlaylist) return;
 
     setPlaylistItemsById((prev) => {
-      const items = prev[selectedPlaylistId] ?? [];
+      const items = prev[selectedPlaylist.id] ?? [];
       const currentIndex = items.findIndex((item) => item.id === itemId);
 
       if (currentIndex === -1) return prev;
@@ -124,33 +212,18 @@ const PlaylistClient = () => {
 
       return {
         ...prev,
-        [selectedPlaylistId]: arrayMove(items, currentIndex, targetIndex),
+        [selectedPlaylist.id]: arrayMove(items, currentIndex, targetIndex),
       };
-    });
-  };
-
-  const handlePlaylistDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (!over || active.id === over.id) return;
-
-    setPlaylists((prev) => {
-      const oldIndex = prev.findIndex((playlist) => playlist.id === active.id);
-      const newIndex = prev.findIndex((playlist) => playlist.id === over.id);
-
-      if (oldIndex === -1 || newIndex === -1) return prev;
-
-      return arrayMove(prev, oldIndex, newIndex);
     });
   };
 
   const handlePlaylistItemDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (!over || active.id === over.id || !selectedPlaylistId) return;
+    if (!over || active.id === over.id || !selectedPlaylist) return;
 
     setPlaylistItemsById((prev) => {
-      const items = prev[selectedPlaylistId] ?? [];
+      const items = prev[selectedPlaylist.id] ?? [];
       const oldIndex = items.findIndex((item) => item.id === active.id);
       const newIndex = items.findIndex((item) => item.id === over.id);
 
@@ -158,34 +231,164 @@ const PlaylistClient = () => {
 
       return {
         ...prev,
-        [selectedPlaylistId]: arrayMove(items, oldIndex, newIndex),
+        [selectedPlaylist.id]: arrayMove(items, oldIndex, newIndex),
       };
     });
   };
 
   return (
     <Box>
-      <CreatePlaylistButton onCreate={createPlaylist} />
+      <CreatePlaylistButton onCreate={createNewPlaylistHandler} />
 
       <Box className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-[420px_1fr]">
         <PlaylistListPanel
-          playlists={playlists}
-          selectedPlaylistId={selectedPlaylistId}
+          playlists={data?.data || []}
+          selectedPlaylist={selectedPlaylist?.id ?? null}
           playlistItemsById={playlistItemsById}
-          onSelect={setSelectedPlaylistId}
-          onDelete={deletePlaylist}
-          onMove={movePlaylist}
-          onDragEnd={handlePlaylistDragEnd}
+          onSelect={selectedPlaylistHandler}
         />
 
-        <PlaylistDetailPanel
-          selectedPlaylist={selectedPlaylist}
-          selectedPlaylistItems={selectedPlaylistItems}
-          onDeleteItem={deletePlaylistItem}
-          onMoveItem={movePlaylistItem}
-          onDragEnd={handlePlaylistItemDragEnd}
-        />
+        {selectedPlaylist && (
+          <Box>
+            <Box className="flex items-center justify-between">
+              <Typography>{selectedPlaylist.name}</Typography>
+
+              <PlaylistOptionButton
+                isLogin={true}
+                openDeleteModal={() => setIsDeleteModalOpen(true)}
+                navigateToEdit={() => setIsEditModalOpen(true)}
+              />
+            </Box>
+
+            {playlistDetailData && !isPlaylistDetailLoading && (
+              <PlaylistDetailPanel
+                selectedPlaylistName={selectedPlaylist.name}
+                selectedPlaylistItems={playlistDetailData.data.items || []}
+                onDeleteItem={deletePlaylistItem}
+                onMoveItem={movePlaylistItem}
+                onDragEnd={handlePlaylistItemDragEnd}
+              />
+            )}
+          </Box>
+        )}
       </Box>
+
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+      >
+        <Box
+          className="flex flex-col items-center"
+          sx={{
+            width: "100%",
+            bgcolor: "#fff",
+            borderRadius: "12px",
+            p: "40px",
+          }}
+        >
+          <Typography variant="h6" sx={{ fontWeight: 700, mb: "8px" }}>
+            플레이리스트 삭제
+          </Typography>
+
+          <Typography
+            sx={{
+              fontSize: "20px",
+              color: "#666",
+              mb: "24px",
+            }}
+          >
+            삭제한 플레이리스트는 다시 복구할 수 없습니다.
+            <br />
+            정말 삭제하시겠습니까?
+          </Typography>
+
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "16px",
+              width: "100%",
+            }}
+          >
+            <Button
+              variant="outlined"
+              onClick={() => setIsDeleteModalOpen(false)}
+            >
+              취소
+            </Button>
+
+            <Button
+              variant="contained"
+              color="error"
+              disabled={!selectedPlaylist}
+              onClick={handleDeleteSelectedPlaylist}
+            >
+              삭제
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
+
+      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)}>
+        <Box
+          className="flex flex-col items-center"
+          sx={{
+            width: "100%",
+            bgcolor: "#fff",
+            borderRadius: "12px",
+            p: "40px",
+          }}
+        >
+          <Typography variant="h6" sx={{ fontWeight: 700, mb: "8px" }}>
+            플레이리스트 이름 변경
+          </Typography>
+
+          <Typography
+            sx={{
+              fontSize: "16px",
+              color: "#666",
+              mb: "24px",
+              textAlign: "center",
+            }}
+          >
+            변경할 플레이리스트 이름을 입력해주세요.
+          </Typography>
+
+          <TextField
+            fullWidth
+            value={editPlaylistName}
+            onChange={(e) => setEditPlaylistName(e.target.value)}
+            placeholder="플레이리스트 이름"
+            sx={{
+              mb: "24px",
+            }}
+          />
+
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "16px",
+              width: "100%",
+            }}
+          >
+            <Button
+              variant="outlined"
+              onClick={() => setIsEditModalOpen(false)}
+            >
+              취소
+            </Button>
+
+            <Button
+              variant="contained"
+              disabled={isEditDisabled}
+              onClick={handleEditSelectedPlaylist}
+            >
+              변경
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
     </Box>
   );
 };

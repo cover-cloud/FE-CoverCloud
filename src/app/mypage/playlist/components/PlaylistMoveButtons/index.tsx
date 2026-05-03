@@ -5,12 +5,12 @@ import { Box, Button } from "@mui/material";
 import { MoveDirection } from "../playlistTypes";
 
 type PlaylistMoveButtonsProps = {
-  onMove: (direction: MoveDirection) => void;
+  // onMove: (direction: MoveDirection) => void;
   onDelete: () => void;
 };
 
 const PlaylistMoveButtons = ({
-  onMove,
+  // onMove,
   onDelete,
 }: PlaylistMoveButtonsProps) => {
   const handleMove = (
@@ -18,7 +18,7 @@ const PlaylistMoveButtons = ({
     direction: MoveDirection,
   ) => {
     e.stopPropagation();
-    onMove(direction);
+    // onMove(direction);
   };
 
   const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -28,7 +28,7 @@ const PlaylistMoveButtons = ({
 
   return (
     <Box className="flex shrink-0 items-center gap-1">
-      <Button
+      {/* <Button
         size="small"
         variant="outlined"
         onClick={(e) => handleMove(e, "top")}
@@ -58,7 +58,7 @@ const PlaylistMoveButtons = ({
         onClick={(e) => handleMove(e, "bottom")}
       >
         맨 아래
-      </Button>
+      </Button> */}
 
       <Button
         size="small"

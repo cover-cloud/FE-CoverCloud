@@ -21,11 +21,8 @@ import {
 } from "@/app/api/cover/comment";
 import { useAuthStore } from "@/app/store/useAuthStore";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
-import Image from "next/image";
-import { fetchAuthMeWithCookie } from "@/app/api/auth/authMe";
 import { useModalStore } from "@/app/store/useModalStore";
 import { useFormatCreatedAt } from "@/app/utils/formetCreatedAt";
-import { requireAuth } from "@/app/utils/requireAuth";
 import { reportComment } from "@/app/api/cover/reportPost";
 
 interface CommentItemProps extends CommentListData {

@@ -165,12 +165,12 @@ export const exampleUsage = () => {
 
   testUrls.forEach((url) => {
     const result = detectAndValidateMediaUrl(url);
-    console.log(`URL: ${url}`);
-    console.log(`Platform: ${result.platform}`);
-    console.log(`Valid: ${result.isValid}`);
-    console.log(`ID: ${result.id}`);
-    console.log(`Embed URL: ${result.embedUrl}`);
-    console.log("---");
+    // console.log(`URL: ${url}`);
+    // console.log(`Platform: ${result.platform}`);
+    // console.log(`Valid: ${result.isValid}`);
+    // console.log(`ID: ${result.id}`);
+    // console.log(`Embed URL: ${result.embedUrl}`);
+    // console.log("---");
   });
 };
 

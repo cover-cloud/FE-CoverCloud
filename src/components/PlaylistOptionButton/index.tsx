@@ -2,23 +2,21 @@ import React, { useEffect, useRef } from "react";
 import { Box } from "@mui/material";
 import { HiDotsHorizontal, HiDotsVertical } from "react-icons/hi";
 
-interface OptionButtonProps {
+interface PlaylistOptionButtonProps {
   isLogin: boolean;
   openDeleteModal: () => void;
-  openReportModal: () => void;
   navigateToEdit: () => void;
   colIcon?: boolean;
   isCenter?: boolean;
 }
 
-const OptionButton = ({
+const PlaylistOptionButton = ({
   isLogin,
   openDeleteModal,
-  openReportModal,
   navigateToEdit,
   colIcon = false,
   isCenter = false,
-}: OptionButtonProps) => {
+}: PlaylistOptionButtonProps) => {
   const [isOptionOpen, setIsOptionOpen] = React.useState(false);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -59,17 +57,7 @@ const OptionButton = ({
       </Box>
 
       {isOptionOpen && isLogin && (
-        <Box className="absolute top-7 right-0 bg-white w-24 border-2 border-gray-200 z-50">
-          <Box
-            className="hover:bg-gray-100 p-2"
-            onClick={(e) => {
-              e.stopPropagation();
-              openDeleteModal();
-              setIsOptionOpen(false);
-            }}
-          >
-            삭제
-          </Box>
+        <Box className="absolute top-7 right-0 bg-white w-[180px] border-2 border-gray-200 z-50">
           <Box
             className="hover:bg-gray-100 p-2"
             onClick={(e) => {
@@ -78,25 +66,22 @@ const OptionButton = ({
               setIsOptionOpen(false);
             }}
           >
-            수정
+            이름 변경
           </Box>
-        </Box>
-      )}
-
-      {isOptionOpen && !isLogin && (
-        <Box
-          className="absolute top-7 right-0 bg-white w-24 border-2 border-gray-200 z-50"
-          onClick={(e) => {
-            e.stopPropagation();
-            openReportModal();
-            setIsOptionOpen(false);
-          }}
-        >
-          <Box className="hover:bg-gray-100 p-2">신고</Box>
+          <Box
+            className="hover:bg-gray-100 p-2"
+            onClick={(e) => {
+              e.stopPropagation();
+              openDeleteModal();
+              setIsOptionOpen(false);
+            }}
+          >
+            플레이리스트 삭제
+          </Box>
         </Box>
       )}
     </Box>
   );
 };
 
-export default OptionButton;
+export default PlaylistOptionButton;

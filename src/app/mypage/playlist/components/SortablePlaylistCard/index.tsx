@@ -12,8 +12,8 @@ type SortablePlaylistCardProps = {
   itemCount: number;
   isSelected: boolean;
   onClick: () => void;
-  onDelete: () => void;
-  onMove: (direction: MoveDirection) => void;
+  // onDelete: () => void;
+  // onMove: (direction: MoveDirection) => void;
 };
 
 const SortablePlaylistCard = ({
@@ -21,8 +21,8 @@ const SortablePlaylistCard = ({
   itemCount,
   isSelected,
   onClick,
-  onDelete,
-  onMove,
+  // onDelete,
+  // onMove,
 }: SortablePlaylistCardProps) => {
   const {
     attributes,
@@ -32,7 +32,7 @@ const SortablePlaylistCard = ({
     transition,
     isDragging,
   } = useSortable({
-    id: playlist.id,
+    id: playlist.playlistId,
   });
 
   const style: React.CSSProperties = {
@@ -50,7 +50,7 @@ const SortablePlaylistCard = ({
         isSelected ? "border-black bg-gray-100" : "bg-white"
       }`}
     >
-      <Button
+      {/* <Button
         type="button"
         size="small"
         variant="outlined"
@@ -60,25 +60,29 @@ const SortablePlaylistCard = ({
         className="min-w-0 cursor-grab active:cursor-grabbing"
       >
         ≡
-      </Button>
-
+      </Button> */}
       <Box className="min-w-0 flex-1">
         <Typography className="truncate font-semibold">
-          {playlist.title}
+          {playlist.name}
         </Typography>
 
-        {playlist.description && (
-          <Typography className="mt-1 truncate text-sm text-gray-500">
-            {playlist.description}
-          </Typography>
-        )}
+        {/* {playlist.description && (
+            <Typography className="mt-1 truncate text-sm text-gray-500">
+              {playlist.description}
+            </Typography>
+          )} */}
 
         <Typography className="mt-1 text-xs text-gray-400">
           {itemCount}곡
         </Typography>
+        <Typography className="mt-1 text-xs text-gray-400">
+          {playlist.createdAt}
+        </Typography>
+        <Typography className="mt-1 text-xs text-gray-400">
+          {playlist.thumbnailUrl}
+        </Typography>
       </Box>
-      {/* 
-      <PlaylistMoveButtons onMove={onMove} onDelete={onDelete} /> */}
+      {/* <PlaylistMoveButtons onDelete={onDelete} /> */}
     </Box>
   );
 };

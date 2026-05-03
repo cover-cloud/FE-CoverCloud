@@ -13,18 +13,17 @@ import {
 } from "@mui/material";
 
 export type CreatePlaylistPayload = {
-  title: string;
-  description?: string;
+  name: string;
 };
 
 type CreatePlaylistButtonProps = {
-  onCreate: (payload: CreatePlaylistPayload) => void | Promise<void>;
+  onCreate: (name: string) => void | Promise<void>;
   buttonText?: string;
 };
 
 const CreatePlaylistButton = ({
   onCreate,
-  buttonText = "재생리스트 만들기",
+  buttonText = "플레이리스트 생성",
 }: CreatePlaylistButtonProps) => {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
@@ -52,10 +51,7 @@ const CreatePlaylistButton = ({
     try {
       setIsSubmitting(true);
 
-      await onCreate({
-        title: trimmedTitle,
-        description: trimmedDescription || undefined,
-      });
+      await onCreate(trimmedTitle);
 
       closeModal();
     } finally {
@@ -72,7 +68,7 @@ const CreatePlaylistButton = ({
       <Dialog open={open} onClose={closeModal} fullWidth maxWidth="xs">
         <DialogTitle>재생리스트 만들기</DialogTitle>
 
-        <DialogContent>
+        <DialogContent onKeyDown={(e) => e.stopPropagation()}>
           <Box className="flex flex-col gap-4 pt-2">
             <Box>
               <Typography variant="body2" className="mb-1">
@@ -96,7 +92,7 @@ const CreatePlaylistButton = ({
               </Typography>
             </Box>
 
-            <Box>
+            {/* <Box>
               <Typography variant="body2" className="mb-1">
                 설명
               </Typography>
@@ -118,7 +114,7 @@ const CreatePlaylistButton = ({
               >
                 {description.length}/100
               </Typography>
-            </Box>
+            </Box> */}
           </Box>
         </DialogContent>
 

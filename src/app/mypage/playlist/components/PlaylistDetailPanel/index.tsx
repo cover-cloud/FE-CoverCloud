@@ -17,7 +17,7 @@ import SortablePlaylistItemCard from "../SortablePlaylistItemCard";
 import { MoveDirection, Playlist, PlaylistItem } from "../playlistTypes";
 
 type PlaylistDetailPanelProps = {
-  selectedPlaylist?: Playlist;
+  selectedPlaylistName: string;
   selectedPlaylistItems: PlaylistItem[];
   onDeleteItem: (itemId: number) => void;
   onMoveItem: (itemId: number, direction: MoveDirection) => void;
@@ -25,7 +25,7 @@ type PlaylistDetailPanelProps = {
 };
 
 const PlaylistDetailPanel = ({
-  selectedPlaylist,
+  selectedPlaylistName,
   selectedPlaylistItems,
   onDeleteItem,
   onMoveItem,
@@ -41,7 +41,7 @@ const PlaylistDetailPanel = ({
 
   return (
     <Box component="section" className="min-h-[300px] rounded-xl border p-4">
-      {!selectedPlaylist ? (
+      {!selectedPlaylistName ? (
         <Box className="flex h-full min-h-[260px] items-center justify-center">
           <Typography className="text-sm text-gray-500">
             재생리스트를 선택하면 곡 목록이 표시됩니다.
@@ -51,14 +51,8 @@ const PlaylistDetailPanel = ({
         <>
           <Box className="mb-4">
             <Typography className="text-lg font-semibold">
-              {selectedPlaylist.title}
+              {selectedPlaylistName}
             </Typography>
-
-            {selectedPlaylist.description && (
-              <Typography className="mt-1 text-sm text-gray-500">
-                {selectedPlaylist.description}
-              </Typography>
-            )}
           </Box>
 
           <Box className="max-h-[60vh] overflow-y-auto pr-1 md:max-h-[520px]">

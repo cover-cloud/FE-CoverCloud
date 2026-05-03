@@ -7,7 +7,9 @@ export type PlaylistItem = {
 };
 
 export type Playlist = {
-  id: number;
-  title: string;
-  description?: string;
+  playlistId: number;
+  name: string;
+  itemCount: number;
+  thumbnailUrl: string;
+  createdAt: string;
 };

@@ -41,9 +41,10 @@ import OptionButton from "@/components/OptionButton";
 import { fetchAuthMeWithCookie, useAuthMeQuery } from "@/app/api/auth/authMe";
 import { useModalStore } from "@/app/store/useModalStore";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
-import { requireAuth } from "@/app/utils/requireAuth";
 import { reportPost } from "@/app/api/cover/reportPost";
 import VideoPlayer from "../../../edit/components/VideoPlayer";
+import PostBasicButton from "@/components/PostBasicButton";
+import AddPlaylistButton from "../AddPlaylistButton";
 const genres = [
   { title: "K-POP", value: "K_POP" },
   { title: "J-POP", value: "J_POP" },
@@ -444,12 +445,14 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
               />
             </Box>
           )}
+
           <ArtistInfo
             coverArtist={originalArtist || "정보없음"}
             songTitle={originalTitle || "정보없음"}
             coverUrl={originalCoverImageUrl || ""}
             isMobile={isMobile}
           />
+          <AddPlaylistButton postId={Number(id)} />
           {!isPostLoading && isMobile && (
             <Box
               onClick={() => setIsCommentOpen(true)}
