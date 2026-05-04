@@ -14,6 +14,7 @@ async function getPost(id: string) {
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/cover/list/${id}`,
     { next: { revalidate: 120 } },
   );
+
   if (!res.ok) throw new Error("데이터를 불러오는 데 실패했습니다.");
   return res.json();
 }
@@ -21,6 +22,7 @@ async function getPost(id: string) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const result = await getPost(id);
+
   const post = result.data;
 
   if (!post) return { title: "포스트를 찾을 수 없습니다." };
@@ -47,7 +49,7 @@ const PostViewPage = async ({ params }: Props) => {
   const { id } = await params;
   const post = await getPost(id);
 
-  return <PostClient id={id} initialData={post} />;
+  return <PostClient id={id} initialData={post.data} />;
 };
 
 export default PostViewPage;

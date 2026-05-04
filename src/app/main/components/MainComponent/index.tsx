@@ -7,7 +7,10 @@ import Box from "@mui/material/Box";
 import Pagination from "@mui/material/Pagination";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button, CircularProgress, useMediaQuery } from "@mui/material";
-import { usePopularCoverListQuery } from "../../../../app/api/cover/list";
+import {
+  CoverListPageResponse,
+  usePopularCoverListQuery,
+} from "../../../../app/api/cover/list";
 import { contentData, Genre } from "../../../../app/main/type";
 import { useTheme } from "@mui/material/styles";
 import InfoMessage from "@/components/InfoMessage";
@@ -34,11 +37,14 @@ const genreTabs: Genre[] = [
   { title: "기타", value: "OTHER", label: "OTHER" },
 ];
 
-const MainComponent = ({ initialData }: { initialData?: any }) => {
+const MainComponent = ({
+  initialData,
+}: {
+  initialData?: CoverListPageResponse;
+}) => {
   const theme = useTheme();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   /* =========================
       URL → 상태 (UI 기준)
     ========================= */

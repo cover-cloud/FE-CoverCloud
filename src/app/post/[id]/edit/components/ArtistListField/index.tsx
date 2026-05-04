@@ -10,13 +10,21 @@ import {
 import React, { useRef, useEffect } from "react";
 import { SongData } from "../../../../components/ItemEditor/type";
 import ArtistProfile from "../../../../components/ArtistProfile";
-import { useSpotifySearchQuery } from "@/app/hook/useSpotifySearchQuery";
 import theme from "@/app/lib/theme";
 import PostBasicButton from "@/components/PostBasicButton";
 import { useSearchQuery } from "@/app/api/spotify/search";
 import { useAuthStore } from "@/app/store/useAuthStore";
-import { is } from "zod/v4/locales";
+import { string } from "zod";
 
+export type MusicSearchItem = {
+  album: string;
+  artist: string;
+  coverUrl: string;
+  durationMs: number;
+  itunesTrackId: string;
+  previewUrl: string;
+  title: string;
+};
 const ArtistListField = ({
   searchsongTitle,
   selectedSongData,
@@ -30,7 +38,7 @@ const ArtistListField = ({
   searchsongTitle: string;
   selectedSongData: SongData;
   setSelectedSongData: (
-    songData: SongData & { title: string; itunesTrackId: string },
+    songData: SongData & { title: string; musicId: string },
   ) => void;
   isSongSearchFocus: boolean;
   isManualInput: boolean;
@@ -64,8 +72,9 @@ const ArtistListField = ({
   const [artist, setArtist] = React.useState("");
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   React.useEffect(() => {
+    if (!isManualInput) return;
     songTitleManualChangeHandler(songTitle, artist);
-  }, [songTitle, artist]);
+  }, [songTitle, artist, isManualInput, songTitleManualChangeHandler]);
   const toggleInputHandler = () => {
     setArtist("");
     setsongTitle("");
@@ -87,7 +96,6 @@ const ArtistListField = ({
       },
     },
   };
-
   return (
     <Box sx={{ backgroundColor: "#F2F2F2", borderRadius: "15px" }}>
       <Box
@@ -99,14 +107,23 @@ const ArtistListField = ({
         className="flex flex-col gap-2  p-2"
       >
         {!isManualInput || data?.length > 0 ? (
-          data?.map((song: any, index: any) => {
+          data?.map((song: MusicSearchItem, index: number) => {
             const isLast = index === data?.length - 1;
 
             return (
               <Box
                 // ref={isLast ? lastSongRef : null}
                 key={`${song.itunesTrackId}-${index}`}
-                onClick={() => setSelectedSongData(song)}
+                onClick={() =>
+                  setSelectedSongData({
+                    key: song.itunesTrackId,
+                    artist: song.artist,
+                    songTitle: song.title,
+                    coverUrl: song.coverUrl,
+                    title: song.title,
+                    musicId: song.itunesTrackId,
+                  })
+                }
                 className="cursor-pointer"
               >
                 <ArtistProfile

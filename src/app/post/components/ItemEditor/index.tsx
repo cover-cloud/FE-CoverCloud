@@ -40,7 +40,6 @@ import { fetchAuthMeWithCookie, useAuthMeQuery } from "@/app/api/auth/authMe";
 import Login from "@/components/auth/Login";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
 import { useModalStore } from "@/app/store/useModalStore";
-import { isValid } from "zod/v3";
 import Loading from "@/app/main/loading";
 
 const fields: FormField[] = [
@@ -230,10 +229,10 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
   };
 
   const selectSongHandler = (
-    songData: SongData & { title: string; itunesTrackId: string },
+    songData: SongData & { title: string; musicId: string },
   ) => {
     setValue("selectedSongData", {
-      key: songData?.itunesTrackId,
+      key: String(songData?.musicId),
       artist: songData?.artist,
       songTitle: songData?.title,
       coverUrl: songData?.coverUrl,
@@ -313,20 +312,21 @@ const ItemEditor = ({ mode }: { mode: "create" | "edit" }) => {
     if (mode !== "edit") return;
 
     if (postData) {
-      setValue("title", postData.data.data.coverTitle);
-      setValue("link", postData.data.data.link);
-      setValue("coverArtist", postData.data.data.coverArtist);
-      setValue("genre", postData.data.data.coverGenre);
-      setValue("selectedSongData", {
-        artist: postData.data.data.originalArtist,
-        songTitle: postData.data.data.originalTitle,
-        key: postData.data.data.itunesTrackId ?? "",
-        coverUrl: postData.data.data.originalCoverImageUrl ?? "",
-      });
+      setValue("title", postData.coverTitle);
+      setValue("link", postData.link);
+      setValue("coverArtist", postData.coverArtist);
+      setValue("genre", postData.coverGenre);
 
-      setTags(postData.data.data.tags ?? []);
+      setValue("selectedSongData", {
+        artist: postData.originalArtist,
+        songTitle: postData.originalTitle,
+        key: String(postData.musicId ?? ""),
+        coverUrl: postData.originalCoverImageUrl ?? "",
+      });
+      setTags(postData.tags ?? []);
     }
   }, [mode, postData]);
+
   if (!isHydrated || isPostLoading) return <Loading />;
   if (data?.success === false || !isLogin) return <Login />;
   return (

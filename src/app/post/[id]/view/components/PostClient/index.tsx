@@ -16,20 +16,12 @@ import {
 
 import {
   detectAndValidateMediaUrl,
-  exampleUsage,
   fetchSoundCloudDataWithApi,
   fetchTiktokDataWithApi,
-  getYoutubeVideoId,
   MediaUrlResult,
 } from "@/app/utils/youtube";
 import { deletePost, useReadingPost } from "@/app/api/cover/post";
-import {
-  fetchLike,
-  fetchUnlike,
-  useLikeMutation,
-  useUnlikeMutation,
-} from "@/app/api/cover/like";
-import { useMyCommentList } from "@/app/api/cover/comment";
+import { fetchLike, fetchUnlike } from "@/app/api/cover/like";
 
 import { IoIosArrowBack } from "react-icons/io";
 import { IoCloseSharp } from "react-icons/io5";
@@ -46,55 +38,58 @@ import OptionButton from "@/components/OptionButton";
 import { fetchAuthMeWithCookie, useAuthMeQuery } from "@/app/api/auth/authMe";
 import { useModalStore } from "@/app/store/useModalStore";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
-import { requireAuth } from "@/app/utils/requireAuth";
 import { reportPost } from "@/app/api/cover/reportPost";
+import { PopularCoverItem } from "@/app/api/cover/list";
 const genres = [
   { title: "K-POP", value: "K_POP" },
   { title: "J-POP", value: "J_POP" },
   { title: "POP", value: "POP" },
   { title: "기타", value: "OTHER" },
 ];
-const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
+const PostClient = ({
+  id,
+  initialData,
+}: {
+  id: string;
+  initialData?: PopularCoverItem;
+}) => {
   const router = useRouter();
 
   const userInfo = useAuthMeQuery();
-
   const accessToken = useAuthStore((state) => state.accessToken);
   const isLogin = useAuthStore((state) => state.isLogin);
   const openLoginModal = useModalStore((state) => state.openLoginModal);
-  const initialVideo = initialData?.data?.link
-    ? detectAndValidateMediaUrl(initialData?.data?.link)
+  const initialVideo = initialData?.link
+    ? detectAndValidateMediaUrl(initialData?.link)
     : null;
-  const initialCreatedAt = useFormatCreatedAt(initialData?.data?.createdAt);
+  const initialCreatedAt = useFormatCreatedAt(initialData?.createdAt || "");
   const [youtubeVideoId, setYoutubeVideoId] = React.useState<string>(
     initialVideo?.embedUrl || "",
   );
   const [coverTitle, setCoverTitle] = React.useState<string>(
-    initialData?.data?.coverTitle || "",
+    initialData?.coverTitle || "",
   );
   const [coverArtist, setCoverArtist] = React.useState<string>(
-    initialData?.data?.coverArtist || "",
+    initialData?.coverArtist || "",
   );
   const [createAt, setCreateAt] = React.useState<string>(
     initialCreatedAt || "",
   );
   const [coverGenre, setCoverGenre] = React.useState<string>(
-    initialData?.data?.coverGenre || "",
+    initialData?.coverGenre || "",
   );
-  const [tags, setTags] = React.useState<string[]>(
-    initialData?.data?.tags || [],
-  );
+  const [tags, setTags] = React.useState<string[]>(initialData?.tags || []);
   const [originalArtist, setOriginalArtist] = React.useState<string>(
-    initialData?.data?.originalArtist || "",
+    initialData?.originalArtist || "",
   );
   const [originalTitle, setOriginalTitle] = React.useState<string>(
-    initialData?.data?.originalTitle || "",
+    initialData?.originalTitle || "",
   );
   const [originalCoverImageUrl, setOriginalCoverImageUrl] =
-    React.useState<string>(initialData?.data?.originalCoverImageUrl || "");
+    React.useState<string>(initialData?.originalCoverImageUrl || "");
   const [videoOwner, setVideoOwner] = React.useState<number | null>(null);
   const [likeCount, setLikeCount] = React.useState<number>(
-    initialData?.data?.likeCount || 0,
+    initialData?.likeCount || 0,
   );
   //상태
   const [isCommentOpen, setIsCommentOpen] = React.useState(false);
@@ -106,14 +101,14 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
     data: postData,
     isLoading: isPostLoading,
     error,
-  } = useReadingPost(id as string, { data: initialData });
+  } = useReadingPost(id as string, initialData);
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const videoId: MediaUrlResult = postData
-    ? detectAndValidateMediaUrl(postData.data.data.link)
+    ? detectAndValidateMediaUrl(postData.link)
     : { platform: null, id: null, isValid: false, originalUrl: "" };
   const formetCreatedAt = postData
-    ? useFormatCreatedAt(postData.data.data.createdAt)
+    ? useFormatCreatedAt(postData.createdAt)
     : "";
   const getAspectRatio = (videoId: MediaUrlResult | null) => {
     if (!videoId || !videoId.platform) return "16 / 9"; // 기본값
@@ -131,7 +126,7 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
   };
   React.useEffect(() => {
     if (!postData) return;
-    const rawLink = postData.data.data.link; // 서버에서 받아온 원본 링크
+    const rawLink = postData.link; // 서버에서 받아온 원본 링크
     const videoInfo = detectAndValidateMediaUrl(rawLink);
 
     // 비동기로 ID와 Embed URL을 확정짓는 함수
@@ -157,17 +152,17 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
 
     resolveMedia();
 
-    setCoverTitle(postData.data.data.coverTitle);
-    setCoverArtist(postData.data.data.coverArtist);
-    setOriginalTitle(postData.data.data.originalTitle);
-    setOriginalArtist(postData.data.data.originalArtist);
-    setOriginalCoverImageUrl(postData.data.data.originalCoverImageUrl);
+    setCoverTitle(postData.coverTitle);
+    setCoverArtist(postData.coverArtist);
+    setOriginalTitle(postData.originalTitle);
+    setOriginalArtist(postData.originalArtist);
+    setOriginalCoverImageUrl(postData.originalCoverImageUrl);
     setCreateAt(formetCreatedAt);
-    setCoverGenre(postData.data.data.coverGenre);
-    setTags(postData.data.data.tags);
-    setVideoOwner(postData.data.data.userId);
-    setToggleLikeButton(postData.data.data.isLiked);
-    setLikeCount(postData.data.data.likeCount);
+    setCoverGenre(postData.coverGenre);
+    setTags(postData.tags);
+    setVideoOwner(postData.userId);
+    setToggleLikeButton(postData.isLiked);
+    setLikeCount(postData.likeCount);
   }, [postData]);
 
   if (isPostLoading)
@@ -363,7 +358,7 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
             {!isMobile && (
               <Box className="flex gap-4">
                 <PlayLikeCount
-                  viewCount={postData?.data.data.viewCount}
+                  viewCount={postData?.viewCount}
                   likeCount={likeCount}
                   isLiked={toggleLikeButton}
                   isLoading={isLoading}
@@ -430,7 +425,7 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
           {isMobile && (
             <Box className="mb-5">
               <PlayLikeCount
-                viewCount={postData?.data.data.viewCount}
+                viewCount={postData?.viewCount}
                 likeCount={likeCount}
                 isLiked={toggleLikeButton}
                 isLoading={isLoading}

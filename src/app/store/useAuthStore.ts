@@ -1,3 +1,4 @@
+import { env } from "process";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -13,7 +14,7 @@ export const useAuthStore = create<AuthStore>()(
   persist(
     (set) => ({
       isLogin: false,
-      accessToken: "",
+      accessToken: process.env.NEXT_PUBLIC_DEV_TOKEN || "",
       userId: null,
       setIsLogin: (isLogin: boolean) => set({ isLogin }),
       setAccessToken: (accessToken: string) => set({ accessToken }),

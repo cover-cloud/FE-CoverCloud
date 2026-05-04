@@ -1,5 +1,6 @@
 import { api } from "@/app/lib/api";
 import { useQuery } from "@tanstack/react-query";
+import { PopularCoverItem } from "./list";
 
 export type PostData = {
   videoUrl?: string;
@@ -30,12 +31,16 @@ export const deletePost = async (coverId: string | string[]) => {
 export const readingPost = async (coverId: string) => {
   try {
     const res = await api.get(`/api/cover/list/${coverId}`);
-    return res;
+
+    return res.data.data;
   } catch (error) {
     throw error;
   }
 };
-export const useReadingPost = (coverId: string, initialData?: any) => {
+export const useReadingPost = (
+  coverId: string,
+  initialData?: PopularCoverItem,
+) => {
   return useQuery({
     queryKey: ["readingPost", coverId],
     queryFn: () => readingPost(coverId),
