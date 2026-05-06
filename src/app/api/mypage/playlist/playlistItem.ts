@@ -30,11 +30,9 @@ export const deletePlaylistItem = async ({
   coverId: number;
 }) => {
   try {
-    const res = await api.delete(`/api/playlist/${playlistId}/items`, {
-      data: {
-        coverId,
-      },
-    });
+    const res = await api.delete(
+      `/api/playlist/${playlistId}/items/${coverId}`,
+    );
 
     return res.data;
   } catch (error) {
@@ -54,7 +52,7 @@ export const reorderPlaylistItems = async ({
 }) => {
   try {
     const res = await api.post(`/api/playlist/${playlistId}/items/reorder`, {
-      orderedItemIds: orderedItemIds.join(","),
+      orderedItemIds,
     });
 
     return res.data;
@@ -94,7 +92,7 @@ export const useDeletePlaylistItemMutation = () => {
       if (!res?.success) return;
 
       queryClient.invalidateQueries({
-        queryKey: ["myPlaylist"],
+        queryKey: ["playlistDetail"],
       });
 
       queryClient.invalidateQueries({
@@ -111,7 +109,9 @@ export const useReorderPlaylistItemsMutation = () => {
     mutationFn: reorderPlaylistItems,
     onSuccess: (res, variables) => {
       if (!res?.success) return;
-
+      queryClient.invalidateQueries({
+        queryKey: ["playlistDetail"],
+      });
       queryClient.invalidateQueries({
         queryKey: ["playlistItems", variables.playlistId],
       });

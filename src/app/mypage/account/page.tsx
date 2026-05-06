@@ -76,7 +76,7 @@ const AccountPage = () => {
   };
   const hasImage = typeof avatar === "string" && avatar.length > 0;
   const handleImageChange = async (file: File) => {
-    if (!isLogin && !accessToken) {
+    if (!isLogin || !accessToken) {
       openLoginModal();
       useSnackbarStore
         .getState()
@@ -98,7 +98,7 @@ const AccountPage = () => {
     }
   };
   const handleRemoveImage = async () => {
-    if (!isLogin && !accessToken) {
+    if (!isLogin || !accessToken) {
       openLoginModal();
       useSnackbarStore
         .getState()
@@ -122,7 +122,7 @@ const AccountPage = () => {
   };
 
   const changedNickNameHandler = async () => {
-    if (!isLogin && !accessToken) {
+    if (!isLogin || !accessToken) {
       openLoginModal();
       useSnackbarStore
         .getState()
@@ -149,7 +149,7 @@ const AccountPage = () => {
     setIsDeleteAccountModalOpen(true);
   };
   const deleteAccountHandler = async () => {
-    if (!isLogin && !accessToken) {
+    if (!isLogin || !accessToken) {
       openLoginModal();
       useSnackbarStore
         .getState()
@@ -163,7 +163,7 @@ const AccountPage = () => {
   };
   const logoutHandler = async () => {
     // TODO: 로그아웃 API 호출
-    if (!isLogin && !accessToken) {
+    if (!isLogin || !accessToken) {
       useSnackbarStore.getState().show("이미 로그아웃 되었습니다.", "error");
       return;
     }
@@ -172,7 +172,7 @@ const AccountPage = () => {
     router.push("/");
   };
   const changedImageHandler = async () => {
-    if (!isLogin && !accessToken) {
+    if (!isLogin || !accessToken) {
       openLoginModal();
       useSnackbarStore
         .getState()

@@ -1,8 +1,6 @@
 import { api } from "@/app/lib/api";
 import axios from "axios";
-import { completeLogin } from "@/app/utils/auth.service";
-import { useAuthStore } from "@/app/store/useAuthStore";
-import { refreshToken } from "./refresh";
+
 export const changeAccount = async (
   nickname: string | undefined,
   profileImage: string | null | undefined,

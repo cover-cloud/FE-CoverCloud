@@ -6,6 +6,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import PlaylistMoveButtons from "../PlaylistMoveButtons";
 import { MoveDirection, PlaylistItem } from "../playlistTypes";
+import PostCard from "@/components/PostCard";
 
 type SortablePlaylistItemCardProps = {
   item: PlaylistItem;
@@ -26,7 +27,7 @@ const SortablePlaylistItemCard = ({
     transition,
     isDragging,
   } = useSortable({
-    id: item.id,
+    id: item.itemId,
   });
 
   const style: React.CSSProperties = {
@@ -51,7 +52,21 @@ const SortablePlaylistItemCard = ({
       >
         ≡
       </Button>
-
+      {/* <PostCard
+        commentCount={0}
+        coverArtist={item.coverArtist || ""}
+        coverGenre={item.coverGenre || ""}
+        coverId={item.coverId}
+        coverTitle={item.coverTitle || ""}
+        createdAt=""
+        likeCount={0}
+        link={item.link || ""}
+        musicId={0}
+        tags={[]}
+        userId={0}
+        viewCount={0}
+        isViewer
+      /> */}
       {/* <Box className="min-w-0 flex-1">
         <Typography className="truncate font-medium">{item.title}</Typography>
 
@@ -62,7 +77,7 @@ const SortablePlaylistItemCard = ({
         )}
       </Box> */}
 
-      <PlaylistMoveButtons onMove={onMove} onDelete={onDelete} />
+      <PlaylistMoveButtons onDelete={onDelete} />
     </Box>
   );
 };

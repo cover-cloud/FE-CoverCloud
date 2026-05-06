@@ -1,9 +1,9 @@
-import { api } from "@/app/lib/api";
+import axios from "axios";
 import { useAuthStore } from "@/app/store/useAuthStore";
 
 export const refreshToken = async () => {
   try {
-    const response = await api.post(
+    const response = await axios.post(
       `/api/auth/refresh`,
       {},
       {

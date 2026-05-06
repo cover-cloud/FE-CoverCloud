@@ -10,6 +10,10 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import {
+  restrictToParentElement,
+  restrictToVerticalAxis,
+} from "@dnd-kit/modifiers";
+import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
@@ -64,22 +68,27 @@ const PlaylistDetailPanel = ({
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
+                modifiers={[restrictToVerticalAxis, restrictToParentElement]}
                 onDragEnd={onDragEnd}
               >
                 <SortableContext
-                  items={selectedPlaylistItems.map((item) => item.id)}
+                  items={selectedPlaylistItems.map((item) => item.itemId)}
                   strategy={verticalListSortingStrategy}
                 >
-                  <Box className="flex flex-col gap-3">
-                    {selectedPlaylistItems.map((item) => (
-                      <SortablePlaylistItemCard
-                        key={item.id}
-                        item={item}
-                        onDelete={() => onDeleteItem(item.id)}
-                        onMove={(direction) => onMoveItem(item.id, direction)}
-                      />
-                    ))}
-                  </Box>
+                  {selectedPlaylistItems && (
+                    <Box className="flex flex-col gap-3">
+                      {selectedPlaylistItems.map((item) => (
+                        <SortablePlaylistItemCard
+                          key={item.itemId}
+                          item={item}
+                          onDelete={() => onDeleteItem(item.itemId)}
+                          onMove={(direction) =>
+                            onMoveItem(item.itemId, direction)
+                          }
+                        />
+                      ))}
+                    </Box>
+                  )}
                 </SortableContext>
               </DndContext>
             )}

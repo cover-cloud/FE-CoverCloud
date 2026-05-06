@@ -27,14 +27,14 @@ export const createPlaylist = async (name: string) => {
 
     return res.data;
   } catch (error) {
-    // useAuthStore.setState({
-    //   accessToken: "",
-    //   isLogin: false,
-    // });
-    // return {
-    //   success: false,
-    //   message: "로그인 정보를 확인할 수 없습니다.",
-    // };
+    useAuthStore.setState({
+      accessToken: "",
+      isLogin: false,
+    });
+    return {
+      success: false,
+      message: "로그인 정보를 확인할 수 없습니다.",
+    };
   }
 };
 

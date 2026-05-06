@@ -255,7 +255,7 @@ const PostClient = ({ id, initialData }: { id: string; initialData?: any }) => {
     }
   };
   const likeToggleHandler = async () => {
-    if (!isLogin && !accessToken) {
+    if (!isLogin || !accessToken) {
       openLoginModal();
       useSnackbarStore
         .getState()

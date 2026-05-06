@@ -37,7 +37,7 @@ const CommentInput = ({
     e.preventDefault();
     const normalizedComment = comment.trim();
     if (!normalizedComment) return;
-    if (!isLogin && !accessToken) {
+    if (!isLogin || !accessToken) {
       openLoginModal();
       useSnackbarStore
         .getState()

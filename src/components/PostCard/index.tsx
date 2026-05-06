@@ -20,17 +20,12 @@ const genres = [
   { title: "기타", value: "OTHER" },
 ];
 const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
-  coverArtist,
   coverGenre,
   coverId,
   coverTitle,
-  createdAt,
   likeCount,
   link,
-  musicId,
   tags,
-  userId,
-  viewCount,
   isViewer,
 }) => {
   const theme = useTheme();

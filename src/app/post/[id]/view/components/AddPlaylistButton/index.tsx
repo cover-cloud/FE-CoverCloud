@@ -49,7 +49,7 @@ const AddPlaylistButton = ({ postId }: AddPlaylistButtonProps) => {
   };
 
   const handleSelectPlaylist = async (playlistId: number, coverId: number) => {
-    if (!isLogin && !accessToken) {
+    if (!isLogin || !accessToken) {
       openLoginModal();
 
       useSnackbarStore
@@ -80,7 +80,7 @@ const AddPlaylistButton = ({ postId }: AddPlaylistButtonProps) => {
   };
 
   const handleCreatePlaylist = async (name: string) => {
-    if (!isLogin && !accessToken) {
+    if (!isLogin || !accessToken) {
       openLoginModal();
 
       useSnackbarStore

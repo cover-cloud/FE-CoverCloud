@@ -1,11 +1,18 @@
 export type MoveDirection = "up" | "down" | "top" | "bottom";
 
-export type PlaylistItem = {
-  id: number;
-  title: string;
-  artist?: string;
-};
-
+export interface PlaylistItem {
+  itemId: number;
+  coverId: number;
+  coverTitle: string;
+  coverArtist: string;
+  originalTitle: string;
+  originalArtist: string;
+  originalCoverImageUrl: string;
+  link: string;
+  position: number;
+  likeCount: number;
+  viewCount: number;
+}
 export type Playlist = {
   playlistId: number;
   name: string;

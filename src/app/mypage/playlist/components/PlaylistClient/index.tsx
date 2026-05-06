@@ -18,18 +18,22 @@ import {
   usePatchPlaylistMutation,
   usePlaylistDetailQuery,
 } from "@/app/api/mypage/playlist/playlist";
-import { useCreatePlaylistItemMutation } from "@/app/api/mypage/playlist/playlistItem";
+import {
+  useDeletePlaylistItemMutation,
+  useReorderPlaylistItemsMutation,
+} from "@/app/api/mypage/playlist/playlistItem";
 import { useAuthStore } from "@/app/store/useAuthStore";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
 import { useModalStore } from "@/app/store/useModalStore";
 import Modal from "@/components/modal/Modal";
 import PlaylistOptionButton from "@/components/PlaylistOptionButton";
-import { is } from "zod/v4/locales";
 
 const PlaylistClient = () => {
   const createPlaylistMutation = useCreatePlaylistMutation();
   const deletePlaylistMutation = useDeletePlaylistMutation();
   const patchPlaylistMutation = usePatchPlaylistMutation();
+  const deletePlaylistItemMutation = useDeletePlaylistItemMutation();
+  const reorderPlaylistItemsMutation = useReorderPlaylistItemsMutation();
 
   const accessToken = useAuthStore((state) => state.accessToken);
   const isLogin = useAuthStore((state) => state.isLogin);
@@ -77,7 +81,7 @@ const PlaylistClient = () => {
   };
 
   const createNewPlaylistHandler = async (name: string) => {
-    if (!isLogin && !accessToken) {
+    if (!isLogin || !accessToken) {
       openLoginModal();
 
       useSnackbarStore
@@ -86,8 +90,9 @@ const PlaylistClient = () => {
 
       return;
     }
-    const result = await createPlaylistMutation.mutateAsync(name);
 
+    const result = await createPlaylistMutation.mutateAsync(name);
+    console.log(result, "dd");
     if (result.success) {
       useSnackbarStore
         .getState()
@@ -106,7 +111,7 @@ const PlaylistClient = () => {
   };
 
   const deletePlaylist = async (playlistId: number) => {
-    if (!isLogin && !accessToken) {
+    if (!isLogin || !accessToken) {
       openLoginModal();
 
       useSnackbarStore
@@ -144,7 +149,7 @@ const PlaylistClient = () => {
 
     if (selectedPlaylist.name.trim() === nextName) return;
 
-    if (!isLogin && !accessToken) {
+    if (!isLogin || !accessToken) {
       openLoginModal();
 
       useSnackbarStore
@@ -180,15 +185,12 @@ const PlaylistClient = () => {
     }
   };
 
-  const deletePlaylistItem = (itemId: number) => {
+  const deletePlaylistItem = async (itemId: number) => {
     if (!selectedPlaylist) return;
-
-    setPlaylistItemsById((prev) => ({
-      ...prev,
-      [selectedPlaylist.id]: (prev[selectedPlaylist.id] ?? []).filter(
-        (item) => item.id !== itemId,
-      ),
-    }));
+    await deletePlaylistItemMutation.mutateAsync({
+      playlistId: selectedPlaylist.id,
+      coverId: itemId,
+    });
   };
 
   const movePlaylistItem = (itemId: number, direction: MoveDirection) => {
@@ -196,7 +198,7 @@ const PlaylistClient = () => {
 
     setPlaylistItemsById((prev) => {
       const items = prev[selectedPlaylist.id] ?? [];
-      const currentIndex = items.findIndex((item) => item.id === itemId);
+      const currentIndex = items.findIndex((item) => item.itemId === itemId);
 
       if (currentIndex === -1) return prev;
 
@@ -216,26 +218,44 @@ const PlaylistClient = () => {
       };
     });
   };
-
-  const handlePlaylistItemDragEnd = (event: DragEndEvent) => {
+  const handlePlaylistItemDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
 
     if (!over || active.id === over.id || !selectedPlaylist) return;
 
-    setPlaylistItemsById((prev) => {
-      const items = prev[selectedPlaylist.id] ?? [];
-      const oldIndex = items.findIndex((item) => item.id === active.id);
-      const newIndex = items.findIndex((item) => item.id === over.id);
+    const items: PlaylistItem[] = playlistDetailData?.data?.items ?? [];
 
-      if (oldIndex === -1 || newIndex === -1) return prev;
+    const oldIndex = items.findIndex(
+      (item) => item.itemId === Number(active.id),
+    );
 
-      return {
-        ...prev,
-        [selectedPlaylist.id]: arrayMove(items, oldIndex, newIndex),
-      };
+    const newIndex = items.findIndex((item) => item.itemId === Number(over.id));
+
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const reorderedItems: PlaylistItem[] = arrayMove<PlaylistItem>(
+      items,
+      oldIndex,
+      newIndex,
+    );
+
+    const itemIds = reorderedItems.map((item) => item.itemId);
+    console.log("itemIds", itemIds);
+    const result = await reorderPlaylistItemsMutation.mutateAsync({
+      playlistId: selectedPlaylist.id,
+      orderedItemIds: itemIds,
     });
-  };
 
+    if (result.success) {
+      useSnackbarStore
+        .getState()
+        .show("플레이리스트 순서가 변경되었습니다.", "success");
+    } else {
+      useSnackbarStore
+        .getState()
+        .show("플레이리스트 순서 변경에 실패했습니다.", "error");
+    }
+  };
   return (
     <Box>
       <CreatePlaylistButton onCreate={createNewPlaylistHandler} />

@@ -69,7 +69,7 @@ const CommentItem = ({
 
   const likeComment = useCommentLikeMutation();
   const likeCommentHandler = async () => {
-    if (!isLogin && !accessToken) {
+    if (!isLogin || !accessToken) {
       openLoginModal();
       useSnackbarStore
         .getState()
@@ -85,7 +85,7 @@ const CommentItem = ({
   };
 
   const deleteCommentHandler = () => {
-    if (!isLogin && !accessToken) {
+    if (!isLogin || !accessToken) {
       openLoginModal();
       useSnackbarStore
         .getState()
@@ -123,7 +123,7 @@ const CommentItem = ({
     if (normalizedComment === content) {
       return;
     }
-    if (!isLogin && !accessToken) {
+    if (!isLogin || !accessToken) {
       openLoginModal();
       useSnackbarStore
         .getState()
@@ -152,7 +152,7 @@ const CommentItem = ({
     );
   };
   const reportCommentHandler = async () => {
-    if (!isLogin && !accessToken) {
+    if (!isLogin || !accessToken) {
       openLoginModal();
       useSnackbarStore
         .getState()
