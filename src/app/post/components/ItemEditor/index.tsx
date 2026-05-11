@@ -40,7 +40,6 @@ import { fetchAuthMeWithCookie, useAuthMeQuery } from "@/app/api/auth/authMe";
 import Login from "@/components/auth/Login";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
 import { useModalStore } from "@/app/store/useModalStore";
-import { isValid } from "zod/v3";
 
 const fields: FormField[] = [
   { key: "title", label: "제목", placeholder: "게시글의 제목을 입력해주세요." },

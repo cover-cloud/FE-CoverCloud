@@ -38,7 +38,9 @@ const SortablePlaylistCard = ({
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.6 : 1,
+    opacity: 1,
+    position: "relative",
+    zIndex: isDragging ? 9999 : 1,
   };
 
   return (

@@ -33,7 +33,9 @@ const SortablePlaylistItemCard = ({
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.6 : 1,
+    opacity: 1,
+    position: "relative",
+    zIndex: isDragging ? 9999 : 1,
   };
 
   return (
@@ -52,7 +54,7 @@ const SortablePlaylistItemCard = ({
       >
         ≡
       </Button>
-      {/* <PostCard
+      <PostCard
         commentCount={0}
         coverArtist={item.coverArtist || ""}
         coverGenre={item.coverGenre || ""}
@@ -62,11 +64,11 @@ const SortablePlaylistItemCard = ({
         likeCount={0}
         link={item.link || ""}
         musicId={0}
-        tags={[]}
+        tags={item.tags}
         userId={0}
         viewCount={0}
         isViewer
-      /> */}
+      />
       {/* <Box className="min-w-0 flex-1">
         <Typography className="truncate font-medium">{item.title}</Typography>
 

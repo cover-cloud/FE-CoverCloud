@@ -4,6 +4,7 @@ export interface PlaylistItem {
   itemId: number;
   coverId: number;
   coverTitle: string;
+  coverGenre: "KPOP" | "JPOP" | "POP" | "OTHER";
   coverArtist: string;
   originalTitle: string;
   originalArtist: string;
@@ -12,6 +13,7 @@ export interface PlaylistItem {
   position: number;
   likeCount: number;
   viewCount: number;
+  tags: string[];
 }
 export type Playlist = {
   playlistId: number;
