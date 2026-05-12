@@ -1,3 +1,4 @@
+import { PlaylistItem } from "@/app/mypage/playlist/components/playlistTypes";
 import { MediaUrlResult } from "@/app/utils/youtube";
 
 export type PlayerViewData = {
@@ -23,12 +24,17 @@ export type PlayerViewerProps = {
   userProfileImage?: string;
   isMobile: boolean;
   isLoading?: boolean;
+  isLikedLoading?: boolean;
+  isVideolistLoading?: boolean;
+  isPlaylistPlayer?: boolean;
 
   showComments?: boolean;
   showAddPlaylistButton?: boolean;
   showOptions?: boolean;
   showPopularVideos?: boolean;
   showLikeCount?: boolean;
+  playlistId?: number;
+  playListItems?: PlaylistItem[];
 
   onBack?: () => void;
   onLikeToggle: () => void;

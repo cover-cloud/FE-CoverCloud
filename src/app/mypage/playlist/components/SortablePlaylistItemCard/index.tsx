@@ -9,12 +9,14 @@ import { MoveDirection, PlaylistItem } from "../playlistTypes";
 import PostCard from "@/components/PostCard";
 
 type SortablePlaylistItemCardProps = {
+  playlistId: number;
   item: PlaylistItem;
   onDelete: () => void;
   onMove: (direction: MoveDirection) => void;
 };
 
 const SortablePlaylistItemCard = ({
+  playlistId,
   item,
   onDelete,
   onMove,
@@ -55,6 +57,7 @@ const SortablePlaylistItemCard = ({
         ≡
       </Button>
       <PostCard
+        isPlaylistPlayer
         commentCount={0}
         coverArtist={item.coverArtist || ""}
         coverGenre={item.coverGenre || ""}
@@ -68,6 +71,8 @@ const SortablePlaylistItemCard = ({
         userId={0}
         viewCount={0}
         isViewer
+        playlistId={playlistId}
+        playlistItemId={item.itemId}
       />
       {/* <Box className="min-w-0 flex-1">
         <Typography className="truncate font-medium">{item.title}</Typography>

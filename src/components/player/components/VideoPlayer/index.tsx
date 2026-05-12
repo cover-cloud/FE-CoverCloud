@@ -1,10 +1,18 @@
 "use client";
-// components/VideoPlayer.tsx
+
 import React, { useRef, useCallback, useState, useEffect } from "react";
-import { Box } from "@mui/material";
 import { MediaPlatform } from "@/app/utils/youtube";
 import { useYouTubePlayer } from "@/app/hook/useYouTubePlayer";
 import { useSoundCloudPlayer } from "@/app/hook/useSoundCloudPlayer";
+
+type VideoPlayerProps = {
+  videoId: string;
+  videoType: MediaPlatform;
+  videoData: any;
+  onVideoEnded?: () => void;
+  getAspectRatio: (videoData: any) => string;
+  autoPlay?: boolean;
+};
 
 const VideoPlayer = ({
   videoId,
@@ -12,21 +20,16 @@ const VideoPlayer = ({
   videoData,
   onVideoEnded,
   getAspectRatio,
-}: {
-  videoId: string;
-  videoType: MediaPlatform;
-  videoData: any;
-  onVideoEnded: () => void;
-  getAspectRatio: (videoData: any) => string;
-}) => {
+  autoPlay = false,
+}: VideoPlayerProps) => {
   const ytIframeRef = useRef<HTMLIFrameElement | null>(null);
   const scIframeRef = useRef<HTMLIFrameElement | null>(null);
 
   const handleEnded = useCallback(() => {
-    console.log(`${videoType} 영상 종료됨`);
-    // 알고리즘에 따른 넥스트비디오아이디 or 다음 포스트로 이동
-    onVideoEnded();
-  }, [videoType, onVideoEnded]);
+    if (!autoPlay) return;
+
+    onVideoEnded?.();
+  }, [autoPlay, onVideoEnded]);
 
   useYouTubePlayer({
     iframeRef: ytIframeRef,
@@ -39,23 +42,52 @@ const VideoPlayer = ({
     onEnded: handleEnded,
   });
 
-  const [ytSrc, setYtSrc] = useState(() =>
-    videoId.includes("enablejsapi")
-      ? videoId
-      : `${videoId}${videoId.includes("?") ? "&" : "?"}enablejsapi=1`,
-  );
+  const buildYouTubeSrc = useCallback(() => {
+    const url = new URL(videoId);
+
+    url.searchParams.set("enablejsapi", "1");
+
+    if (typeof window !== "undefined") {
+      url.searchParams.set("origin", window.location.origin);
+    }
+
+    if (autoPlay) {
+      url.searchParams.set("autoplay", "1");
+    } else {
+      url.searchParams.delete("autoplay");
+    }
+
+    return url.toString();
+  }, [videoId, autoPlay]);
+
+  const buildSoundCloudSrc = useCallback(() => {
+    const url = new URL(videoId);
+
+    url.searchParams.set("enable_api", "true");
+
+    if (autoPlay) {
+      url.searchParams.set("auto_play", "true");
+    } else {
+      url.searchParams.delete("auto_play");
+    }
+
+    return url.toString();
+  }, [videoId, autoPlay]);
+
+  const [ytSrc, setYtSrc] = useState(videoId);
+  const [scSrc, setScSrc] = useState(videoId);
 
   useEffect(() => {
-    if (!videoId.includes("enablejsapi")) {
-      setYtSrc(
-        `${videoId}${videoId.includes("?") ? "&" : "?"}enablejsapi=1&origin=${window.location.origin}`,
-      );
-    }
-  }, [videoId]);
+    if (!videoId) return;
 
-  const scSrc = videoId.includes("enable_api")
-    ? videoId
-    : `${videoId}${videoId.includes("?") ? "&" : "?"}enable_api=true`;
+    if (videoType === "youtube") {
+      setYtSrc(buildYouTubeSrc());
+    }
+
+    if (videoType === "soundcloud") {
+      setScSrc(buildSoundCloudSrc());
+    }
+  }, [videoId, videoType, buildYouTubeSrc, buildSoundCloudSrc]);
 
   if (videoType === "youtube") {
     return (
@@ -69,6 +101,7 @@ const VideoPlayer = ({
           borderRadius: "12px",
           border: "none",
         }}
+        allow="autoplay; encrypted-media; picture-in-picture"
         allowFullScreen
       />
     );
@@ -85,6 +118,7 @@ const VideoPlayer = ({
           borderRadius: "12px",
           border: "none",
         }}
+        allow="autoplay"
         allowFullScreen
       />
     );
@@ -100,6 +134,7 @@ const VideoPlayer = ({
         borderRadius: "12px",
         border: "none",
       }}
+      allow="autoplay; encrypted-media; picture-in-picture"
       allowFullScreen
     />
   );

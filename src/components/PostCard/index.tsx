@@ -19,7 +19,14 @@ const genres = [
   { title: "POP", value: "POP" },
   { title: "기타", value: "OTHER" },
 ];
-const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
+const PostCard: React.FC<
+  contentData & {
+    isViewer?: boolean;
+    playlistId?: number;
+    playlistItemId?: number;
+    isPlaylistPlayer?: boolean;
+  }
+> = ({
   coverGenre,
   coverId,
   coverTitle,
@@ -27,12 +34,20 @@ const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
   link,
   tags,
   isViewer,
+  playlistId,
+  playlistItemId,
+  isPlaylistPlayer,
 }) => {
   const theme = useTheme();
   const videoId = detectAndValidateMediaUrl(link);
 
   const [imageSrc, setImageSrc] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const href =
+    isPlaylistPlayer && playlistId && playlistItemId
+      ? `/mypage/playlist/${playlistId}/play?itemId=${playlistItemId}`
+      : `/post/${coverId}/view`;
 
   // ✅ useEffect 안에서 async 처리
   React.useEffect(() => {
@@ -56,7 +71,7 @@ const PostCard: React.FC<contentData & { isViewer?: boolean }> = ({
     fetchThumbnail();
   }, [videoId]);
   return (
-    <Link href={`/post/${coverId}/view`}>
+    <Link href={href}>
       <Box
         className={` ${isViewer ? "flex" : "flex-col"}`}
         sx={{

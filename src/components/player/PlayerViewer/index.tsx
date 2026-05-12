@@ -24,10 +24,11 @@ import PlayLikeCount from "@/components/player/components/PlayLikeCount";
 import ArtistInfo from "@/components/player/components/ArtistInfo";
 import CommentSection from "@/components/player/components/CommentSection";
 import PopularVideos from "@/components/player/components/PopularVideos";
-import AddPlaylistButton from "@/components/player/components/AddPlaylistButton";
+import AddPlaylistButton from "@/components/playlist/AddPlaylistButton";
 import OptionButton from "@/components/OptionButton";
 import { PlayerViewerProps } from "../playerTypes";
 import { useAuthMeQuery } from "@/app/api/auth/authMe";
+import PlaylistVideos from "../components/PlaylistVideos";
 
 const genres = [
   { title: "K-POP", value: "K_POP" },
@@ -40,7 +41,11 @@ const PlayerViewer = ({
   data,
   userProfileImage = "",
   isMobile,
-  isLoading = false,
+  isLikedLoading = false,
+  isVideolistLoading = false,
+  playListItems = [],
+  playlistId,
+  isPlaylistPlayer = false,
 
   showComments = true,
   showAddPlaylistButton = true,
@@ -106,6 +111,7 @@ const PlayerViewer = ({
               videoData={videoData}
               onVideoEnded={onVideoEnded}
               getAspectRatio={getAspectRatio}
+              autoPlay={isPlaylistPlayer}
             />
           ) : (
             <Skeleton
@@ -132,7 +138,7 @@ const PlayerViewer = ({
                     viewCount={data.viewCount}
                     likeCount={data.likeCount ?? 0}
                     isLiked={data.isLiked ?? false}
-                    isLoading={isLoading}
+                    isLoading={isLikedLoading}
                     isMobile={isMobile}
                     onLikeToggle={onLikeToggle}
                   />
@@ -204,7 +210,7 @@ const PlayerViewer = ({
                 viewCount={data.viewCount}
                 likeCount={data.likeCount ?? 0}
                 isLiked={data.isLiked ?? false}
-                isLoading={isLoading}
+                isLoading={isLikedLoading}
                 isMobile={isMobile}
                 onLikeToggle={onLikeToggle}
               />
@@ -246,12 +252,20 @@ const PlayerViewer = ({
           )}
         </Box>
       </Box>
-      {/* 여기서 Populer 리스트 컴포넌트 보여줄지 아니면 플레이리스트 컴포넌트 보여줄지 결정 */}
-      {showPopularVideos && (
-        <Box className="sidebar-content">
+      {/* 여기서 Popular 리스트 컴포넌트 보여줄지 아니면 플레이리스트 컴포넌트 보여줄지 결정 */}
+
+      <Box className="sidebar-content">
+        {showPopularVideos ? (
           <PopularVideos isViewer={!isMobile} currentCoverId={data.id} />
-        </Box>
-      )}
+        ) : (
+          <PlaylistVideos
+            isViewer={!isMobile}
+            playlistId={playlistId || 0}
+            data={playListItems || []}
+            isVideolistLoading={isVideolistLoading}
+          />
+        )}
+      </Box>
 
       {showComments && isMobile && (
         <SwipeableDrawer

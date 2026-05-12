@@ -26,7 +26,7 @@ import { useAuthStore } from "@/app/store/useAuthStore";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
 import { useModalStore } from "@/app/store/useModalStore";
 import Modal from "@/components/modal/Modal";
-import PlaylistOptionButton from "@/components/PlaylistOptionButton";
+import PlaylistOptionButton from "@/components/playlist/PlaylistOptionButton";
 
 const PlaylistClient = () => {
   const createPlaylistMutation = useCreatePlaylistMutation();
@@ -283,6 +283,7 @@ const PlaylistClient = () => {
             {playlistDetailData && !isPlaylistDetailLoading && (
               <PlaylistDetailPanel
                 selectedPlaylistName={selectedPlaylist.name}
+                selectedPlaylistId={selectedPlaylist.id}
                 selectedPlaylistItems={playlistDetailData.data.items || []}
                 onDeleteItem={deletePlaylistItem}
                 onMoveItem={movePlaylistItem}

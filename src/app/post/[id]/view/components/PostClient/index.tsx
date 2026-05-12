@@ -8,16 +8,9 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import { useRouter } from "next/navigation";
 
-import { deletePost, useReadingPost } from "@/app/api/cover/post";
-import { fetchLike, fetchUnlike } from "@/app/api/cover/like";
-import { fetchAuthMeWithCookie, useAuthMeQuery } from "@/app/api/auth/authMe";
-import { reportPost } from "@/app/api/cover/reportPost";
-
-import { useAuthStore } from "@/app/store/useAuthStore";
-import { useModalStore } from "@/app/store/useModalStore";
-import { useSnackbarStore } from "@/app/store/useSnackbar";
+import { useReadingPost } from "@/app/api/cover/post";
+import { useAuthMeQuery } from "@/app/api/auth/authMe";
 
 import Modal from "@/components/modal/Modal";
 import PlayerViewer from "@/components/player/PlayerViewer";
@@ -26,6 +19,8 @@ import theme from "@/app/lib/theme";
 import { useFormatCreatedAt } from "@/app/utils/formetCreatedAt";
 import { MediaUrlResult } from "@/app/utils/youtube";
 import { PlayerViewData } from "@/components/player/playerTypes";
+import { usePlayerActions } from "@/app/hook/usePlayerActions";
+import ConfirmModal from "@/components/player/components/ConfirmModal";
 
 type PostClientProps = {
   id: string;
@@ -33,20 +28,10 @@ type PostClientProps = {
 };
 
 const PostClient = ({ id, initialData }: PostClientProps) => {
-  const router = useRouter();
-
   const userInfo = useAuthMeQuery();
-
-  const accessToken = useAuthStore((state) => state.accessToken);
-  const isLogin = useAuthStore((state) => state.isLogin);
-  const openLoginModal = useModalStore((state) => state.openLoginModal);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = React.useState(false);
-
-  const [toggleLikeButton, setToggleLikeButton] = React.useState(false);
-  const [likeCount, setLikeCount] = React.useState(0);
-  const [isLoading, setIsLoading] = React.useState(false);
 
   const {
     data: postData,
@@ -60,12 +45,24 @@ const PostClient = ({ id, initialData }: PostClientProps) => {
 
   const formattedCreatedAt = useFormatCreatedAt(post?.createdAt ?? "");
 
-  React.useEffect(() => {
-    if (!post) return;
-
-    setToggleLikeButton(post.isLiked);
-    setLikeCount(post.likeCount ?? 0);
-  }, [post]);
+  const {
+    isLiked,
+    likeCount,
+    isLikeLoading,
+    navigateToEdit,
+    reportHandler,
+    deleteHandler,
+    likeToggleHandler,
+    goBack,
+  } = usePlayerActions({
+    coverId: id,
+    initialIsLiked: post?.isLiked ?? false,
+    initialLikeCount: post?.likeCount ?? 0,
+    editHref: `/post/${id}/edit`,
+    afterDeleteHref: "/",
+    onDeleteModalClose: () => setIsDeleteModalOpen(false),
+    onReportModalClose: () => setIsReportModalOpen(false),
+  });
 
   const getAspectRatio = (videoData: MediaUrlResult | null) => {
     if (!videoData || !videoData.platform) return "16 / 9";
@@ -132,138 +129,7 @@ const PostClient = ({ id, initialData }: PostClientProps) => {
 
     likeCount,
     viewCount: post.viewCount ?? 0,
-    isLiked: toggleLikeButton,
-  };
-
-  const navigateToEdit = async () => {
-    const isAuthenticated = await fetchAuthMeWithCookie(accessToken);
-
-    if (!isAuthenticated.success) {
-      openLoginModal();
-
-      useSnackbarStore
-        .getState()
-        .show("로그인 후 수정할 수 있습니다.", "error");
-
-      return;
-    }
-
-    router.push(`/post/${id}/edit`);
-  };
-
-  const reportPostHandler = async () => {
-    const isAuthenticated = await fetchAuthMeWithCookie(accessToken);
-
-    if (!isAuthenticated.success) {
-      openLoginModal();
-
-      useSnackbarStore
-        .getState()
-        .show("로그인 후 신고할 수 있습니다.", "error");
-
-      setIsReportModalOpen(false);
-
-      return;
-    }
-
-    try {
-      const reportResult = await reportPost(id);
-
-      if (reportResult.data.success) {
-        useSnackbarStore.getState().show("신고가 접수되었습니다.", "success");
-      } else {
-        useSnackbarStore.getState().show("신고 실패", "error");
-      }
-
-      setIsReportModalOpen(false);
-    } catch (error) {
-      setIsReportModalOpen(false);
-
-      useSnackbarStore.getState().show("신고 실패", "error");
-    }
-  };
-
-  const deletePostHandler = async () => {
-    const isAuthenticated = await fetchAuthMeWithCookie(accessToken);
-
-    if (!isAuthenticated.success) {
-      openLoginModal();
-
-      useSnackbarStore
-        .getState()
-        .show("로그인 후 삭제할 수 있습니다.", "error");
-
-      setIsDeleteModalOpen(false);
-
-      return;
-    }
-
-    try {
-      const deleteResult = await deletePost(id);
-
-      if (deleteResult.success) {
-        useSnackbarStore.getState().show("삭제가 완료되었습니다.", "success");
-        router.push("/");
-      } else {
-        useSnackbarStore.getState().show("삭제 실패", "error");
-      }
-
-      setIsDeleteModalOpen(false);
-    } catch (error) {
-      setIsDeleteModalOpen(false);
-
-      useSnackbarStore.getState().show("삭제 실패", "error");
-    }
-  };
-
-  const likeToggleHandler = async () => {
-    if (!isLogin || !accessToken) {
-      openLoginModal();
-
-      useSnackbarStore
-        .getState()
-        .show("로그인 후 좋아요를 할 수 있습니다.", "error");
-
-      return;
-    }
-
-    if (isLoading) return;
-
-    setIsLoading(true);
-
-    try {
-      if (toggleLikeButton) {
-        const unlikeResult = await fetchUnlike(id);
-
-        if (!unlikeResult.success) {
-          useSnackbarStore
-            .getState()
-            .show("좋아요 취소에 실패했습니다.", "error");
-
-          return;
-        }
-
-        useSnackbarStore.getState().show("좋아요가 취소되었습니다.", "success");
-
-        setToggleLikeButton(false);
-        setLikeCount((prev) => prev - 1);
-      } else {
-        const likeResult = await fetchLike(id);
-
-        if (!likeResult.success) {
-          useSnackbarStore.getState().show("좋아요에 실패했습니다.", "error");
-
-          return;
-        }
-
-        useSnackbarStore.getState().show("좋아요가 추가되었습니다.", "success");
-
-        setToggleLikeButton(true);
-        setLikeCount((prev) => prev + 1);
-      }
-    } finally {
-      setIsLoading(false);
-    }
+    isLiked,
   };
 
   return (
@@ -272,13 +138,13 @@ const PostClient = ({ id, initialData }: PostClientProps) => {
         data={playerData}
         userProfileImage={userInfo.data?.data?.profileImage || ""}
         isMobile={isMobile}
-        isLoading={isLoading}
+        isLikedLoading={isLikeLoading}
         showComments
         showAddPlaylistButton
         showOptions
         showPopularVideos
         showLikeCount
-        onBack={() => router.back()}
+        onBack={goBack}
         onLikeToggle={likeToggleHandler}
         onEdit={navigateToEdit}
         onDelete={() => setIsDeleteModalOpen(true)}
@@ -289,113 +155,31 @@ const PostClient = ({ id, initialData }: PostClientProps) => {
         getAspectRatio={getAspectRatio}
       />
 
-      <Modal
+      <ConfirmModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
-      >
-        <Box
-          className="flex flex-col items-center"
-          sx={{
-            width: "100%",
-            bgcolor: "#fff",
-            borderRadius: "12px",
-            p: "40px",
-          }}
-        >
-          <Typography variant="h6" sx={{ fontWeight: 700, mb: "8px" }}>
-            게시글 삭제
-          </Typography>
-
-          <Typography
-            sx={{
-              fontSize: "20px",
-              color: "#666",
-              mb: "24px",
-            }}
-          >
+        title="게시글 삭제"
+        description={
+          <>
             삭제한 게시글은 다시 복구할 수 없습니다.
             <br />
             정말 삭제하시겠습니까?
-          </Typography>
+          </>
+        }
+        confirmText="삭제"
+        confirmColor="error"
+        onConfirm={deleteHandler}
+      />
 
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "16px",
-              width: "100%",
-            }}
-          >
-            <Button
-              variant="outlined"
-              onClick={() => setIsDeleteModalOpen(false)}
-            >
-              취소
-            </Button>
-
-            <Button
-              variant="contained"
-              color="error"
-              onClick={deletePostHandler}
-            >
-              삭제
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
-
-      <Modal
+      <ConfirmModal
         isOpen={isReportModalOpen}
         onClose={() => setIsReportModalOpen(false)}
-      >
-        <Box
-          className="flex flex-col items-center"
-          sx={{
-            width: "100%",
-            bgcolor: "#fff",
-            borderRadius: "12px",
-            p: "40px",
-          }}
-        >
-          <Typography variant="h6" sx={{ fontWeight: 700, mb: "8px" }}>
-            게시글 신고
-          </Typography>
-
-          <Typography
-            sx={{
-              fontSize: "20px",
-              color: "#666",
-              mb: "24px",
-            }}
-          >
-            게시글을 신고하시겠습니까?
-          </Typography>
-
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "16px",
-              width: "100%",
-            }}
-          >
-            <Button
-              variant="outlined"
-              onClick={() => setIsReportModalOpen(false)}
-            >
-              취소
-            </Button>
-
-            <Button
-              variant="contained"
-              color="error"
-              onClick={reportPostHandler}
-            >
-              신고
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
+        title="게시글 신고"
+        description="게시글을 신고하시겠습니까?"
+        confirmText="신고"
+        confirmColor="error"
+        onConfirm={reportHandler}
+      />
     </>
   );
 };

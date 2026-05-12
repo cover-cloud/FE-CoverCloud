@@ -22,6 +22,7 @@ import { MoveDirection, Playlist, PlaylistItem } from "../playlistTypes";
 
 type PlaylistDetailPanelProps = {
   selectedPlaylistName: string;
+  selectedPlaylistId: number;
   selectedPlaylistItems: PlaylistItem[];
   onDeleteItem: (itemId: number) => void;
   onMoveItem: (itemId: number, direction: MoveDirection) => void;
@@ -30,6 +31,7 @@ type PlaylistDetailPanelProps = {
 
 const PlaylistDetailPanel = ({
   selectedPlaylistName,
+  selectedPlaylistId,
   selectedPlaylistItems,
   onDeleteItem,
   onMoveItem,
@@ -80,6 +82,7 @@ const PlaylistDetailPanel = ({
                       {selectedPlaylistItems.map((item) => (
                         <SortablePlaylistItemCard
                           key={item.itemId}
+                          playlistId={selectedPlaylistId}
                           item={item}
                           onDelete={() => onDeleteItem(item.itemId)}
                           onMove={(direction) =>

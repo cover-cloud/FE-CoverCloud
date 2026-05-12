@@ -1,10 +1,16 @@
 import PlaylistPlayerClient from "./components/PlaylistPlayerClient";
 
 export const dynamic = "force-dynamic";
-export default function ActivityPage({
+
+export default async function PlaylistPlayerPage({
   params,
+  searchParams,
 }: {
-  params: { playlistId: string };
+  params: Promise<{ playlistId: string }>;
+  searchParams: Promise<{ itemId?: string }>;
 }) {
-  return <PlaylistPlayerClient playlistId={params.playlistId} />;
+  const { playlistId } = await params;
+  const { itemId } = await searchParams;
+
+  return <PlaylistPlayerClient playlistId={playlistId} />;
 }
