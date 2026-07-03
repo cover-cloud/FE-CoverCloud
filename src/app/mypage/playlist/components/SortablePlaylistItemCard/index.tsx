@@ -12,14 +12,12 @@ type SortablePlaylistItemCardProps = {
   playlistId: number;
   item: PlaylistItem;
   onDelete: () => void;
-  onMove: (direction: MoveDirection) => void;
 };
 
 const SortablePlaylistItemCard = ({
   playlistId,
   item,
   onDelete,
-  onMove,
 }: SortablePlaylistItemCardProps) => {
   const {
     attributes,

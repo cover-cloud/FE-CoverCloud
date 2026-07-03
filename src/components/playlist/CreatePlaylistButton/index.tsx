@@ -11,6 +11,8 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import PostBasicButton from "@/components/PostBasicButton";
+import theme from "@/app/lib/theme";
 
 export type CreatePlaylistPayload = {
   name: string;
@@ -23,8 +25,9 @@ type CreatePlaylistButtonProps = {
 
 const CreatePlaylistButton = ({
   onCreate,
-  buttonText = "플레이리스트 생성",
-}: CreatePlaylistButtonProps) => {
+  buttonText = "신규 플레이리스트",
+  icon = null,
+}: CreatePlaylistButtonProps & { icon?: React.ReactNode }) => {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -61,9 +64,20 @@ const CreatePlaylistButton = ({
 
   return (
     <>
-      <Button variant="contained" onClick={openModal}>
+      <PostBasicButton
+        onClick={openModal}
+        icon={icon}
+        postRadius="50px"
+        backgroundColor={theme.palette.common.black}
+        sxStyle={{
+          color: theme.palette.common.white,
+          fontSize: "20px",
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
         {buttonText}
-      </Button>
+      </PostBasicButton>
 
       <Dialog open={open} onClose={closeModal} fullWidth maxWidth="xs">
         <DialogTitle>재생리스트 만들기</DialogTitle>

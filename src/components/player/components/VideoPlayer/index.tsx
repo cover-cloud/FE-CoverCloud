@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useCallback, useState, useEffect } from "react";
+import React, { useRef, useCallback, useMemo } from "react";
 import { MediaPlatform } from "@/app/utils/youtube";
 import { useYouTubePlayer } from "@/app/hook/useYouTubePlayer";
 import { useSoundCloudPlayer } from "@/app/hook/useSoundCloudPlayer";
@@ -26,10 +26,49 @@ const VideoPlayer = ({
   const scIframeRef = useRef<HTMLIFrameElement | null>(null);
 
   const handleEnded = useCallback(() => {
-    if (!autoPlay) return;
-
     onVideoEnded?.();
-  }, [autoPlay, onVideoEnded]);
+  }, [onVideoEnded]);
+
+  const ytSrc = useMemo(() => {
+    if (!videoId || videoType !== "youtube") return null;
+
+    const url = new URL(videoId);
+
+    url.searchParams.set("enablejsapi", "1");
+    url.searchParams.set("playsinline", "1");
+
+    if (typeof window !== "undefined") {
+      url.searchParams.set("origin", window.location.origin);
+    }
+
+    if (autoPlay) {
+      url.searchParams.set("autoplay", "1");
+
+      // 자동재생이 계속 막히면 켜기
+      // url.searchParams.set("mute", "1");
+    } else {
+      url.searchParams.delete("autoplay");
+      url.searchParams.delete("mute");
+    }
+
+    return url.toString();
+  }, [videoId, videoType, autoPlay]);
+
+  const scSrc = useMemo(() => {
+    if (!videoId || videoType !== "soundcloud") return null;
+
+    const url = new URL(videoId);
+
+    url.searchParams.set("enable_api", "true");
+
+    if (autoPlay) {
+      url.searchParams.set("auto_play", "true");
+    } else {
+      url.searchParams.delete("auto_play");
+    }
+
+    return url.toString();
+  }, [videoId, videoType, autoPlay]);
 
   useYouTubePlayer({
     iframeRef: ytIframeRef,
@@ -42,54 +81,9 @@ const VideoPlayer = ({
     onEnded: handleEnded,
   });
 
-  const buildYouTubeSrc = useCallback(() => {
-    const url = new URL(videoId);
-
-    url.searchParams.set("enablejsapi", "1");
-
-    if (typeof window !== "undefined") {
-      url.searchParams.set("origin", window.location.origin);
-    }
-
-    if (autoPlay) {
-      url.searchParams.set("autoplay", "1");
-    } else {
-      url.searchParams.delete("autoplay");
-    }
-
-    return url.toString();
-  }, [videoId, autoPlay]);
-
-  const buildSoundCloudSrc = useCallback(() => {
-    const url = new URL(videoId);
-
-    url.searchParams.set("enable_api", "true");
-
-    if (autoPlay) {
-      url.searchParams.set("auto_play", "true");
-    } else {
-      url.searchParams.delete("auto_play");
-    }
-
-    return url.toString();
-  }, [videoId, autoPlay]);
-
-  const [ytSrc, setYtSrc] = useState(videoId);
-  const [scSrc, setScSrc] = useState(videoId);
-
-  useEffect(() => {
-    if (!videoId) return;
-
-    if (videoType === "youtube") {
-      setYtSrc(buildYouTubeSrc());
-    }
-
-    if (videoType === "soundcloud") {
-      setScSrc(buildSoundCloudSrc());
-    }
-  }, [videoId, videoType, buildYouTubeSrc, buildSoundCloudSrc]);
-
   if (videoType === "youtube") {
+    if (!ytSrc) return null;
+
     return (
       <iframe
         ref={ytIframeRef}
@@ -108,6 +102,8 @@ const VideoPlayer = ({
   }
 
   if (videoType === "soundcloud") {
+    if (!scSrc) return null;
+
     return (
       <iframe
         ref={scIframeRef}
@@ -123,6 +119,8 @@ const VideoPlayer = ({
       />
     );
   }
+
+  if (!videoId) return null;
 
   return (
     <iframe

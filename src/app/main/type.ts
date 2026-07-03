@@ -12,7 +12,7 @@ export type contentData = {
   commentCount: number;
   coverArtist: string;
   coverGenre: string;
-  coverId: number;
+  coverId?: number;
   coverTitle: string;
   createdAt: string;
   likeCount: number;

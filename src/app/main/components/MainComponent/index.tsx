@@ -5,14 +5,14 @@ import Grid from "@mui/material/Grid";
 import PostCard from "../../../../components/PostCard";
 import Box from "@mui/material/Box";
 import Pagination from "@mui/material/Pagination";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Button, CircularProgress, useMediaQuery } from "@mui/material";
+import { useSearchParamUpdater } from "@/app/hook/useSearchParamsUpdater";
+
+import { Button, CircularProgress } from "@mui/material";
 import { usePopularCoverListQuery } from "../../../../app/api/cover/list";
 import { contentData, Genre } from "../../../../app/main/type";
 import { useTheme } from "@mui/material/styles";
 import InfoMessage from "@/components/InfoMessage";
 import { Period } from "@/app/api/cover/list";
-import PostBasicButton from "@/components/PostBasicButton";
 import MainBanner from "../MainBanner";
 
 type PopularTab = {
@@ -36,20 +36,21 @@ const genreTabs: Genre[] = [
 
 const MainComponent = ({ initialData }: { initialData?: any }) => {
   const theme = useTheme();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const { searchParams, updateParams } = useSearchParamUpdater();
+
   /* =========================
       URL → 상태 (UI 기준)
     ========================= */
-  const page = Math.max(1, Number(searchParams.get("page") ?? 1));
-  const period = (searchParams.get("period") as Period) ?? "ALL";
+  const pageParam = Number(searchParams.get("page") ?? 1);
+  const page = Number.isNaN(pageParam) ? 1 : Math.max(1, pageParam);
+
+  const periodParam = searchParams.get("period");
+  const period = popularTabs.some((tab) => tab.period === periodParam)
+    ? (periodParam as Period)
+    : "ALL";
   const genreValues = searchParams.get("genres")
     ? searchParams.get("genres")!.split(",")
     : [];
-
-  const selectedTab =
-    popularTabs.find((t) => t.period === period) ?? popularTabs[0];
 
   const selectedGenres = genreTabs.filter((g) => genreValues.includes(g.value));
 
@@ -79,35 +80,30 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
   const isDisabled = isTabChanging || isFetching;
 
   /* =========================
-      URL 변경 헬퍼
-    ========================= */
-  const updateParams = (next: Record<string, string>) => {
-    setIsTabChanging(true);
-    const params = new URLSearchParams(searchParams.toString());
-
-    Object.entries(next).forEach(([key, value]) => {
-      params.set(key, value);
-    });
-
-    router.push(`/main?${params.toString()}`, { scroll: false });
-  };
-
-  /* =========================
       핸들러
     ========================= */
   const handlePageChange = (_: any, value: number) => {
-    updateParams({ page: String(value) });
-    window.scrollTo({ top: 0, behavior: "instant" });
+    setIsTabChanging(true);
+
+    updateParams({
+      page: value,
+    });
+
+    window.scrollTo({ top: 0, behavior: "auto" });
   };
 
   const popularTabChangeHandler = (tab: PopularTab) => {
+    setIsTabChanging(true);
+
     updateParams({
       period: tab.period,
-      page: "1",
+      page: 1,
     });
   };
 
   const genreTabChangeHandler = (genre: Genre) => {
+    setIsTabChanging(true);
+
     const current = new Set(genreValues);
 
     current.has(genre.value)
@@ -116,7 +112,7 @@ const MainComponent = ({ initialData }: { initialData?: any }) => {
 
     updateParams({
       genres: Array.from(current).join(","),
-      page: "1",
+      page: 1,
     });
   };
 

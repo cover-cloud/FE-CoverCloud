@@ -6,32 +6,26 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import PlaylistMoveButtons from "../PlaylistMoveButtons";
 import { MoveDirection, Playlist } from "../playlistTypes";
+import PostCard from "@/components/PostCard";
 
 type SortablePlaylistCardProps = {
   playlist: Playlist;
-  itemCount: number;
-  isSelected: boolean;
   onClick: () => void;
   // onDelete: () => void;
   // onMove: (direction: MoveDirection) => void;
+  openDeleteModal: () => void;
+  navigateToEdit: () => void;
 };
 
 const SortablePlaylistCard = ({
   playlist,
-  itemCount,
-  isSelected,
   onClick,
   // onDelete,
   // onMove,
+  openDeleteModal,
+  navigateToEdit,
 }: SortablePlaylistCardProps) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
+  const { setNodeRef, transform, transition, isDragging } = useSortable({
     id: playlist.playlistId,
   });
 
@@ -41,17 +35,33 @@ const SortablePlaylistCard = ({
     opacity: 1,
     position: "relative",
     zIndex: isDragging ? 9999 : 1,
+    flex: 1,
   };
-
+  console.log(playlist);
   return (
     <Box
       ref={setNodeRef}
       style={style}
-      onClick={onClick}
-      className={`flex cursor-pointer items-center gap-3 rounded-lg border p-4 ${
-        isSelected ? "border-black bg-gray-100" : "bg-white"
-      }`}
+      className={`flex cursor-pointer items-center gap-3 `}
     >
+      <PostCard
+        commentCount={0}
+        coverArtist={playlist.name}
+        coverGenre={""}
+        playlistId={playlist.playlistId}
+        coverTitle={playlist.name}
+        createdAt={playlist.createdAt}
+        thumbnailUrl={playlist.thumbnailUrl || ""}
+        likeCount={0}
+        link=""
+        musicId={0}
+        tags={[]}
+        userId={0}
+        viewCount={0}
+        playListOpntionButtonClickHandler={onClick}
+        openDeleteModal={openDeleteModal}
+        navigateToEdit={navigateToEdit}
+      />
       {/* <Button
         type="button"
         size="small"
@@ -62,17 +72,17 @@ const SortablePlaylistCard = ({
         className="min-w-0 cursor-grab active:cursor-grabbing"
       >
         ≡
-      </Button> */}
+      </Button>
       <Box className="min-w-0 flex-1">
         <Typography className="truncate font-semibold">
           {playlist.name}
         </Typography>
 
-        {/* {playlist.description && (
+        {playlist.description && (
             <Typography className="mt-1 truncate text-sm text-gray-500">
               {playlist.description}
             </Typography>
-          )} */}
+          )}
 
         <Typography className="mt-1 text-xs text-gray-400">
           {itemCount}곡
@@ -84,7 +94,7 @@ const SortablePlaylistCard = ({
           {playlist.thumbnailUrl}
         </Typography>
       </Box>
-      {/* <PlaylistMoveButtons onDelete={onDelete} /> */}
+      <PlaylistMoveButtons onDelete={onDelete} /> */}
     </Box>
   );
 };

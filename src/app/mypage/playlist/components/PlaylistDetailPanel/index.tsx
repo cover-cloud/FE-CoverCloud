@@ -25,7 +25,6 @@ type PlaylistDetailPanelProps = {
   selectedPlaylistId: number;
   selectedPlaylistItems: PlaylistItem[];
   onDeleteItem: (itemId: number) => void;
-  onMoveItem: (itemId: number, direction: MoveDirection) => void;
   onDragEnd: (event: DragEndEvent) => void;
 };
 
@@ -34,7 +33,6 @@ const PlaylistDetailPanel = ({
   selectedPlaylistId,
   selectedPlaylistItems,
   onDeleteItem,
-  onMoveItem,
   onDragEnd,
 }: PlaylistDetailPanelProps) => {
   const sensors = useSensors(
@@ -85,9 +83,6 @@ const PlaylistDetailPanel = ({
                           playlistId={selectedPlaylistId}
                           item={item}
                           onDelete={() => onDeleteItem(item.itemId)}
-                          onMove={(direction) =>
-                            onMoveItem(item.itemId, direction)
-                          }
                         />
                       ))}
                     </Box>

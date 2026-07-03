@@ -1,47 +1,33 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { DragEndEvent } from "@dnd-kit/core";
-import { arrayMove } from "@dnd-kit/sortable";
-import CreatePlaylistButton, {
-  CreatePlaylistPayload,
-} from "@/components/playlist/CreatePlaylistButton";
+import CreatePlaylistButton from "@/components/playlist/CreatePlaylistButton";
 import PlaylistListPanel from "../PlaylistListPanel";
-import PlaylistDetailPanel from "../PlaylistDetailPanel";
-import { getMovedIndex } from "../playlistUtils";
-import { MoveDirection, PlaylistItem } from "../playlistTypes";
+import { PlaylistItem } from "../playlistTypes";
 import {
   useCreatePlaylistMutation,
   useMyPlaylistQuery,
   useDeletePlaylistMutation,
   usePatchPlaylistMutation,
-  usePlaylistDetailQuery,
 } from "@/app/api/mypage/playlist/playlist";
-import {
-  useDeletePlaylistItemMutation,
-  useReorderPlaylistItemsMutation,
-} from "@/app/api/mypage/playlist/playlistItem";
+
 import { useAuthStore } from "@/app/store/useAuthStore";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
 import { useModalStore } from "@/app/store/useModalStore";
 import Modal from "@/components/modal/Modal";
+
+import AddIcon from "@mui/icons-material/Add";
 import PlaylistOptionButton from "@/components/playlist/PlaylistOptionButton";
 
 const PlaylistClient = () => {
   const createPlaylistMutation = useCreatePlaylistMutation();
   const deletePlaylistMutation = useDeletePlaylistMutation();
   const patchPlaylistMutation = usePatchPlaylistMutation();
-  const deletePlaylistItemMutation = useDeletePlaylistItemMutation();
-  const reorderPlaylistItemsMutation = useReorderPlaylistItemsMutation();
 
   const accessToken = useAuthStore((state) => state.accessToken);
   const isLogin = useAuthStore((state) => state.isLogin);
   const openLoginModal = useModalStore((state) => state.openLoginModal);
-
-  const [playlistItemsById, setPlaylistItemsById] = useState<
-    Record<number, PlaylistItem[]>
-  >({});
 
   const [selectedPlaylist, setSelectedPlaylist] = useState<{
     id: number;
@@ -54,11 +40,7 @@ const PlaylistClient = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const { data, isLoading, isError } = useMyPlaylistQuery();
-  const {
-    data: playlistDetailData,
-    isLoading: isPlaylistDetailLoading,
-    error: playlistDetailError,
-  } = usePlaylistDetailQuery(selectedPlaylist?.id ?? null);
+
   //이름 변경이 같은지 확인
   const trimmedEditPlaylistName = editPlaylistName.trim();
 
@@ -185,90 +167,34 @@ const PlaylistClient = () => {
     }
   };
 
-  const deletePlaylistItem = async (itemId: number) => {
-    if (!selectedPlaylist) return;
-    await deletePlaylistItemMutation.mutateAsync({
-      playlistId: selectedPlaylist.id,
-      coverId: itemId,
-    });
-  };
-
-  const movePlaylistItem = (itemId: number, direction: MoveDirection) => {
-    if (!selectedPlaylist) return;
-
-    setPlaylistItemsById((prev) => {
-      const items = prev[selectedPlaylist.id] ?? [];
-      const currentIndex = items.findIndex((item) => item.itemId === itemId);
-
-      if (currentIndex === -1) return prev;
-
-      const targetIndex = getMovedIndex(items, currentIndex, direction);
-
-      if (
-        targetIndex < 0 ||
-        targetIndex >= items.length ||
-        targetIndex === currentIndex
-      ) {
-        return prev;
-      }
-
-      return {
-        ...prev,
-        [selectedPlaylist.id]: arrayMove(items, currentIndex, targetIndex),
-      };
-    });
-  };
-  const handlePlaylistItemDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (!over || active.id === over.id || !selectedPlaylist) return;
-
-    const items: PlaylistItem[] = playlistDetailData?.data?.items ?? [];
-
-    const oldIndex = items.findIndex(
-      (item) => item.itemId === Number(active.id),
-    );
-
-    const newIndex = items.findIndex((item) => item.itemId === Number(over.id));
-
-    if (oldIndex === -1 || newIndex === -1) return;
-
-    const reorderedItems: PlaylistItem[] = arrayMove<PlaylistItem>(
-      items,
-      oldIndex,
-      newIndex,
-    );
-
-    const itemIds = reorderedItems.map((item) => item.itemId);
-    console.log("itemIds", itemIds);
-    const result = await reorderPlaylistItemsMutation.mutateAsync({
-      playlistId: selectedPlaylist.id,
-      orderedItemIds: itemIds,
-    });
-
-    if (result.success) {
-      useSnackbarStore
-        .getState()
-        .show("플레이리스트 순서가 변경되었습니다.", "success");
-    } else {
-      useSnackbarStore
-        .getState()
-        .show("플레이리스트 순서 변경에 실패했습니다.", "error");
-    }
-  };
   return (
     <Box>
-      <CreatePlaylistButton onCreate={createNewPlaylistHandler} />
+      <Box className="flex items-center justify-center">
+        <Typography variant="h5">내 플레이리스트</Typography>
+      </Box>
 
-      <Box className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-[420px_1fr]">
+      <Box className="flex items-center justify-end">
+        <CreatePlaylistButton
+          onCreate={createNewPlaylistHandler}
+          icon={<AddIcon fontSize="large" sx={{ mr: 1 }} />}
+        />
+      </Box>
+
+      <Box className="mt-6 gap-6">
         <PlaylistListPanel
           playlists={data?.data || []}
           selectedPlaylist={selectedPlaylist?.id ?? null}
-          playlistItemsById={playlistItemsById}
           onSelect={selectedPlaylistHandler}
+          openDeleteModal={() => setIsDeleteModalOpen(true)}
+          navigateToEdit={() => setIsEditModalOpen(true)}
         />
 
-        {selectedPlaylist && (
+        <PlaylistOptionButton
+          isLogin={true}
+          openDeleteModal={() => setIsDeleteModalOpen(true)}
+          navigateToEdit={() => setIsEditModalOpen(true)}
+        />
+        {/* {selectedPlaylist && (
           <Box>
             <Box className="flex items-center justify-between">
               <Typography>{selectedPlaylist.name}</Typography>
@@ -291,7 +217,7 @@ const PlaylistClient = () => {
               />
             )}
           </Box>
-        )}
+        )} */}
       </Box>
 
       <Modal

@@ -4,6 +4,7 @@ import { HiDotsHorizontal, HiDotsVertical } from "react-icons/hi";
 
 interface PlaylistOptionButtonProps {
   isLogin: boolean;
+  onClick: () => void;
   openDeleteModal: () => void;
   navigateToEdit: () => void;
   colIcon?: boolean;
@@ -12,6 +13,7 @@ interface PlaylistOptionButtonProps {
 
 const PlaylistOptionButton = ({
   isLogin,
+  onClick,
   openDeleteModal,
   navigateToEdit,
   colIcon = false,
@@ -50,6 +52,7 @@ const PlaylistOptionButton = ({
       <Box
         onClick={(e) => {
           e.stopPropagation();
+          onClick();
           setIsOptionOpen((prev) => !prev);
         }}
       >

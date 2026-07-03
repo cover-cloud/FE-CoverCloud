@@ -1,12 +1,11 @@
 "use client";
 
 import React from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useMediaQuery } from "@mui/material";
 
 import PlayerViewer from "@/components/player/PlayerViewer";
 import ConfirmModal from "@/components/player/components/ConfirmModal";
-import Loading from "@/app/main/loading";
 
 import theme from "@/app/lib/theme";
 import { MediaUrlResult } from "@/app/utils/youtube";
@@ -16,6 +15,7 @@ import { useReadingPost } from "@/app/api/cover/post";
 
 import { PlaylistItem } from "@/app/mypage/playlist/components/playlistTypes";
 import { usePlayerActions } from "@/app/hook/usePlayerActions";
+import { useSearchParamUpdater } from "@/app/hook/useSearchParamsUpdater";
 
 type PlaylistPlayerClientProps = {
   playlistId: string;
@@ -23,14 +23,18 @@ type PlaylistPlayerClientProps = {
 
 const PlaylistPlayerClient = ({ playlistId }: PlaylistPlayerClientProps) => {
   const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const { searchParams, updateParams, getNumberParam } =
+    useSearchParamUpdater();
 
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
+  const [videoItems, setVideoItems] = React.useState<PlaylistItem[]>([]);
 
   const playlistIdNum = Number(playlistId);
 
   const { data, isLoading } = usePlaylistDetailQuery(playlistIdNum);
+
+  const serverItems: PlaylistItem[] = data?.data?.items ?? [];
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = React.useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = React.useState(false);
@@ -39,9 +43,10 @@ const PlaylistPlayerClient = ({ playlistId }: PlaylistPlayerClientProps) => {
 
   /**
    * /play 로 들어오면 itemIdParam은 null
-   * /play?itemId=18 로 들어오면 "18"
+   * /play?itemId=18 로 들어오면 18
    */
   const itemIdParam = searchParams.get("itemId");
+  const itemId = getNumberParam("itemId", 0);
 
   /**
    * itemId가 있으면 해당 item
@@ -54,16 +59,14 @@ const PlaylistPlayerClient = ({ playlistId }: PlaylistPlayerClientProps) => {
       return 0;
     }
 
-    const currentItemId = Number(itemIdParam);
-
-    if (!Number.isFinite(currentItemId)) {
+    if (!Number.isFinite(itemId) || itemId <= 0) {
       return 0;
     }
 
-    const foundIndex = items.findIndex((item) => item.itemId === currentItemId);
+    const foundIndex = items.findIndex((item) => item.itemId === itemId);
 
     return foundIndex === -1 ? 0 : foundIndex;
-  }, [items, itemIdParam]);
+  }, [items, itemIdParam, itemId]);
 
   const currentItem = items[currentIndex];
 
@@ -99,7 +102,9 @@ const PlaylistPlayerClient = ({ playlistId }: PlaylistPlayerClientProps) => {
   const moveToItem = (nextItemId: number) => {
     if (nextItemId === currentItem?.itemId) return;
 
-    router.push(`${pathname}?itemId=${nextItemId}`);
+    updateParams({
+      itemId: nextItemId,
+    });
   };
 
   const {
@@ -133,9 +138,11 @@ const PlaylistPlayerClient = ({ playlistId }: PlaylistPlayerClientProps) => {
     moveToItem(nextItem.itemId);
   };
 
-  if (isLoading || isPostLoading || isPostFetching) {
-    return <Loading />;
-  }
+  React.useEffect(() => {
+    if (!serverItems.length) return;
+
+    setVideoItems(serverItems);
+  }, [serverItems]);
 
   if (!items.length) {
     return <div>플레이리스트에 재생할 곡이 없습니다.</div>;

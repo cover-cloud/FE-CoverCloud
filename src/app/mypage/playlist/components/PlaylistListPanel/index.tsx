@@ -7,37 +7,39 @@ import { Playlist, PlaylistItem } from "../playlistTypes";
 type PlaylistListPanelProps = {
   playlists: Playlist[];
   selectedPlaylist: number | null;
-  playlistItemsById: Record<number, PlaylistItem[]>;
   onSelect: (playlistId: number, playlistName: string) => void;
   // onDelete: (playlistId: number, playlistName: string) => void;
+  openDeleteModal: () => void;
+  navigateToEdit: () => void;
 };
 
 const PlaylistListPanel = ({
   playlists,
   selectedPlaylist,
-  playlistItemsById,
   onSelect,
   // onDelete,
+  openDeleteModal,
+  navigateToEdit,
 }: PlaylistListPanelProps) => {
   return (
     <Box component="section" className="rounded-xl border p-4">
       <Typography className="mb-4 text-lg font-semibold">재생리스트</Typography>
 
-      <Box className="max-h-[60vh] overflow-y-auto pr-1 md:max-h-[520px]">
+      <Box className="">
         {playlists.length === 0 ? (
           <Typography className="text-sm text-gray-500">
             아직 만든 재생리스트가 없습니다.
           </Typography>
         ) : (
-          <Box className="flex flex-col gap-3">
+          <Box className="grid grid-cols-3 gap-3">
             {playlists.map((playlist) => (
               <SortablePlaylistCard
                 key={playlist.playlistId}
                 playlist={playlist}
-                itemCount={playlist.itemCount}
-                isSelected={playlist.playlistId === selectedPlaylist}
                 onClick={() => onSelect(playlist.playlistId, playlist.name)}
                 // onDelete={() => onDelete(playlist.playlistId, playlist.name)}
+                openDeleteModal={openDeleteModal}
+                navigateToEdit={navigateToEdit}
               />
             ))}
           </Box>
