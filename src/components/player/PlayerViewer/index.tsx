@@ -16,6 +16,7 @@ import {
   detectAndValidateMediaUrl,
   MediaPlatform,
   MediaUrlResult,
+  resolveMediaUrl,
 } from "@/app/utils/youtube";
 import theme from "@/app/lib/theme";
 
@@ -64,19 +65,44 @@ const PlayerViewer = ({
 }: PlayerViewerProps) => {
   const router = useRouter();
   const [isCommentOpen, setIsCommentOpen] = React.useState(false);
-
-  const videoData: MediaUrlResult = data.link
-    ? detectAndValidateMediaUrl(data.link)
-    : {
-        platform: null,
-        id: null,
-        isValid: false,
-        originalUrl: "",
-      };
+  const [videoData, setVideoData] = React.useState<MediaUrlResult>({
+    platform: null,
+    id: null,
+    isValid: false,
+    originalUrl: "",
+  });
+ 
   const userInfo = useAuthMeQuery();
   const loginUserId = userInfo.data?.data?.userId ?? null;
   const isOwner = loginUserId === data.userId;
 
+  React.useEffect(() => {
+    let isMounted = true;
+  
+    const resolveVideoData = async () => {
+      if (!data.link) {
+        setVideoData({
+          platform: null,
+          id: null,
+          isValid: false,
+          originalUrl: "",
+        });
+        return;
+      }
+  
+      const resolved = await resolveMediaUrl(data.link);
+  
+      if (!isMounted) return;
+  
+      setVideoData(resolved);
+    };
+  
+    resolveVideoData();
+  
+    return () => {
+      isMounted = false;
+    };
+  }, [data.link]);
   return (
     <Box className="main-wrapper">
       <Box className="post-content">
