@@ -58,7 +58,7 @@ const SortablePlaylistCard = ({
         tags={[]}
         userId={0}
         viewCount={0}
-        playListOpntionButtonClickHandler={onClick}
+        playListOptionButtonClickHandler={onClick}
         openDeleteModal={openDeleteModal}
         navigateToEdit={navigateToEdit}
       />
