@@ -191,6 +191,7 @@ const PlaylistClient = () => {
 
         <PlaylistOptionButton
           isLogin={true}
+          onClick={() => setIsDeleteModalOpen(true)}
           openDeleteModal={() => setIsDeleteModalOpen(true)}
           navigateToEdit={() => setIsEditModalOpen(true)}
         />
