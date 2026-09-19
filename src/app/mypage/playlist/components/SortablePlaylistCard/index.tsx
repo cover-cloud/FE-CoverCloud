@@ -35,9 +35,8 @@ const SortablePlaylistCard = ({
     opacity: 1,
     position: "relative",
     zIndex: isDragging ? 9999 : 1,
-    flex: 1,
   };
-  console.log(playlist);
+
   return (
     <Box
       ref={setNodeRef}
@@ -61,6 +60,7 @@ const SortablePlaylistCard = ({
         playListOptionButtonClickHandler={onClick}
         openDeleteModal={openDeleteModal}
         navigateToEdit={navigateToEdit}
+        playlistItemCount={playlist.itemCount}
       />
       {/* <Button
         type="button"

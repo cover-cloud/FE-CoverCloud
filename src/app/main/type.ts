@@ -18,9 +18,9 @@ export type contentData = {
   likeCount: number;
   link: string;
   musicId: number;
-  tags: string[];
+  tags?: string[];
   userId: number;
-  viewCount: number;
+  viewCount?: number;
 };
 
 export type Genre = {

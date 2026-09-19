@@ -63,7 +63,7 @@ const CreatePlaylistButton = ({
   };
 
   return (
-    <>
+    <Box mt={2}>
       <PostBasicButton
         onClick={openModal}
         icon={icon}
@@ -80,13 +80,13 @@ const CreatePlaylistButton = ({
       </PostBasicButton>
 
       <Dialog open={open} onClose={closeModal} fullWidth maxWidth="xs">
-        <DialogTitle>재생리스트 만들기</DialogTitle>
+        <DialogTitle>플레이리스트 만들기</DialogTitle>
 
         <DialogContent onKeyDown={(e) => e.stopPropagation()}>
           <Box className="flex flex-col gap-4 pt-2">
             <Box>
               <Typography variant="body2" className="mb-1">
-                재생리스트 이름
+                플레이리스트 이름
               </Typography>
 
               <TextField
@@ -116,7 +116,7 @@ const CreatePlaylistButton = ({
                 multiline
                 minRows={3}
                 size="small"
-                placeholder="재생리스트 설명을 입력하세요."
+                placeholder="플레이리스트 설명을 입력하세요."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 inputProps={{ maxLength: 100 }}
@@ -146,7 +146,7 @@ const CreatePlaylistButton = ({
           </Button>
         </DialogActions>
       </Dialog>
-    </>
+    </Box>
   );
 };
 

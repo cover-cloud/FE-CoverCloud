@@ -71,14 +71,14 @@ const PlayerViewer = ({
     isValid: false,
     originalUrl: "",
   });
- 
+
   const userInfo = useAuthMeQuery();
   const loginUserId = userInfo.data?.data?.userId ?? null;
   const isOwner = loginUserId === data.userId;
 
   React.useEffect(() => {
     let isMounted = true;
-  
+
     const resolveVideoData = async () => {
       if (!data.link) {
         setVideoData({
@@ -89,16 +89,16 @@ const PlayerViewer = ({
         });
         return;
       }
-  
+
       const resolved = await resolveMediaUrl(data.link);
-  
+
       if (!isMounted) return;
-  
+
       setVideoData(resolved);
     };
-  
+
     resolveVideoData();
-  
+
     return () => {
       isMounted = false;
     };
@@ -250,7 +250,7 @@ const PlayerViewer = ({
             isMobile={isMobile}
           />
 
-          {showAddPlaylistButton && <AddPlaylistButton postId={data.id} />}
+          {showAddPlaylistButton && <AddPlaylistButton coverId={data.id} />}
 
           {showComments && isMobile && (
             <Box

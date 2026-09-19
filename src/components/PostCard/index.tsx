@@ -16,6 +16,8 @@ import {
   getMediaThumbnail,
 } from "../../app/utils/youtube";
 import PlaylistOptionButton from "../playlist/PlaylistOptionButton";
+import { Typography } from "@mui/material";
+import { FiPlus } from "react-icons/fi";
 
 const DEFAULT_IMAGE = "/asset/image/default-image.png";
 
@@ -32,6 +34,7 @@ type PostCardProps = contentData & {
   playlistItemId?: number;
   isPlaylistPlayer?: boolean;
   thumbnailUrl?: string;
+  playlistItemCount?: number;
   playListOptionButtonClickHandler?: () => void;
   openDeleteModal?: () => void;
   navigateToEdit?: () => void;
@@ -49,6 +52,7 @@ const PostCard: React.FC<PostCardProps> = ({
   playlistItemId,
   isPlaylistPlayer = false,
   thumbnailUrl,
+  playlistItemCount,
   playListOptionButtonClickHandler,
   openDeleteModal,
   navigateToEdit,
@@ -134,15 +138,19 @@ const PostCard: React.FC<PostCardProps> = ({
         flex: 1,
         padding: isViewer ? "0px" : "12px 20px 14px 20px",
         borderRadius: "12px",
+
         cursor: isPlaylistManageCard ? "default" : "pointer",
+
         "&:hover": {
-          backgroundColor: theme.palette.gray.tertiary,
+          backgroundColor: isPlaylistManageCard
+            ? "transparent"
+            : theme.palette.gray.tertiary,
         },
       }}
     >
       <Box
         className={`relative flex-shrink-0 ${
-          isViewer ? "w-[148px] h-[107px]" : "w-full h-40"
+          isViewer ? "w-[148px] h-[107px]" : "w-full aspect-video"
         }`}
       >
         {(loading || !imageSrc) && (
@@ -173,6 +181,43 @@ const PostCard: React.FC<PostCardProps> = ({
             }}
           />
         )}
+        {/* 플레이리스트 곡 개수 */}
+        {isPlaylistManageCard && playlistItemCount !== undefined && (
+          <Box
+            sx={{
+              position: "absolute",
+              right: "12px",
+              bottom: "12px",
+              zIndex: 2,
+
+              display: "flex",
+              alignItems: "center",
+              gap: "7px",
+
+              height: "32px",
+              px: "11px",
+
+              borderRadius: "6px",
+              backgroundColor: "rgba(40, 40, 40, 0.78)",
+              color: "#fff",
+
+              fontSize: "14px",
+              fontWeight: 600,
+            }}
+          >
+            <Box
+              component="span"
+              sx={{
+                fontSize: "24px",
+                lineHeight: 1,
+                fontWeight: 300,
+              }}
+            >
+              <FiPlus size={20} />
+            </Box>
+            <Typography>{playlistItemCount}</Typography>
+          </Box>
+        )}
       </Box>
 
       <Box
@@ -186,9 +231,22 @@ const PostCard: React.FC<PostCardProps> = ({
       >
         <Box className="flex justify-between items-center">
           {coverTitle && (
-            <h3 className="text-sm font-medium S2 overflow-hidden text-ellipsis whitespace-nowrap min-w-0 flex-1">
+            <Box
+              component="h3"
+              sx={{
+                fontSize: "20px",
+                fontWeight: 600,
+
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+
+                minWidth: 0,
+                flex: 1,
+              }}
+            >
               {coverTitle}
-            </h3>
+            </Box>
           )}
 
           {!isViewer && !hasPlaylistId && (
@@ -213,28 +271,66 @@ const PostCard: React.FC<PostCardProps> = ({
 
         {isPlaylistManageCard && (
           <Box
-            className="S4"
-            onClick={handleNavigate}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleNavigate();
+            }}
             sx={{
               width: "fit-content",
+
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+
+              fontSize: "12px",
+              color: "#555",
+
               cursor: "pointer",
-              color: theme.palette.gray.primary,
+
               "&:hover": {
-                color: theme.palette.common.black,
-                textDecoration: "underline",
+                color: "#000",
               },
             }}
           >
-            전체보기
+            <span>전체 재생목록 보기</span>
+
+            <Box
+              component="span"
+              sx={{
+                fontSize: "18px",
+                lineHeight: 1,
+                transform: "translateY(-1px)",
+              }}
+            >
+              ›
+            </Box>
           </Box>
         )}
 
         <Box className="flex gap-2 items-center overflow-hidden min-w-0">
-          <Box className="flex-shrink-0 S4">
-            {genres.find((g) => g.value === coverGenre)?.title || "기타"}
-          </Box>
+          {!isPlaylistManageCard && (
+            <Box className="flex gap-2 items-center overflow-hidden min-w-0">
+              <Box className="flex-shrink-0 S4">
+                {genres.find((g) => g.value === coverGenre)?.title || "기타"}
+              </Box>
 
-          <Box className="w-[1px] h-4 bg-black flex-shrink-0" />
+              <Box className="w-[1px] h-4 bg-black flex-shrink-0" />
+
+              <Box
+                className="overflow-hidden text-ellipsis whitespace-nowrap min-w-0 flex-1 S4"
+                sx={{
+                  color: theme.palette.genre.primary,
+                }}
+              >
+                {tags?.map((tag) => (
+                  <span key={tag} className="text-xs mr-2">
+                    #{tag}
+                  </span>
+                ))}
+              </Box>
+              <Box className="w-[1px] h-4 bg-black flex-shrink-0" />
+            </Box>
+          )}
 
           <Box
             className="overflow-hidden text-ellipsis whitespace-nowrap min-w-0 flex-1 S4"

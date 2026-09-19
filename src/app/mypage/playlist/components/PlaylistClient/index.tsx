@@ -2,9 +2,12 @@
 
 import { useState } from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
+
+import AddIcon from "@mui/icons-material/Add";
+
 import CreatePlaylistButton from "@/components/playlist/CreatePlaylistButton";
 import PlaylistListPanel from "../PlaylistListPanel";
-import { PlaylistItem } from "../playlistTypes";
+
 import {
   useCreatePlaylistMutation,
   useMyPlaylistQuery,
@@ -15,19 +18,23 @@ import {
 import { useAuthStore } from "@/app/store/useAuthStore";
 import { useSnackbarStore } from "@/app/store/useSnackbar";
 import { useModalStore } from "@/app/store/useModalStore";
-import Modal from "@/components/modal/Modal";
 
-import AddIcon from "@mui/icons-material/Add";
-import PlaylistOptionButton from "@/components/playlist/PlaylistOptionButton";
+import Modal from "@/components/modal/Modal";
 
 const PlaylistClient = () => {
   const createPlaylistMutation = useCreatePlaylistMutation();
+
   const deletePlaylistMutation = useDeletePlaylistMutation();
+
   const patchPlaylistMutation = usePatchPlaylistMutation();
 
   const accessToken = useAuthStore((state) => state.accessToken);
+
   const isLogin = useAuthStore((state) => state.isLogin);
+
   const openLoginModal = useModalStore((state) => state.openLoginModal);
+
+  const { data } = useMyPlaylistQuery();
 
   const [selectedPlaylist, setSelectedPlaylist] = useState<{
     id: number;
@@ -37,11 +44,9 @@ const PlaylistClient = () => {
   const [editPlaylistName, setEditPlaylistName] = useState("");
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  const { data, isLoading, isError } = useMyPlaylistQuery();
-
-  //이름 변경이 같은지 확인
   const trimmedEditPlaylistName = editPlaylistName.trim();
 
   const isSamePlaylistName =
@@ -50,6 +55,9 @@ const PlaylistClient = () => {
   const isEditDisabled =
     !selectedPlaylist || !trimmedEditPlaylistName || isSamePlaylistName;
 
+  /**
+   * 플레이리스트 카드 클릭
+   */
   const selectedPlaylistHandler = (
     playlistId: number,
     playlistName: string,
@@ -58,10 +66,42 @@ const PlaylistClient = () => {
       id: playlistId,
       name: playlistName,
     });
-
-    setEditPlaylistName(playlistName);
   };
 
+  /**
+   * 삭제 메뉴 클릭
+   *
+   * 삭제할 플레이리스트를 여기서 확실하게 지정
+   */
+  const openDeletePlaylistModal = (
+    playlistId: number,
+    playlistName: string,
+  ) => {
+    setSelectedPlaylist({
+      id: playlistId,
+      name: playlistName,
+    });
+
+    setIsDeleteModalOpen(true);
+  };
+
+  /**
+   * 이름 변경 메뉴 클릭
+   */
+  const openEditPlaylistModal = (playlistId: number, playlistName: string) => {
+    setSelectedPlaylist({
+      id: playlistId,
+      name: playlistName,
+    });
+
+    setEditPlaylistName(playlistName);
+
+    setIsEditModalOpen(true);
+  };
+
+  /**
+   * 생성
+   */
   const createNewPlaylistHandler = async (name: string) => {
     if (!isLogin || !accessToken) {
       openLoginModal();
@@ -74,7 +114,7 @@ const PlaylistClient = () => {
     }
 
     const result = await createPlaylistMutation.mutateAsync(name);
-    console.log(result, "dd");
+
     if (result.success) {
       useSnackbarStore
         .getState()
@@ -86,13 +126,12 @@ const PlaylistClient = () => {
     }
   };
 
-  const handleDeleteSelectedPlaylist = () => {
+  /**
+   * 삭제
+   */
+  const handleDeleteSelectedPlaylist = async () => {
     if (!selectedPlaylist) return;
 
-    deletePlaylist(selectedPlaylist.id);
-  };
-
-  const deletePlaylist = async (playlistId: number) => {
     if (!isLogin || !accessToken) {
       openLoginModal();
 
@@ -103,7 +142,9 @@ const PlaylistClient = () => {
       return;
     }
 
-    const result = await deletePlaylistMutation.mutateAsync(playlistId);
+    const result = await deletePlaylistMutation.mutateAsync(
+      selectedPlaylist.id,
+    );
 
     if (result.success) {
       useSnackbarStore
@@ -112,16 +153,18 @@ const PlaylistClient = () => {
 
       setSelectedPlaylist(null);
       setEditPlaylistName("");
-      setIsDeleteModalOpen(false);
     } else {
       useSnackbarStore
         .getState()
         .show("플레이리스트 삭제에 실패했습니다.", "error");
-
-      setIsDeleteModalOpen(false);
     }
+
+    setIsDeleteModalOpen(false);
   };
 
+  /**
+   * 이름 변경
+   */
   const handleEditSelectedPlaylist = async () => {
     if (!selectedPlaylist) return;
 
@@ -129,7 +172,9 @@ const PlaylistClient = () => {
 
     if (!nextName) return;
 
-    if (selectedPlaylist.name.trim() === nextName) return;
+    if (selectedPlaylist.name.trim() === nextName) {
+      return;
+    }
 
     if (!isLogin || !accessToken) {
       openLoginModal();
@@ -157,20 +202,21 @@ const PlaylistClient = () => {
       });
 
       setEditPlaylistName(nextName);
-      setIsEditModalOpen(false);
     } else {
       useSnackbarStore
         .getState()
         .show("플레이리스트 수정에 실패했습니다.", "error");
-
-      setIsEditModalOpen(false);
     }
+
+    setIsEditModalOpen(false);
   };
 
   return (
     <Box>
       <Box className="flex items-center justify-center">
-        <Typography variant="h5">내 플레이리스트</Typography>
+        <Typography variant="h5" fontWeight={700}>
+          내 플레이리스트
+        </Typography>
       </Box>
 
       <Box className="flex items-center justify-end">
@@ -180,47 +226,17 @@ const PlaylistClient = () => {
         />
       </Box>
 
-      <Box className="mt-6 gap-6">
+      <Box className="mt-6">
         <PlaylistListPanel
           playlists={data?.data || []}
           selectedPlaylist={selectedPlaylist?.id ?? null}
           onSelect={selectedPlaylistHandler}
-          openDeleteModal={() => setIsDeleteModalOpen(true)}
-          navigateToEdit={() => setIsEditModalOpen(true)}
+          openDeleteModal={openDeletePlaylistModal}
+          navigateToEdit={openEditPlaylistModal}
         />
-
-        <PlaylistOptionButton
-          isLogin={true}
-          onClick={() => setIsDeleteModalOpen(true)}
-          openDeleteModal={() => setIsDeleteModalOpen(true)}
-          navigateToEdit={() => setIsEditModalOpen(true)}
-        />
-        {/* {selectedPlaylist && (
-          <Box>
-            <Box className="flex items-center justify-between">
-              <Typography>{selectedPlaylist.name}</Typography>
-
-              <PlaylistOptionButton
-                isLogin={true}
-                openDeleteModal={() => setIsDeleteModalOpen(true)}
-                navigateToEdit={() => setIsEditModalOpen(true)}
-              />
-            </Box>
-
-            {playlistDetailData && !isPlaylistDetailLoading && (
-              <PlaylistDetailPanel
-                selectedPlaylistName={selectedPlaylist.name}
-                selectedPlaylistId={selectedPlaylist.id}
-                selectedPlaylistItems={playlistDetailData.data.items || []}
-                onDeleteItem={deletePlaylistItem}
-                onMoveItem={movePlaylistItem}
-                onDragEnd={handlePlaylistItemDragEnd}
-              />
-            )}
-          </Box>
-        )} */}
       </Box>
 
+      {/* DELETE MODAL */}
       <Modal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
@@ -234,7 +250,13 @@ const PlaylistClient = () => {
             p: "40px",
           }}
         >
-          <Typography variant="h6" sx={{ fontWeight: 700, mb: "8px" }}>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 700,
+              mb: "8px",
+            }}
+          >
             플레이리스트 삭제
           </Typography>
 
@@ -277,6 +299,7 @@ const PlaylistClient = () => {
         </Box>
       </Modal>
 
+      {/* EDIT MODAL */}
       <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)}>
         <Box
           className="flex flex-col items-center"
@@ -287,7 +310,13 @@ const PlaylistClient = () => {
             p: "40px",
           }}
         >
-          <Typography variant="h6" sx={{ fontWeight: 700, mb: "8px" }}>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 700,
+              mb: "8px",
+            }}
+          >
             플레이리스트 이름 변경
           </Typography>
 
@@ -307,9 +336,7 @@ const PlaylistClient = () => {
             value={editPlaylistName}
             onChange={(e) => setEditPlaylistName(e.target.value)}
             placeholder="플레이리스트 이름"
-            sx={{
-              mb: "24px",
-            }}
+            sx={{ mb: "24px" }}
           />
 
           <Box

@@ -108,7 +108,9 @@ const SortablePlaylistList = ({
 
   if (playlists.length === 0) {
     return (
-      <p className="text-sm text-gray-500">아직 만든 재생리스트가 없습니다.</p>
+      <p className="text-sm text-gray-500">
+        아직 만든 플레이리스트가 없습니다.
+      </p>
     );
   }
 

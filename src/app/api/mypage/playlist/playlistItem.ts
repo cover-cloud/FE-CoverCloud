@@ -1,5 +1,7 @@
 import { api } from "@/app/lib/api";
+import { useSnackbarStore } from "@/app/store/useSnackbar";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 
 export const createPlaylistItem = async ({
   playlistId,
@@ -8,18 +10,11 @@ export const createPlaylistItem = async ({
   playlistId: number;
   coverId: number;
 }) => {
-  try {
-    const res = await api.post(`/api/playlist/${playlistId}/items`, {
-      coverId,
-    });
+  const res = await api.post(`/api/playlist/${playlistId}/items`, {
+    coverId,
+  });
 
-    return res.data;
-  } catch (error) {
-    return {
-      success: false,
-      message: "플레이리스트에 곡을 추가하지 못했습니다.",
-    };
-  }
+  return res.data;
 };
 
 export const deletePlaylistItem = async ({
@@ -69,6 +64,7 @@ export const useCreatePlaylistItemMutation = () => {
 
   return useMutation({
     mutationFn: createPlaylistItem,
+
     onSuccess: (res, variables) => {
       if (!res?.success) return;
 
@@ -79,6 +75,28 @@ export const useCreatePlaylistItemMutation = () => {
       queryClient.invalidateQueries({
         queryKey: ["playlistItems", variables.playlistId],
       });
+
+      useSnackbarStore
+        .getState()
+        .show("플레이리스트에 곡을 추가했습니다.", "success");
+    },
+
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        const message = error.response?.data?.message;
+
+        if (message === "Cover already in playlist") {
+          useSnackbarStore
+            .getState()
+            .show("이미 이 플레이리스트에 추가된 곡입니다.", "warning");
+
+          return;
+        }
+      }
+
+      useSnackbarStore
+        .getState()
+        .show("플레이리스트에 곡을 추가하지 못했습니다.", "error");
     },
   });
 };

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { Box } from "@mui/material";
 import { HiDotsHorizontal, HiDotsVertical } from "react-icons/hi";
+import { FiEdit3, FiTrash2 } from "react-icons/fi";
 
 interface PlaylistOptionButtonProps {
   isLogin: boolean;
@@ -23,7 +24,6 @@ const PlaylistOptionButton = ({
 
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  // 🔹 밖 클릭 감지
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -46,40 +46,126 @@ const PlaylistOptionButton = ({
   return (
     <Box
       ref={wrapperRef}
-      className={`flex ${isCenter ? "items-center" : "items-start"} justify-center relative`}
+      sx={{
+        position: "relative",
+        display: "flex",
+        alignItems: isCenter ? "center" : "flex-start",
+        justifyContent: "center",
+        flexShrink: 0,
+      }}
     >
-      {/* 버튼 클릭 */}
+      {/* ... 버튼 */}
       <Box
         onClick={(e) => {
+          e.preventDefault();
           e.stopPropagation();
+
           onClick();
           setIsOptionOpen((prev) => !prev);
         }}
+        sx={{
+          width: "34px",
+          height: "34px",
+          borderRadius: "50%",
+
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+
+          cursor: "pointer",
+
+          backgroundColor: "transparent",
+
+          transition: "background-color 0.15s ease",
+
+          "&:hover": {
+            backgroundColor: "#E5E5E5",
+          },
+        }}
       >
-        {colIcon ? <HiDotsVertical /> : <HiDotsHorizontal size={24} />}
+        {colIcon ? (
+          <HiDotsVertical size={21} />
+        ) : (
+          <HiDotsHorizontal size={21} />
+        )}
       </Box>
 
+      {/* 옵션 메뉴 */}
       {isOptionOpen && isLogin && (
-        <Box className="absolute top-7 right-0 bg-white w-[180px] border-2 border-gray-200 z-50">
+        <Box
+          sx={{
+            position: "absolute",
+            top: "40px",
+            right: 0,
+
+            width: "94px",
+            backgroundColor: "#fff",
+
+            borderRadius: "12px",
+            overflow: "hidden",
+
+            boxShadow: "0px 6px 20px rgba(0, 0, 0, 0.15)",
+
+            zIndex: 100,
+            py: "4px",
+          }}
+        >
           <Box
-            className="hover:bg-gray-100 p-2"
             onClick={(e) => {
+              e.preventDefault();
               e.stopPropagation();
+
               navigateToEdit();
               setIsOptionOpen(false);
             }}
+            sx={{
+              height: "44px",
+
+              display: "flex",
+              alignItems: "center",
+
+              gap: "14px",
+              px: "16px",
+
+              fontSize: "13px",
+              cursor: "pointer",
+
+              "&:hover": {
+                backgroundColor: "#F5F5F5",
+              },
+            }}
           >
-            이름 변경
+            <FiEdit3 size={18} />
+            수정
           </Box>
+
           <Box
-            className="hover:bg-gray-100 p-2"
             onClick={(e) => {
+              e.preventDefault();
               e.stopPropagation();
+
               openDeleteModal();
               setIsOptionOpen(false);
             }}
+            sx={{
+              height: "44px",
+
+              display: "flex",
+              alignItems: "center",
+
+              gap: "14px",
+              px: "16px",
+
+              fontSize: "13px",
+              cursor: "pointer",
+
+              "&:hover": {
+                backgroundColor: "#F5F5F5",
+              },
+            }}
           >
-            플레이리스트 삭제
+            <FiTrash2 size={18} />
+            삭제
           </Box>
         </Box>
       )}
